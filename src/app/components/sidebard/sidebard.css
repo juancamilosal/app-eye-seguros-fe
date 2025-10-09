@@ -1,0 +1,12 @@
+/* Fondo animado igual que el login */
+.brand-animated-bg {
+  background: linear-gradient(120deg, #243B88, #3E1F78, #7EA6F4);
+  background-size: 200% 200%;
+  animation: brandGradientShift 8s ease-in-out infinite;
+}
+
+@keyframes brandGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
