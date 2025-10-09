@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 
@@ -10,9 +10,13 @@ import { RouterLink, RouterLinkActive, Router } from '@angular/router';
   styleUrls: ['./sidebard.css']
 })
 export class Sidebard {
+  @Output() select = new EventEmitter<void>();
   constructor(private router: Router) {}
 
   logout() {
     this.router.navigateByUrl('/login');
+  }
+  onSelect() {
+    this.select.emit();
   }
 }

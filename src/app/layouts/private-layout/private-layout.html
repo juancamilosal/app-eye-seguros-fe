@@ -1,6 +1,30 @@
 <div class="min-h-screen bg-gray-50">
-  <app-sidebard/>
-  <main class="ml-64">
+  <!-- Barra superior móvil -->
+  <header class="md:hidden sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-gray-200">
+    <div class="flex items-center justify-between px-4 py-3">
+      <button type="button" aria-label="Abrir menú" (click)="toggleSidebar()" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-[#243B88] hover:text-[#3E1F78] hover:bg-[#E8EAF0]">
+        <svg viewBox="0 0 24 24" fill="none" class="w-6 h-6" stroke="currentColor">
+          <path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <span class="text-sm font-medium">Menú</span>
+      </button>
+      <div class="text-[#243B88] font-semibold">Eye Seguros</div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <app-sidebard
+    (select)="closeSidebar()"
+    [ngClass]="{ 'block': isSidebarOpen, 'hidden': !isSidebarOpen }"
+    class="hidden md:block z-50">
+  </app-sidebard>
+
+  <!-- Overlay móvil cuando el sidebar está abierto -->
+  @if (isSidebarOpen) {
+    <div class="fixed inset-0 bg-black/40 z-40 md:hidden" (click)="closeSidebar()"></div>
+  }
+
+  <main class="md:ml-64">
     <router-outlet />
   </main>
 </div>

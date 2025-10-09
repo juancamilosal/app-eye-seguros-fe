@@ -1,4 +1,4 @@
-<aside class="fixed inset-y-0 left-0 w-64 brand-animated-bg text-white shadow-lg flex flex-col sidebar">
+<aside class="fixed inset-y-0 left-0 w-64 brand-animated-bg text-white shadow-lg flex flex-col sidebar z-50">
   <div class="h-24 flex items-center justify-center px-4 border-b border-white/10">
     <div class="h-20 w-20 rounded-full overflow-hidden ring-2 ring-white/30 my-4">
       <img src="/assets/imagenes/logo-eye.png" alt="Logo" class="h-full w-full object-cover" />
@@ -8,7 +8,7 @@
     <nav class="mt-4 px-2">
       <ul class="rounded-md overflow-hidden divide-y divide-white/20">
         <li>
-          <a #rlaDashboard="routerLinkActive" routerLink="/dashboard" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
+          <a (click)="onSelect()" #rlaDashboard="routerLinkActive" routerLink="/dashboard" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
              [routerLinkActiveOptions]="{ exact: true }"
              class="block px-3 py-4 text-2xl font-light"
              [ngClass]="{ 'hover:bg-[#3E1F78]': !rlaDashboard.isActive }">
@@ -16,7 +16,7 @@
           </a>
         </li>
         <li>
-          <a #rlaClients="routerLinkActive" routerLink="/clients" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
+          <a (click)="onSelect()" #rlaClients="routerLinkActive" routerLink="/clients" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
              [routerLinkActiveOptions]="{ exact: true }"
              class="block px-3 py-4 text-2xl font-light"
              [ngClass]="{ 'hover:bg-[#3E1F78]': !rlaClients.isActive }">
@@ -24,7 +24,7 @@
           </a>
         </li>
         <li>
-          <a #rlaGestion="routerLinkActive" routerLink="/gestion" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
+          <a (click)="onSelect()" #rlaGestion="routerLinkActive" routerLink="/gestion" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
              [routerLinkActiveOptions]="{ exact: true }"
              class="block px-3 py-4 text-2xl font-light"
              [ngClass]="{ 'hover:bg-[#3E1F78]': !rlaGestion.isActive }">
