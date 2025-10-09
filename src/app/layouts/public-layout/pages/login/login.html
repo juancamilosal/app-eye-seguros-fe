@@ -81,3 +81,10 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de notificación -->
+<app-notification-modal
+  [isVisible]="isModalVisible"
+  [notification]="notification"
+  (close)="onModalClosed()"
+></app-notification-modal>
