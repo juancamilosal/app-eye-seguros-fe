@@ -20,9 +20,9 @@ export const routes: Routes = [
         loadComponent: () => import('./layouts/private-layout/pages/dashboard/dashboard').then(m => m.Dashboard)
       },
       {
-        path: 'clients',
+        path: 'clientes',
         title: 'Euyenid & Edder | Clientes',
-        loadComponent: () => import('./layouts/private-layout/pages/clients/clients').then(m => m.Clients)
+        loadComponent: () => import('./layouts/private-layout/pages/clientes/clientes').then(m => m.Clientes)
       },
       {
         path: 'gestion',
