@@ -1,32 +1,28 @@
 # Etapa 1: Build de Angular
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 # Copiar archivos necesarios para instalar dependencias
 COPY package.json package-lock.json ./
 
-# Instalar dependencias incluyendo dev (necesario para Angular CLI)
+# Instalar dependencias (con devDependencies)
 RUN npm ci
 
 # Copiar el resto del código fuente
 COPY . .
 
-# Compilar la aplicación Angular usando npx para evitar problemas con ng global
-RUN npx ng build
+# Compilar la aplicación Angular (modo producción recomendado)
+RUN npx ng build --configuration=production
 
 # Etapa 2: Servir con NGINX
 FROM nginx:alpine
 
-# Eliminar la configuración por defecto de NGINX si es necesario
+# Limpiar html por defecto
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copiar los archivos compilados desde el builder
+# ⚠️ Ajustar esta ruta según tu build real
 COPY --from=builder /app/dist/app-eye-seguros-fe/browser /usr/share/nginx/html
 
-# Copiar configuración personalizada de NGINX si la tienes
-# COPY nginx.conf /etc/nginx/nginx.conf
-
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]
