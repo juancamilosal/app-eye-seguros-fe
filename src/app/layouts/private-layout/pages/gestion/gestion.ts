@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Management } from '../../../../core/models/Management';
-import { VencimientoForm } from './vencimiento-form/vencimiento-form';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-gestion',
   standalone: true,
-  imports: [CommonModule, VencimientoForm],
+  imports: [CommonModule],
   templateUrl: './gestion.html'
 })
 export class Gestion {
-  isFormOpen = false;
+  constructor(private router: Router) {}
   vencimientos: Management[] = [
     {
       titular: 'Carlos Pérez',
@@ -58,15 +58,6 @@ export class Gestion {
   }
 
   openForm() {
-    this.isFormOpen = true;
-  }
-
-  closeForm() {
-    this.isFormOpen = false;
-  }
-
-  addVencimiento(item: Management) {
-    this.vencimientos = [item, ...this.vencimientos];
-    this.isFormOpen = false;
+    this.router.navigateByUrl('/gestion/nuevo');
   }
 }

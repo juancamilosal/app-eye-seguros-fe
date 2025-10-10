@@ -1,8 +1,8 @@
 <div class="min-h-screen bg-white">
   <div class="w-full mx-auto px-6 py-10">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h1 class="text-3xl font-bold text-[#243B88]">Gestión</h1>
-      <button (click)="openForm()" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">
+      <button (click)="openForm()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">
         Crear Vencimiento
       </button>
     </div>
@@ -38,11 +38,4 @@
       </table>
     </div>
   </div>
-  @if (isFormOpen) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(0, 0, 0, 0.5);" (click)="closeForm()">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6" (click)="$event.stopPropagation()">
-        <app-vencimiento-form (cancel)="closeForm()" (save)="addVencimiento($event)"></app-vencimiento-form>
-      </div>
-    </div>
-  }
 </div>

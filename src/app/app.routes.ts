@@ -29,6 +29,12 @@ export const routes: Routes = [
         title: 'Euyenid & Edder | Gestión',
         loadComponent: () => import('./layouts/private-layout/pages/gestion/gestion').then(m => m.Gestion)
       }
+      ,
+      {
+        path: 'gestion/nuevo',
+        title: 'Euyenid & Edder | Nuevo Vencimiento',
+        loadComponent: () => import('./layouts/private-layout/pages/gestion/vencimiento-create/vencimiento-create').then(m => m.VencimientoCreate)
+      }
     ]
   },
   { path: '**', redirectTo: 'login' }
