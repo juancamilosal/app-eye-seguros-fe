@@ -1,0 +1,43 @@
+<aside class="fixed inset-y-0 left-0 w-64 brand-animated-bg text-white shadow-lg flex flex-col sidebar z-50">
+  <div class="h-34 flex items-center justify-center border-b border-white/10">
+    <div class="h-20 w-20 rounded-full overflow-hidden ring-2 ring-white/30 ">
+      <img src="/assets/imagenes/logo-eye.png" alt="Logo" class="h-full w-full object-cover" />
+    </div>
+  </div>
+  <div class="flex-1 overflow-y-auto">
+    <nav class="mt-4 px-2">
+      <ul class="rounded-md overflow-hidden divide-y divide-white/20">
+        <li>
+          <a (click)="onSelect()" #rlaDashboard="routerLinkActive" routerLink="/dashboard" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
+             [routerLinkActiveOptions]="{ exact: true }"
+             class="block px-3 py-4 text-2xl font-light"
+             [ngClass]="{ 'hover:bg-[#3E1F78]': !rlaDashboard.isActive }">
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a (click)="onSelect()" #rlaClients="routerLinkActive" routerLink="/clientes" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
+             [routerLinkActiveOptions]="{ exact: true }"
+             class="block px-3 py-4 text-2xl font-light"
+             [ngClass]="{ 'hover:bg-[#3E1F78]': !rlaClients.isActive }">
+            Clientes
+          </a>
+        </li>
+        <li>
+          <a (click)="onSelect()" #rlaGestion="routerLinkActive" routerLink="/gestion" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
+             [routerLinkActiveOptions]="{ exact: true }"
+             class="block px-3 py-4 text-2xl font-light"
+             [ngClass]="{ 'hover:bg-[#3E1F78]': !rlaGestion.isActive }">
+            Gestión
+          </a>
+        </li>
+        <!-- Agrega más enlaces aquí -->
+      </ul>
+    </nav>
+  </div>
+  <div class="mt-auto border-t border-white/10 p-3">
+    <button (click)="logout()" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-white/10 hover:bg-white/20 text-white">
+      Cerrar sesión
+    </button>
+  </div>
+</aside>

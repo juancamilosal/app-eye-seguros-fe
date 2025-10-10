@@ -3,13 +3,16 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "./out-tsc/app",
-    "types": []
+    "composite": true,
+    "outDir": "./out-tsc/app"
   },
   "include": [
     "src/**/*.ts"
   ],
   "exclude": [
-    "src/**/*.spec.ts"
+    "src/**/*.spec.ts",
+    "out-tsc",
+    "dist",
+    ".angular"
   ]
 }
