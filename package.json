@@ -6,7 +6,8 @@
     "start": "ng serve -o",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "serve:ssr:n": "node dist/app-eye-seguros-fe/server/server.mjs"
   },
   "prettier": {
     "overrides": [
