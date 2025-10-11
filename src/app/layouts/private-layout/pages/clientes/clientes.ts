@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ClienteService } from '../../../../core/services/cliente.service';
+import { Client } from '../../../../core/models/Client';
 
 @Component({
   selector: 'app-clientes',
@@ -8,25 +10,21 @@ import { Router } from '@angular/router';
   imports: [CommonModule],
   templateUrl: './clientes.html'
 })
-export class Clientes {
-  constructor(private router: Router) {}
+export class Clientes implements OnInit {
+  clientes: Client[] = [];
 
-  clientes = [
-    {
-      nombre: 'María',
-      apellido: 'González',
-      fecha_nacimiento: new Date(1990, 4, 12),
-      direccion: 'Av. Principal 123, Caracas',
-      email: 'maria.gonzalez@example.com'
-    },
-    {
-      nombre: 'Juan',
-      apellido: 'Pérez',
-      fecha_nacimiento: new Date(1985, 10, 3),
-      direccion: 'Calle 45 #67-89, Bogotá',
-      email: 'juan.perez@example.com'
-    }
-  ];
+  constructor(private router: Router, private clienteService: ClienteService) {}
+
+  ngOnInit(): void {
+    this.clienteService.obtenerClientes().subscribe({
+      next: (resp) => {
+        this.clientes = resp.data ?? [];
+      },
+      error: () => {
+        this.clientes = [];
+      }
+    });
+  }
 
   goToCreate() {
     this.router.navigateByUrl('/clientes/nuevo');
