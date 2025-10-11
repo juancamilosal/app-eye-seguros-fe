@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-clientes',
@@ -8,6 +9,8 @@ import { CommonModule } from '@angular/common';
   templateUrl: './clientes.html'
 })
 export class Clientes {
+  constructor(private router: Router) {}
+
   clientes = [
     {
       nombre: 'María',
@@ -24,4 +27,8 @@ export class Clientes {
       email: 'juan.perez@example.com'
     }
   ];
+
+  goToCreate() {
+    this.router.navigateByUrl('/clientes/nuevo');
+  }
 }
