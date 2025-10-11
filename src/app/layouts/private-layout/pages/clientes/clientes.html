@@ -1,6 +1,37 @@
 <div class="min-h-screen bg-white">
-  <div class="max-w-6xl mx-auto px-6 py-10">
-    <h1 class="text-3xl font-bold text-[#243B88]">Clientes</h1>
-    <p class="mt-4 text-gray-700">Gestión de clientes.</p>
+  <div class="w-full mx-auto px-6 py-10">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <h1 class="text-3xl font-bold text-[#243B88]">Clientes</h1>
+      <button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">
+        Nuevo Cliente
+      </button>
+    </div>
+
+    <div class="mt-6 w-full overflow-x-auto rounded-xl shadow-sm ring-1 ring-black/5 bg-white">
+      <table class="w-full table-auto divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Nombre</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Apellido</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Fecha de Nacimiento</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Dirección</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (cliente of clientes; track cliente.email) {
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 text-sm text-gray-900">{{ cliente.nombre }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">{{ cliente.apellido }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">{{ cliente.fecha_nacimiento | date: 'dd/MM/yyyy' }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">{{ cliente.direccion }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">
+                <a class="text-[#243B88] hover:underline" href="mailto:{{ cliente.email }}">{{ cliente.email }}</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
