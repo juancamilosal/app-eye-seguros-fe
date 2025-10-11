@@ -27,7 +27,7 @@ FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copiar los archivos compilados desde la etapa de build
-COPY --from=builder /app/dist/app-eye-seguros-fe /usr/share/nginx/html
+COPY --from=builder /app/dist/app-eye-seguros-fe/browser /usr/share/nginx/html
 
 # (Opcional) Copiar configuración personalizada de NGINX para SPA (Angular routing)
 # COPY nginx.conf /etc/nginx/conf.d/default.conf
