@@ -17,35 +17,88 @@
         Lleva un seguimiento de los portafolios de tus clientes.
       </p>
     </div>
-    <div class="mt-6 w-full overflow-x-auto rounded-xl shadow-sm ring-1 ring-black/5 bg-white">
+    <!-- Buscador debajo del título -->
+    <div class="mt-4 w-full sm:w-96 relative">
+      <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-500">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+          <path fill-rule="evenodd" d="M10.5 3a7.5 7.5 0 105.22 12.96l3.16 3.16a.75.75 0 101.06-1.06l-3.16-3.16A7.5 7.5 0 0010.5 3zm0 1.5a6 6 0 100 12 6 6 0 000-12z" clip-rule="evenodd" />
+        </svg>
+      </span>
+      <input type="text" (input)="onSearchChange($event.target.value)" placeholder="Buscar por póliza, tipo, aseguradora o titular" class="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+    </div>
+
+    <!-- Controles de paginación (arriba) -->
+    <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-2 text-sm text-gray-700">
+        <span class="text-gray-600">Mostrar</span>
+        <select (change)="onLimitChange($any($event.target).value)" [value]="limit" class="border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#243B88]">
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <span class="text-gray-600">por página</span>
+      </div>
+      <div class="text-sm text-gray-700">
+        <span class="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+          <img src="/assets/icons/gestion.png" alt="Total vencimientos" class="w-5 h-5 object-contain" />
+          Total: {{ total }}
+        </span>
+      </div>
+    </div>
+
+    <div class="mt-3 w-full overflow-x-auto rounded-xl shadow-sm ring-1 ring-black/5 bg-white">
       <table class="w-full table-auto divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-        <tr>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Titular</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Número Póliza</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tipo de Póliza</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Forma de Pago</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Valor Póliza (Año Anterior)</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Valor Póliza (Año Actual)</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Fecha de Vencimiento</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Aseguradora</th>
-        </tr>
+        <thead class="bg-[#38338a]">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Titular</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Número Póliza</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Tipo de Póliza</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Forma de Pago</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Valor Póliza (Año Anterior)</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Valor Póliza (Año Actual)</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Fecha de Vencimiento</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Aseguradora</th>
+          </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          @for (vencimiento of vencimientos; track vencimiento.numeroPoliza) {
-            <tr class="hover:bg-gray-50">
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.titular }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.numeroPoliza }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.tipoPoliza }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.formaPagoRenovacion }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.valorAnterior | currency:'$':'symbol':'1.0-0' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.valorActual | currency:'$':'symbol':'1.0-0' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">—</td>
-              <td class="px-4 py-3 text-sm text-gray-900">—</td>
+          @if (loading) {
+            <tr>
+              <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-600">Cargando...</td>
             </tr>
+          } @else if (!loading && vencimientos.length === 0) {
+            <!-- Empty state -->
+            <tr>
+              <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-600">
+                No hay datos para mostrar.
+              </td>
+            </tr>
+          } @else {
+            @for (vencimiento of vencimientos; track vencimiento.numeroPoliza) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.titular }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.numeroPoliza }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.tipoPoliza }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.formaPagoRenovacion }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.valorAnterior | currency:'$':'symbol':'1.0-0' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.valorActual | currency:'$':'symbol':'1.0-0' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date: 'dd/MM/yyyy') : '—' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.aseguradora || '—' }}</td>
+              </tr>
+            }
           }
         </tbody>
       </table>
+    </div>
+
+    <!-- Paginador (abajo) -->
+    <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div class="text-sm text-gray-700">Mostrando {{ startIndex }} - {{ endIndex }} de {{ total }}</div>
+      <div class="inline-flex items-center gap-2">
+        <button (click)="prevPage()" class="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50" [disabled]="page <= 1">Anterior</button>
+        <span class="text-sm text-gray-700">Página {{ page }} de {{ totalPages }}</span>
+        <button (click)="nextPage()" class="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50" [disabled]="page >= totalPages">Siguiente</button>
+      </div>
     </div>
   </div>
 </div>

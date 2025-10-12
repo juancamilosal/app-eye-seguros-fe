@@ -24,4 +24,8 @@ export class VencimientoService {
   crearVencimiento(payload: VencimientoPayload): Observable<ResponseAPI<any>> {
     return this.http.post<ResponseAPI<any>>(this.url, payload);
   }
+
+  obtenerVencimientos(params?: Record<string, string>): Observable<ResponseAPI<any[]>> {
+    return this.http.get<ResponseAPI<any[]>>(this.url, { params });
+  }
 }
