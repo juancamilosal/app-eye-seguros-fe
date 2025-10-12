@@ -5,6 +5,8 @@ import { ClienteService } from '../../../../core/services/cliente.service';
 import { Client } from '../../../../core/models/Client';
 import { NotificationModalComponent } from '../../../../components/notification-modal/notification-modal';
 import { NotificationData } from '../../../../core/models/NotificationData';
+import { Subject, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-clientes',
@@ -18,20 +20,47 @@ export class Clientes implements OnInit {
   isModalVisible = false;
   notification: NotificationData | null = null;
   clienteToDelete: Client | null = null;
+  private search$ = new Subject<string>();
 
   constructor(private router: Router, private clienteService: ClienteService) {}
 
   ngOnInit(): void {
-    this.clienteService.obtenerClientes().subscribe({
-      next: (resp) => {
-        this.clientes = resp.data ?? [];
+    this.search$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((term) => {
+          this.loading = true;
+          const params = this.buildFilterParams(term);
+          return this.clienteService.obtenerClientes(params).pipe(
+            catchError(() => of({ data: [] }))
+          );
+        })
+      )
+      .subscribe((resp: any) => {
+        this.clientes = resp?.data ?? [];
         this.loading = false;
-      },
-      error: () => {
-        this.clientes = [];
-        this.loading = false;
-      }
-    });
+      });
+
+    // Carga inicial sin filtros
+    this.search$.next('');
+  }
+
+  onSearchChange(value: string) {
+    this.search$.next(value?.trim() ?? '');
+  }
+
+  private buildFilterParams(term: string | undefined): Record<string, string> | undefined {
+    const q = (term ?? '').trim();
+    if (!q) return undefined;
+    // Directus filter with OR on nombre, apellido, numero_documento (case-insensitive contains)
+    return {
+      'filter[_or][0][nombre][_icontains]': q,
+      'filter[_or][1][apellido][_icontains]': q,
+      'filter[_or][2][numero_documento][_icontains]': q,
+      // Opcional: ordenar por nombre
+      'sort': 'nombre'
+    };
   }
 
   goToCreate() {

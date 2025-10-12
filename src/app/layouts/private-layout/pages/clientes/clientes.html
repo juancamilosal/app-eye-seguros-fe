@@ -7,6 +7,23 @@
       </button>
     </div>
 
+    <!-- Descripción de la pantalla -->
+    <div class="mt-2 text-base text-gray-700">
+      <p class="text-lg">
+        Administra tus clientes en esta sección.
+      </p>
+    </div>
+
+    <!-- Buscador debajo del título -->
+    <div class="mt-4 w-full sm:w-96 relative">
+      <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-500">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+          <path fill-rule="evenodd" d="M10.5 3a7.5 7.5 0 105.22 12.96l3.16 3.16a.75.75 0 101.06-1.06l-3.16-3.16A7.5 7.5 0 0010.5 3zm0 1.5a6 6 0 100 12 6 6 0 000-12z" clip-rule="evenodd" />
+        </svg>
+      </span>
+      <input type="text" (input)="onSearchChange($event.target.value)" placeholder="Buscar por nombre, apellido o documento" class="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+    </div>
+
     <div class="mt-6 w-full overflow-x-auto rounded-xl shadow-sm ring-1 ring-black/5 bg-white">
       <table class="w-full table-auto divide-y divide-gray-200">
         <thead class="bg-[#38338a]">
