@@ -19,6 +19,7 @@ export class Login {
   currentYear = new Date().getFullYear();
   isModalVisible = false;
   notification: NotificationData | null = null;
+  showPassword = false;
   form!: FormGroup;
 
   constructor(private fb: FormBuilder, private router: Router, private auth: AuthService) {
@@ -26,6 +27,10 @@ export class Login {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
   }
 
   submit() {

@@ -1,12 +1,22 @@
 <div class="min-h-screen">
   <div class="w-full mx-auto px-6 py-10">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h1 class="text-3xl font-bold text-[#243B88]">Gestión</h1>
+      <div class="flex items-center gap-8 sm:gap-6">
+        <span class="inline-flex items-center justify-center w-12 h-12" aria-hidden="true">
+              <img src="/assets/icons/personas.png" alt="Clientes" class="w-full h-full object-contain" />
+            </span>
+        <h1 class="text-3xl font-bold text-[#38338a]">Gestión</h1>
+      </div>
       <button (click)="openForm()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">
-        Crear Vencimiento
+        + Crear Registro
       </button>
     </div>
-
+    <!-- Descripción de la pantalla -->
+    <div class="mt-2 text-base text-gray-700 mb-16 sm:mb-10">
+      <p class="text-lg">
+        Lleva un seguimiento de los portafolios de tus clientes.
+      </p>
+    </div>
     <div class="mt-6 w-full overflow-x-auto rounded-xl shadow-sm ring-1 ring-black/5 bg-white">
       <table class="w-full table-auto divide-y divide-gray-200">
         <thead class="bg-gray-50">
