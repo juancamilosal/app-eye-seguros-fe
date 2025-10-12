@@ -4,4 +4,8 @@ export const environment = {
   production: false,
 
   clientes: apiUrl + 'items/clientes',
+  crearCliente: apiUrl + 'items/clientes',
+  listarClientes: apiUrl + 'items/clientes',
+  authLogin: apiUrl + 'auth/login',
+  authMe: apiUrl + 'users/me',
 };
