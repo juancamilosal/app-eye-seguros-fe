@@ -1,5 +1,7 @@
 export interface Management {
   titular: string;
+  tipoDocumento?: string;
+  numeroDocumento?: string;
   numeroPoliza: string;
   tipoPoliza: string;
   formaPagoRenovacion: string;

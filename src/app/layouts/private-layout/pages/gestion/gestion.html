@@ -76,7 +76,12 @@
           } @else {
             @for (vencimiento of vencimientos; track vencimiento.numeroPoliza) {
               <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.titular }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  <div class="font-medium">{{ vencimiento.titular }}</div>
+                  <div class="text-xs text-gray-600 mt-1" *ngIf="vencimiento.tipoDocumento || vencimiento.numeroDocumento">
+                    {{ vencimiento.tipoDocumento }} : {{ vencimiento.numeroDocumento }}
+                  </div>
+                </td>
                 <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.numeroPoliza }}</td>
                 <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.tipoPoliza }}</td>
                 <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.formaPagoRenovacion }}</td>
@@ -92,12 +97,24 @@
     </div>
 
     <!-- Paginador (abajo) -->
-    <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-      <div class="text-sm text-gray-700">Mostrando {{ startIndex }} - {{ endIndex }} de {{ total }}</div>
-      <div class="inline-flex items-center gap-2">
-        <button (click)="prevPage()" class="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50" [disabled]="page <= 1">Anterior</button>
-        <span class="text-sm text-gray-700">Página {{ page }} de {{ totalPages }}</span>
-        <button (click)="nextPage()" class="px-3 py-1 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50" [disabled]="page >= totalPages">Siguiente</button>
+    <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="text-sm text-gray-700">
+        Mostrando <span class="font-medium">{{ startIndex }}</span> - <span class="font-medium">{{ endIndex }}</span> de <span class="font-medium">{{ total }}</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="prevPage()" class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50" [disabled]="page <= 1">
+          <span class="inline-flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Anterior
+          </span>
+        </button>
+        <span class="px-2 py-1 text-sm text-gray-600">Página {{ page }} de {{ totalPages }}</span>
+        <button (click)="nextPage()" class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50" [disabled]="page >= totalPages">
+          <span class="inline-flex items-center gap-1">
+            Siguiente
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M8.25 4.5L15.75 12 8.25 19.5"/></svg>
+          </span>
+        </button>
       </div>
     </div>
   </div>

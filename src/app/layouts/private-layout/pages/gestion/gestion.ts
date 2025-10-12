@@ -46,16 +46,24 @@ export class Gestion implements OnInit {
       .subscribe((resp: any) => {
         const raw = resp?.data ?? [];
         // Mapear a Management
-        this.vencimientos = raw.map((r: any) => ({
-          titular: `${(r?.nombre ?? '').trim()} ${(r?.apellido ?? '').trim()}`.trim() || (r?.titular ?? ''),
-          numeroPoliza: r?.numero_poliza ?? r?.numeroPoliza ?? '',
-          tipoPoliza: r?.tipo_poliza ?? r?.tipoPoliza ?? '',
-          formaPagoRenovacion: r?.forma_pago ?? r?.formaPagoRenovacion ?? '',
-          valorAnterior: Number(r?.valor_poliza_anterior ?? r?.valorAnterior ?? 0),
-          valorActual: Number(r?.valor_poliza_actual ?? r?.valorActual ?? 0),
-          fechaVencimiento: r?.fecha_vencimiento ?? r?.fechaVencimiento ?? undefined,
-          aseguradora: r?.aseguradora ?? undefined,
-        }));
+        this.vencimientos = raw.map((r: any) => {
+          const nombre = (r?.cliente_id?.nombre ?? r?.nombre ?? '').trim();
+          const apellido = (r?.cliente_id?.apellido ?? r?.apellido ?? '').trim();
+          const tipoDocumento = r?.cliente_id?.tipo_documento ?? r?.tipo_documento ?? undefined;
+          const numeroDocumento = r?.cliente_id?.numero_documento ?? r?.numero_documento ?? undefined;
+          return {
+            titular: `${nombre} ${apellido}`.trim() || (r?.titular ?? ''),
+            tipoDocumento,
+            numeroDocumento,
+            numeroPoliza: r?.numero_poliza ?? r?.numeroPoliza ?? '',
+            tipoPoliza: r?.tipo_poliza ?? r?.tipoPoliza ?? '',
+            formaPagoRenovacion: r?.forma_pago ?? r?.formaPagoRenovacion ?? '',
+            valorAnterior: Number(r?.valor_poliza_anterior ?? r?.valorAnterior ?? 0),
+            valorActual: Number(r?.valor_poliza_actual ?? r?.valorActual ?? 0),
+            fechaVencimiento: r?.fecha_vencimiento ?? r?.fechaVencimiento ?? undefined,
+            aseguradora: r?.aseguradora ?? undefined,
+          } as Management;
+        });
 
         const meta = resp?.meta ?? {};
         this.total = (meta?.filter_count ?? meta?.total_count ?? 0) as number;
@@ -78,9 +86,11 @@ export class Gestion implements OnInit {
       params['filter[_or][0][numero_poliza][_icontains]'] = q;
       params['filter[_or][1][tipo_poliza][_icontains]'] = q;
       params['filter[_or][2][aseguradora][_icontains]'] = q;
-      // Si backend expone nombre/apellido directamente en colección vencimientos
-      params['filter[_or][3][nombre][_icontains]'] = q;
-      params['filter[_or][4][apellido][_icontains]'] = q;
+      // Nombre y apellido vía relación cliente_id
+      params['filter[_or][3][cliente_id][nombre][_icontains]'] = q;
+      params['filter[_or][4][cliente_id][apellido][_icontains]'] = q;
+      // Número de documento vía relación cliente_id
+      params['filter[_or][5][cliente_id][numero_documento][_icontains]'] = q;
     }
     return params;
   }

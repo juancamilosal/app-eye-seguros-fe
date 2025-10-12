@@ -26,6 +26,12 @@ export class VencimientoService {
   }
 
   obtenerVencimientos(params?: Record<string, string>): Observable<ResponseAPI<any[]>> {
-    return this.http.get<ResponseAPI<any[]>>(this.url, { params });
+    const query = {
+      ...params,
+      fields: '*,cliente_id.*'
+    };
+
+    return this.http.get<ResponseAPI<any[]>>(this.url, { params: query });
   }
+
 }
