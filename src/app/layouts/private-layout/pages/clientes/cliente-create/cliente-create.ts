@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ClienteForm, Cliente } from '../cliente-form/cliente-form';
 import {ClienteService} from "../../../../../core/services/cliente.service";
+import { Client } from "../../../../../core/models/Client";
 
 @Component({
   selector: 'app-cliente-create',
@@ -25,7 +26,7 @@ export class ClienteCreate {
 
   onSave(item: Cliente) {
     // Mapear a Client (API) con snake_case para fecha_nacimiento
-    const payload = {
+    const payload: Client = {
       tipo_documento: item.tipoDocumento,
       numero_documento: item.numeroDocumento,
       nombre: item.nombre,
@@ -34,7 +35,7 @@ export class ClienteCreate {
       direccion: item.direccion,
       numero_contacto: item.numeroContacto,
       email: item.email,
-    } as any;
+    };
 
     this.isSubmitting = true;
     this.clienteService.crearCliente(payload).subscribe({

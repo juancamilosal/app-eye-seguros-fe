@@ -1,5 +1,5 @@
 export class Client {
-  id: string;
+  id?: string;
   tipo_documento: string;
   numero_documento: string;
   nombre: string;
