@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angula
 import { NotificationModalComponent } from '../../../../components/notification-modal/notification-modal';
 import { NotificationData } from '../../../../core/models/NotificationData';
 import { Router } from '@angular/router';
+import { StorageServices } from '../../../../core/services/storage.services';
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
@@ -44,18 +45,15 @@ export class Login {
     const { email, password } = this.form.value;
     this.auth.login(email, password).subscribe({
       next: () => {
-        // Validar usuario con permisos (opcional: llamar a me() y verificar role)
+        // Validar usuario con permisos y guardar información de usuario en sessionStorage
         this.auth.me().subscribe({
-          next: () => {
+          next: (meResp) => {
+            try {
+              StorageServices.saveObjectInSessionStorage(StorageServices.CURRENT_USER, meResp?.data);
+            } catch {}
             this.isSubmitting = false;
-            this.notification = {
-              type: 'success',
-              title: 'Inicio de sesión exitoso',
-              message: 'Redirigiendo al dashboard... ',
-              duration: 1200
-            };
             this.isModalVisible = true;
-            setTimeout(() => this.router.navigateByUrl('/dashboard'), 1200);
+            this.router.navigateByUrl('/dashboard')
           },
           error: () => {
             this.isSubmitting = false;
