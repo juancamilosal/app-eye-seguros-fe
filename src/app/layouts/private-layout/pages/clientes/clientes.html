@@ -14,6 +14,7 @@
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Cliente</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Fecha de Nacimiento</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Dirección</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Número de Contacto</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
           </tr>
         </thead>
@@ -27,7 +28,10 @@
               <td class="px-4 py-3 text-sm text-gray-900">{{ cliente.fecha_nacimiento | date: 'dd/MM/yyyy' }}</td>
               <td class="px-4 py-3 text-sm text-gray-900">{{ cliente.direccion }}</td>
               <td class="px-4 py-3 text-sm text-gray-900">
-                <a class="text-[#243B88] hover:underline" href="mailto:{{ cliente.email }}">{{ cliente.email }}</a>
+                <a class="text-[#243B88] hover:underline" href="mailto:{{ cliente.numero_contacto }}">{{ cliente.numero_contacto }}</a>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-900">
+               {{cliente.email }}
               </td>
             </tr>
           }

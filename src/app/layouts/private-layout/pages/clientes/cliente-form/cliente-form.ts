@@ -10,6 +10,7 @@ export interface Cliente {
   apellido: string;
   fechaNacimiento: string;
   direccion: string;
+  numeroContacto: string;
   email: string;
 }
 
@@ -36,6 +37,7 @@ export class ClienteForm implements OnInit {
       apellido: [null, [Validators.required, Validators.minLength(2)]],
       fechaNacimiento: [null, [Validators.required]],
       direccion: [null, [Validators.required, Validators.minLength(5)]],
+      numeroContacto: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       email: [null, [Validators.required, Validators.email]]
     });
   }

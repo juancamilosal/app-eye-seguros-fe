@@ -32,6 +32,7 @@ export class ClienteCreate {
       apellido: item.apellido,
       fecha_nacimiento: item.fechaNacimiento,
       direccion: item.direccion,
+      numero_contacto: item.numeroContacto,
       email: item.email,
     } as any;
 
