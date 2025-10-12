@@ -1,39 +1,122 @@
 <div class="w-full">
-  <h2 class="text-2xl font-semibold text-[#243B88] mb-6">Nuevo vencimiento</h2>
+  <form [formGroup]="vencimientoForm" (ngSubmit)="onSubmit()" class="space-y-8">
+    <!-- Sección: Información Titular -->
+    <div>
+      <h3 class="text-xl font-semibold text-[#243B88] mb-6">Información Titular</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700 ">Tipo Documento</label>
+          <select formControlName="tipoDocumento" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]">
+            @for (td of tiposDocumento; track td.id) {
+              <option [value]="td.id">{{ td.name }}</option>
+            }
+          </select>
+          <div class="absolute left-0 top-full h-5 pointer-events-none ">
+            @if (isInvalid('tipoDocumento')) {
+              <span class="text-xs text-red-600">{{ getError('tipoDocumento') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700 ">Número de Documento</label>
+          <input type="text" formControlName="numeroDocumento" maxlength="10" inputmode="numeric" (input)="onNumericInput($event, 'numeroDocumento', 10)" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('numeroDocumento')) {
+              <span class="text-xs text-red-600">{{ getError('numeroDocumento') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700 ">Nombre</label>
+          <input type="text" formControlName="nombre" placeholder="Campo se llena automáticamente" [disabled]="true" class="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500 placeholder:text-gray-400 cursor-not-allowed" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('nombre')) {
+              <span class="text-xs text-red-600">{{ getError('nombre') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700 ">Apellido</label>
+          <input type="text" formControlName="apellido" placeholder="Campo se llena automáticamente" [disabled]="true" class="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500 placeholder:text-gray-400 cursor-not-allowed" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('apellido')) {
+              <span class="text-xs text-red-600">{{ getError('apellido') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <form [formGroup]="vencimientoForm" (ngSubmit)="onSubmit()" class="space-y-5">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Titular</label>
-        <input type="text" formControlName="titular" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Número de Póliza</label>
-        <input type="text" formControlName="numeroPoliza" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Tipo de Póliza</label>
-        <input type="text" formControlName="tipoPoliza" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Forma de Pago Renovación</label>
-        <input type="text" formControlName="formaPagoRenovacion" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Valor Póliza (Año Anterior)</label>
-        <input type="number" formControlName="valorAnterior" min="0" step="1" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Valor Póliza (Año Actual)</label>
-        <input type="number" formControlName="valorActual" min="0" step="1" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha de Vencimiento</label>
-        <input type="date" formControlName="fechaVencimiento" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Aseguradora</label>
-        <input type="text" formControlName="aseguradora" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+    <!-- Separador sutil entre secciones -->
+    <div class="h-px bg-gray-200/60"></div>
+
+    <!-- Sección: Información Póliza -->
+    <div>
+      <h3 class="text-xl font-semibold text-[#243B88] mb-6">Información Póliza</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700 ">Número de Póliza</label>
+          <input type="text" formControlName="numeroPoliza" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('numeroPoliza')) {
+              <span class="text-xs text-red-600">{{ getError('numeroPoliza') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700 ">Tipo de Póliza</label>
+          <input type="text" formControlName="tipoPoliza" (input)="onCapitalizeInput($event, 'tipoPoliza')" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('tipoPoliza')) {
+              <span class="text-xs text-red-600">{{ getError('tipoPoliza') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700 ">Forma de Pago</label>
+          <input type="text" formControlName="formaPagoRenovacion" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('formaPagoRenovacion')) {
+              <span class="text-xs text-red-600">{{ getError('formaPagoRenovacion') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700 ">Valor Póliza Año Anterior</label>
+          <input type="text" formControlName="valorAnterior" inputmode="numeric" (input)="onNumericInput($event, 'valorAnterior')" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('valorAnterior')) {
+              <span class="text-xs text-red-600">{{ getError('valorAnterior') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700">Valor Póliza Año Actual</label>
+          <input type="text" formControlName="valorActual" inputmode="numeric" (input)="onNumericInput($event, 'valorActual')" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('valorActual')) {
+              <span class="text-xs text-red-600">{{ getError('valorActual') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700 ">Fecha de Vencimiento</label>
+          <input type="date" formControlName="fechaVencimiento" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('fechaVencimiento')) {
+              <span class="text-xs text-red-600">{{ getError('fechaVencimiento') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative mb-5">
+          <label class="block text-sm font-medium text-gray-700">Aseguradora</label>
+          <input type="text" formControlName="aseguradora" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('aseguradora')) {
+              <span class="text-xs text-red-600">{{ getError('aseguradora') }}</span>
+            }
+          </div>
+        </div>
       </div>
     </div>
 

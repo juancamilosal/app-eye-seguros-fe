@@ -1,4 +1,4 @@
-export const  TipoDocumentoConst = [
+export const  TIPO_DOCUMENTO_CONST = [
   {id: 'CC', name: 'Cédula de Ciudadanía'},
   {id: 'CE', name: 'Cédula de Extranjería'},
   {id: 'PP', name: 'Pasaporte'},

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TipoDocumentoConst } from '../../../../../core/const/TipoDocumentoConst';
+import { TIPO_DOCUMENTO_CONST } from '../../../../../core/const/TIPO_DOCUMENTO_CONST';
 
 export interface Cliente {
   tipoDocumento: string;
@@ -32,7 +32,7 @@ export class ClienteForm implements OnInit {
   }
 
   clienteForm!: FormGroup;
-  tiposDocumento = TipoDocumentoConst;
+  tiposDocumento = TIPO_DOCUMENTO_CONST;
   submitted = false;
   isNitSelected = false;
 
