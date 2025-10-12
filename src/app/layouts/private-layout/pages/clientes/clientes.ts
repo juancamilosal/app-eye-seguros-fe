@@ -29,4 +29,23 @@ export class Clientes implements OnInit {
   goToCreate() {
     this.router.navigateByUrl('/clientes/nuevo');
   }
+
+  editCliente(cliente: Client) {
+    if (!cliente.id) return;
+    this.router.navigateByUrl(`/clientes/${cliente.id}/editar`);
+  }
+
+  eliminarCliente(cliente: Client) {
+    if (!cliente.id) return;
+    const confirmado = window.confirm(`¿Deseas eliminar al cliente ${cliente.nombre} ${cliente.apellido}?`);
+    if (!confirmado) return;
+    this.clienteService.eliminarCliente(cliente.id).subscribe({
+      next: () => {
+        this.clientes = this.clientes.filter(c => c.id !== cliente.id);
+      },
+      error: () => {
+        // Podrías agregar notificación de error
+      }
+    });
+  }
 }

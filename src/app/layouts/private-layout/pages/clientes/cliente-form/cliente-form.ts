@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TipoDocumentoConst } from '../../../../../core/const/TipoDocumentoConst';
@@ -23,6 +23,13 @@ export interface Cliente {
 export class ClienteForm implements OnInit {
   @Output() cancel = new EventEmitter<void>();
   @Output() save = new EventEmitter<Cliente>();
+  private _initialValue: Cliente | null = null;
+  @Input() set initialValue(value: Cliente | null) {
+    this._initialValue = value;
+    if (value && this.clienteForm) {
+      this.clienteForm.patchValue(value);
+    }
+  }
 
   clienteForm!: FormGroup;
   tiposDocumento = TipoDocumentoConst;
@@ -40,6 +47,10 @@ export class ClienteForm implements OnInit {
       numeroContacto: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       email: [null, [Validators.required, Validators.email]]
     });
+
+    if (this._initialValue) {
+      this.clienteForm.patchValue(this._initialValue);
+    }
   }
 
   onCancel() {

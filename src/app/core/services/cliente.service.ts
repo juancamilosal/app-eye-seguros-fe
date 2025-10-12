@@ -19,4 +19,16 @@ export class ClienteService {
     return this.http.get<ResponseAPI<Client[]>>(this.urlClientes);
   }
 
+  obtenerCliente(id: string): Observable<ResponseAPI<Client>> {
+    return this.http.get<ResponseAPI<Client>>(`${this.urlClientes}/${id}`);
+  }
+
+  actualizarCliente(id: string, cliente: Client): Observable<ResponseAPI<Client>> {
+    return this.http.patch<ResponseAPI<Client>>(`${this.urlClientes}/${id}` , cliente);
+  }
+
+  eliminarCliente(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.urlClientes}/${id}`);
+  }
+
 }
