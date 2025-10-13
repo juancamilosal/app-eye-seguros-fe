@@ -9,4 +9,5 @@ export interface Management {
   valorActual: number;
   fechaVencimiento?: string;
   aseguradora?: string;
+  prenda?: boolean;
 }

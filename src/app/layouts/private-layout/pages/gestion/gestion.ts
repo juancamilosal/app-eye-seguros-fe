@@ -5,18 +5,23 @@ import { Router } from '@angular/router';
 import { VencimientoService } from '../../../../core/services/vencimiento.service';
 import { Subject, BehaviorSubject, of, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith } from 'rxjs/operators';
+import { NotificationModalComponent } from '../../../../components/notification-modal/notification-modal';
+import { NotificationData } from '../../../../core/models/NotificationData';
 
 @Component({
   selector: 'app-gestion',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, NotificationModalComponent],
   templateUrl: './gestion.html'
 })
 export class Gestion implements OnInit {
   constructor(private router: Router, private vencimientoService: VencimientoService) {}
 
-  vencimientos: Management[] = [];
+  vencimientos: Array<Management & { id?: string }> = [];
   loading = true;
+  isModalVisible = false;
+  notification: NotificationData | null = null;
+  vencimientoToDelete: { id: string; numeroPoliza?: string; titular?: string } | null = null;
   // Búsqueda
   private search$ = new Subject<string>();
   // Paginación
@@ -52,6 +57,7 @@ export class Gestion implements OnInit {
           const tipoDocumento = r?.cliente_id?.tipo_documento ?? r?.tipo_documento ?? undefined;
           const numeroDocumento = r?.cliente_id?.numero_documento ?? r?.numero_documento ?? undefined;
           return {
+            id: r?.id,
             titular: `${nombre} ${apellido}`.trim() || (r?.titular ?? ''),
             tipoDocumento,
             numeroDocumento,
@@ -147,5 +153,42 @@ export class Gestion implements OnInit {
 
   openForm() {
     this.router.navigateByUrl('/gestion/nuevo');
+  }
+
+  eliminarVencimientoPrompt(item: { id?: string; numeroPoliza?: string; titular?: string }) {
+    if (!item?.id) return;
+    this.vencimientoToDelete = { id: item.id!, numeroPoliza: item.numeroPoliza, titular: item.titular };
+    this.notification = {
+      type: 'warning',
+      title: 'Confirmar eliminación',
+      message: `¿Desea eliminar el registro de ${item.titular ?? '—'} (Póliza: ${item.numeroPoliza ?? '—'})?`,
+      confirmable: true,
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar'
+    };
+    this.isModalVisible = true;
+  }
+
+  onModalClosed() {
+    this.isModalVisible = false;
+    this.notification = null;
+    this.vencimientoToDelete = null;
+  }
+
+  onModalConfirm() {
+    const v = this.vencimientoToDelete;
+    if (!v?.id) {
+      this.onModalClosed();
+      return;
+    }
+    this.vencimientoService.eliminarVencimiento(v.id).subscribe({
+      next: () => {
+        this.vencimientos = this.vencimientos.filter(item => item.id !== v.id);
+        this.onModalClosed();
+      },
+      error: () => {
+        this.onModalClosed();
+      }
+    });
   }
 }

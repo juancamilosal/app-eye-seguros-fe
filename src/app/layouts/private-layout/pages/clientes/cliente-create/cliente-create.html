@@ -5,7 +5,7 @@
     </div>
 
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 mx-auto">
-    <app-cliente-form (cancel)="onCancel()" (save)="onSave($event)"></app-cliente-form>
+    <app-cliente-form [isSubmitting]="isSubmitting" (cancel)="onCancel()" (save)="onSave($event)"></app-cliente-form>
     @if (isSubmitting) {
       <div class="mt-4 flex items-center justify-end text-sm text-gray-600">
         <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor">

@@ -1,11 +1,12 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, Input} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Management } from '../../../../../core/models/Management';
 import { ClienteService } from '../../../../../core/services/cliente.service';
 import { combineLatest, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith, filter as rxFilter } from 'rxjs/operators';
-import {TIPO_DOCUMENTO_CONST} from '../../../../../core/const/TIPO_DOCUMENTO_CONST';
+import {TIPO_DOCUMENTO} from '../../../../../core/const/TipoDocumentoConst';
+import {FORMA_PAGO} from '../../../../../core/const/FormaPagoConst';
 
 @Component({
   selector: 'app-vencimiento-form',
@@ -16,8 +17,9 @@ import {TIPO_DOCUMENTO_CONST} from '../../../../../core/const/TIPO_DOCUMENTO_CON
 export class VencimientoForm implements OnInit {
   @Output() cancel = new EventEmitter<void>();
   @Output() save = new EventEmitter<Management & { titularId?: string }>();
-  tiposDocumento = TIPO_DOCUMENTO_CONST;
-
+  @Input() isSubmitting = false;
+  tiposDocumento = TIPO_DOCUMENTO;
+  formaPago = FORMA_PAGO;
   vencimientoForm: FormGroup;
   private clienteIdEncontrado: string | null = null;
   submitted = false;
@@ -37,10 +39,16 @@ export class VencimientoForm implements OnInit {
       valorAnterior: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       valorActual: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       fechaVencimiento: [null, Validators.required],
-      aseguradora: [null, Validators.required]
+      aseguradora: [null, Validators.required],
+      prenda: [false]
     });
 
     this.setupAutoFill();
+  }
+
+  get isNitSelected(): boolean {
+    const val = this.vencimientoForm?.get('tipoDocumento')?.value;
+    return String(val || '').toUpperCase() === 'NIT';
   }
 
   private setupAutoFill() {
@@ -97,6 +105,7 @@ export class VencimientoForm implements OnInit {
       valorActual: number | string;
       fechaVencimiento?: string;
       aseguradora?: string;
+      prenda?: boolean;
     };
 
     const data: Management & { titularId?: string } = {
@@ -108,6 +117,7 @@ export class VencimientoForm implements OnInit {
       valorActual: Number(v.valorActual ?? 0),
       fechaVencimiento: v.fechaVencimiento || undefined,
       aseguradora: v.aseguradora || undefined,
+      prenda: !!v.prenda,
       titularId: this.clienteIdEncontrado ?? undefined,
     };
     this.save.emit(data);
@@ -156,7 +166,17 @@ export class VencimientoForm implements OnInit {
       onlyDigits = onlyDigits.slice(0, maxLen);
     }
     const ctrl = this.vencimientoForm.get(controlName as string);
-    ctrl?.setValue(onlyDigits, { emitEvent: false });
+    // Para mostrar puntos de miles en los campos de valor (vista) y guardar solo dígitos (modelo)
+    if (controlName === 'valorAnterior' || controlName === 'valorActual') {
+      const formatted = onlyDigits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+      // Primero actualizamos el control con solo dígitos
+      ctrl?.setValue(onlyDigits, { emitEvent: false });
+      // Luego actualizamos el input visible con el formato con puntos
+      target.value = formatted;
+    } else {
+      ctrl?.setValue(onlyDigits, { emitEvent: false });
+      target.value = onlyDigits;
+    }
   }
 
   private toTitleCaseSpanish(value: string): string {

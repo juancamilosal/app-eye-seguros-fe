@@ -13,6 +13,7 @@ export interface VencimientoPayload {
   valor_poliza_actual?: number;
   fecha_vencimiento?: string;
   aseguradora?: string;
+  prenda?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -32,6 +33,10 @@ export class VencimientoService {
     };
 
     return this.http.get<ResponseAPI<any[]>>(this.url, { params: query });
+  }
+
+  eliminarVencimiento(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
   }
 
 }

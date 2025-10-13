@@ -59,13 +59,41 @@
             <th class="px-4 py-3 text-left text-sm font-semibold text-white">Valor Póliza (Año Actual)</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-white">Fecha de Vencimiento</th>
             <th class="px-4 py-3 text-left text-sm font-semibold text-white">Aseguradora</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Acción</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
           @if (loading) {
-            <tr>
-              <td colspan="8" class="px-4 py-8 text-center text-sm text-gray-600">Cargando...</td>
-            </tr>
+            <!-- Skeleton rows while loading -->
+            @for (i of [1,2,3,4]; track i) {
+              <tr>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-40 bg-gray-200 animate-pulse rounded"></div>
+                  <div class="h-3 w-32 bg-gray-100 animate-pulse rounded mt-2"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-28 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-28 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-40 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+              </tr>
+            }
           } @else if (!loading && vencimientos.length === 0) {
             <!-- Empty state -->
             <tr>
@@ -89,6 +117,16 @@
                 <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.valorActual | currency:'$':'symbol':'1.0-0' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date: 'dd/MM/yyyy') : '—' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.aseguradora || '—' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  <div class="flex items-center gap-2">
+                    <button (click)="eliminarVencimientoPrompt(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                        <path d="M9 3.75A2.25 2.25 0 0111.25 1.5h1.5A2.25 2.25 0 0115 3.75v.75h3.75a.75.75 0 010 1.5H5.25a.75.75 0 010-1.5H9V3.75z" />
+                        <path d="M6.75 7.5h10.5l-.642 10.272a3 3 0 01-2.993 2.728H10.385a3 3 0 01-2.993-2.728L6.75 7.5z" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
               </tr>
             }
           }
@@ -118,4 +156,10 @@
       </div>
     </div>
   </div>
+  <app-notification-modal
+    [isVisible]="isModalVisible"
+    [notification]="notification"
+    (close)="onModalClosed()"
+    (confirm)="onModalConfirm()"
+  ></app-notification-modal>
 </div>

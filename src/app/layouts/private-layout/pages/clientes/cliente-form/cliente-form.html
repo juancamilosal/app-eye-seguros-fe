@@ -100,7 +100,17 @@
 
     <div class="mt-2 flex items-center justify-end gap-3">
       <button type="button" (click)="onCancel()" class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50">Cancelar</button>
-      <button type="submit" class="px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">Guardar</button>
+      <button type="submit" [disabled]="isSubmitting" class="px-4 py-2 rounded-md bg-[#243B88] text-white disabled:opacity-70 disabled:cursor-not-allowed">
+        <span class="inline-flex items-center gap-2">
+          @if (isSubmitting) {
+            <svg xmlns="http://www.w3.org/2000/svg" class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25" />
+              <path d="M4 12a8 8 0 018-8" stroke-width="4" class="opacity-75" />
+            </svg>
+          }
+          <span>{{ isSubmitting ? 'Guardando...' : 'Guardar' }}</span>
+        </span>
+      </button>
     </div>
   </form>
 </div>

@@ -4,7 +4,7 @@
       <h1 class="text-3xl font-bold text-[#243B88]">Nuevo Registro</h1>
     </div>
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 mx-auto">
-      <app-vencimiento-form (cancel)="onCancel()" (save)="onSave($event)"></app-vencimiento-form>
+      <app-vencimiento-form [isSubmitting]="isSubmitting" (cancel)="onCancel()" (save)="onSave($event)"></app-vencimiento-form>
   </div>
   <!-- Modal de notificación -->
   <app-notification-modal

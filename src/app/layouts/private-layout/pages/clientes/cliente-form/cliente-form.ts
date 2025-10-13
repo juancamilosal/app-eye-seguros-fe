@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TIPO_DOCUMENTO_CONST } from '../../../../../core/const/TIPO_DOCUMENTO_CONST';
+import { TIPO_DOCUMENTO } from '../../../../../core/const/TipoDocumentoConst';
 
 export interface Cliente {
   tipoDocumento: string;
@@ -23,6 +23,7 @@ export interface Cliente {
 export class ClienteForm implements OnInit {
   @Output() cancel = new EventEmitter<void>();
   @Output() save = new EventEmitter<Cliente>();
+  @Input() isSubmitting = false;
   private _initialValue: Cliente | null = null;
   @Input() set initialValue(value: Cliente | null) {
     this._initialValue = value;
@@ -32,7 +33,7 @@ export class ClienteForm implements OnInit {
   }
 
   clienteForm!: FormGroup;
-  tiposDocumento = TIPO_DOCUMENTO_CONST;
+  tiposDocumento = TIPO_DOCUMENTO;
   submitted = false;
   isNitSelected = false;
 

@@ -39,6 +39,7 @@ export class VencimientoCreate {
       valor_poliza_actual: item.valorActual,
       fecha_vencimiento: item.fechaVencimiento,
       aseguradora: item.aseguradora,
+      prenda: !!item.prenda,
     };
 
     this.isSubmitting = true;
