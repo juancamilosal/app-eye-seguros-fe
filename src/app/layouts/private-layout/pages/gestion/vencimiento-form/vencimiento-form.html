@@ -154,6 +154,17 @@
             </label>
             <p class="mt-1 text-xs text-gray-500">Si el vehículo tiene prenda, active este campo.</p>
           </div>
+          @if (vencimientoForm.get('prenda')?.value) {
+            <div class="relative mb-5">
+              <label class="block text-sm font-medium text-gray-700">Entidad prendaria</label>
+              <input type="text" formControlName="entidadPrendaria" (input)="onCapitalizeInput($event, 'entidadPrendaria')" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />
+              <div class="absolute left-0 top-full h-5 pointer-events-none">
+                @if (isInvalid('entidadPrendaria')) {
+                  <span class="text-xs text-red-600">La Entidad prendaria es obligatoria</span>
+                }
+              </div>
+            </div>
+          }
         }
       </div>
     </div>

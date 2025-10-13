@@ -12,4 +12,5 @@ export interface Management {
   prenda?: boolean;
   esVehiculo?: boolean;
   placa?: string;
+  entidadPrendaria?: string;
 }

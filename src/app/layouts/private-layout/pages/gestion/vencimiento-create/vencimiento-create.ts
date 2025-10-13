@@ -42,6 +42,7 @@ export class VencimientoCreate {
       prenda: !!item.prenda,
       es_vehiculo: !!item.esVehiculo,
       placa: item.esVehiculo ? (item.placa || '') : undefined,
+      entidad_prendaria: item.prenda ? (item.entidadPrendaria || '') : undefined,
     };
 
     this.isSubmitting = true;

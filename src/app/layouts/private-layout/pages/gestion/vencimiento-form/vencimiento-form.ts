@@ -42,7 +42,8 @@ export class VencimientoForm implements OnInit {
       aseguradora: [null, Validators.required],
       esVehiculo: [false],
       prenda: [{ value: false, disabled: true }],
-      placa: [{ value: null, disabled: true }]
+      placa: [{ value: null, disabled: true }],
+      entidadPrendaria: [{ value: null, disabled: true }]
     });
 
     this.setupAutoFill();
@@ -50,20 +51,43 @@ export class VencimientoForm implements OnInit {
     // Toggle Prenda and Placa based on esVehiculo
     const esVehiculoCtrl = this.vencimientoForm.get('esVehiculo');
     const prendaCtrl = this.vencimientoForm.get('prenda');
+    const entidadCtrl = this.vencimientoForm.get('entidadPrendaria');
     const placaCtrl = this.vencimientoForm.get('placa');
     esVehiculoCtrl?.valueChanges.subscribe((isVehiculo: boolean) => {
       if (isVehiculo) {
         prendaCtrl?.enable({ emitEvent: false });
         placaCtrl?.enable({ emitEvent: false });
         placaCtrl?.addValidators([Validators.required]);
+        // Entidad prendaria depende de prenda
+        if (prendaCtrl?.value) {
+          entidadCtrl?.enable({ emitEvent: false });
+          entidadCtrl?.addValidators([Validators.required]);
+        }
       } else {
         prendaCtrl?.disable({ emitEvent: false });
         prendaCtrl?.setValue(false, { emitEvent: false });
         placaCtrl?.clearValidators();
         placaCtrl?.setValue(null, { emitEvent: false });
         placaCtrl?.disable({ emitEvent: false });
+        entidadCtrl?.clearValidators();
+        entidadCtrl?.setValue(null, { emitEvent: false });
+        entidadCtrl?.disable({ emitEvent: false });
       }
       placaCtrl?.updateValueAndValidity({ emitEvent: false });
+      entidadCtrl?.updateValueAndValidity({ emitEvent: false });
+    });
+
+    // Reaccionar a cambios de prenda para habilitar/validar entidad prendaria
+    prendaCtrl?.valueChanges.subscribe((hasPrenda: boolean) => {
+      if (hasPrenda) {
+        entidadCtrl?.enable({ emitEvent: false });
+        entidadCtrl?.addValidators([Validators.required]);
+      } else {
+        entidadCtrl?.clearValidators();
+        entidadCtrl?.setValue(null, { emitEvent: false });
+        entidadCtrl?.disable({ emitEvent: false });
+      }
+      entidadCtrl?.updateValueAndValidity({ emitEvent: false });
     });
   }
 
@@ -129,6 +153,7 @@ export class VencimientoForm implements OnInit {
       esVehiculo?: boolean;
       prenda?: boolean;
       placa?: string;
+      entidadPrendaria?: string;
     };
 
     const data: Management & { titularId?: string } = {
@@ -144,6 +169,7 @@ export class VencimientoForm implements OnInit {
       // Campos vehículo
       esVehiculo: !!v.esVehiculo,
       placa: v.esVehiculo ? (v.placa || '').trim() : undefined,
+      entidadPrendaria: v.prenda ? this.toTitleCaseSpanish((v.entidadPrendaria || '').trim()) : undefined,
       titularId: this.clienteIdEncontrado ?? undefined,
     };
     this.save.emit(data);
