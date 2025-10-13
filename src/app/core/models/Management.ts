@@ -10,4 +10,6 @@ export interface Management {
   fechaVencimiento?: string;
   aseguradora?: string;
   prenda?: boolean;
+  esVehiculo?: boolean;
+  placa?: string;
 }

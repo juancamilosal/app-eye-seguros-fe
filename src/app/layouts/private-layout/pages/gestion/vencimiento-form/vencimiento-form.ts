@@ -40,10 +40,31 @@ export class VencimientoForm implements OnInit {
       valorActual: [null, [Validators.required, Validators.pattern(/^\d+$/)]],
       fechaVencimiento: [null, Validators.required],
       aseguradora: [null, Validators.required],
-      prenda: [false]
+      esVehiculo: [false],
+      prenda: [{ value: false, disabled: true }],
+      placa: [{ value: null, disabled: true }]
     });
 
     this.setupAutoFill();
+
+    // Toggle Prenda and Placa based on esVehiculo
+    const esVehiculoCtrl = this.vencimientoForm.get('esVehiculo');
+    const prendaCtrl = this.vencimientoForm.get('prenda');
+    const placaCtrl = this.vencimientoForm.get('placa');
+    esVehiculoCtrl?.valueChanges.subscribe((isVehiculo: boolean) => {
+      if (isVehiculo) {
+        prendaCtrl?.enable({ emitEvent: false });
+        placaCtrl?.enable({ emitEvent: false });
+        placaCtrl?.addValidators([Validators.required]);
+      } else {
+        prendaCtrl?.disable({ emitEvent: false });
+        prendaCtrl?.setValue(false, { emitEvent: false });
+        placaCtrl?.clearValidators();
+        placaCtrl?.setValue(null, { emitEvent: false });
+        placaCtrl?.disable({ emitEvent: false });
+      }
+      placaCtrl?.updateValueAndValidity({ emitEvent: false });
+    });
   }
 
   get isNitSelected(): boolean {
@@ -105,7 +126,9 @@ export class VencimientoForm implements OnInit {
       valorActual: number | string;
       fechaVencimiento?: string;
       aseguradora?: string;
+      esVehiculo?: boolean;
       prenda?: boolean;
+      placa?: string;
     };
 
     const data: Management & { titularId?: string } = {
@@ -118,6 +141,9 @@ export class VencimientoForm implements OnInit {
       fechaVencimiento: v.fechaVencimiento || undefined,
       aseguradora: v.aseguradora || undefined,
       prenda: !!v.prenda,
+      // Campos vehículo
+      esVehiculo: !!v.esVehiculo,
+      placa: v.esVehiculo ? (v.placa || '').trim() : undefined,
       titularId: this.clienteIdEncontrado ?? undefined,
     };
     this.save.emit(data);
@@ -199,5 +225,14 @@ export class VencimientoForm implements OnInit {
     const transformed = this.toTitleCaseSpanish(target.value || '');
     const ctrl = this.vencimientoForm.get(controlName as string);
     ctrl?.setValue(transformed, { emitEvent: false });
+  }
+
+  onUppercaseInput(event: Event, controlName: keyof Management | 'placa') {
+    const target = event.target as HTMLInputElement | null;
+    if (!target) return;
+    const upper = (target.value || '').toLocaleUpperCase('es-ES');
+    const ctrl = this.vencimientoForm.get(controlName as string);
+    ctrl?.setValue(upper, { emitEvent: false });
+    target.value = upper;
   }
 }

@@ -120,19 +120,27 @@
                   }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900">
-                  @if (editingRowId === vencimiento.id) {
-                    <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                           [value]="(editBuffer[editingRowId!]?.tipoPoliza ?? vencimiento.tipoPoliza)"
-                           (input)="onInlineFieldChange(editingRowId || '', 'tipoPoliza', $any($event.target).value)" />
-                  } @else {
-                    {{ vencimiento.tipoPoliza }}
-                  }
+                  <div class="flex flex-col">
+                    <span>{{ vencimiento.tipoPoliza }}</span>
+                    @if (vencimiento.esVehiculo) {
+                      <span class="text-xs text-gray-600">
+                        {{ vencimiento.prenda ? 'Con Prenda' : 'Sin Prenda' }}
+                        @if (vencimiento.placa) {
+                          — Placa: {{ vencimiento.placa }}
+                        }
+                      </span>
+                    }
+                  </div>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900">
                   @if (editingRowId === vencimiento.id) {
-                    <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                           [value]="(editBuffer[editingRowId!]?.formaPagoRenovacion ?? vencimiento.formaPagoRenovacion)"
-                           (input)="onInlineFieldChange(editingRowId || '', 'formaPagoRenovacion', $any($event.target).value)" />
+                    <select class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                            [value]="(editBuffer[editingRowId!]?.formaPagoRenovacion ?? vencimiento.formaPagoRenovacion)"
+                            (change)="onInlineFieldChange(editingRowId || '', 'formaPagoRenovacion', $any($event.target).value)">
+                      @for (fp of formaPago; track fp) {
+                        <option [value]="fp">{{ fp }}</option>
+                      }
+                    </select>
                   } @else {
                     {{ vencimiento.formaPagoRenovacion }}
                   }
@@ -177,16 +185,12 @@
                   <div class="flex items-center gap-2">
                     @if (editingRowId === vencimiento.id) {
                       <!-- Actualizar -->
-                      <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md text-green-600 hover:bg-green-50" title="Actualizar">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="w-5 h-5">
-                          <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                        </svg>
+                      <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
+                        <img src="/assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
                       </button>
                       <!-- Volver (cancelar edición) -->
-                      <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:bg-gray-50" title="Volver">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="w-5 h-5">
-                          <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                        </svg>
+                      <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
+                        <img src="/assets/icons/regresar.png" alt="Regresar" class="w-5 h-5" />
                       </button>
                     } @else {
                       <button (click)="startInlineEdit(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">

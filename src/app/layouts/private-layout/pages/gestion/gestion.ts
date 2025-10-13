@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Management } from '../../../../core/models/Management';
 import { Router } from '@angular/router';
 import { VencimientoService, VencimientoPayload } from '../../../../core/services/vencimiento.service';
+import { FORMA_PAGO } from '../../../../core/const/FormaPagoConst';
 import { Subject, BehaviorSubject, of, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith } from 'rxjs/operators';
 import { NotificationModalComponent } from '../../../../components/notification-modal/notification-modal';
@@ -18,6 +19,7 @@ export class Gestion implements OnInit {
   constructor(private router: Router, private vencimientoService: VencimientoService) {}
 
   vencimientos: Array<Management & { id?: string }> = [];
+  formaPago = FORMA_PAGO;
   loading = true;
   isModalVisible = false;
   notification: NotificationData | null = null;
@@ -71,6 +73,10 @@ export class Gestion implements OnInit {
             valorActual: Number(r?.valor_poliza_actual ?? r?.valorActual ?? 0),
             fechaVencimiento: r?.fecha_vencimiento ?? r?.fechaVencimiento ?? undefined,
             aseguradora: r?.aseguradora ?? undefined,
+            // Campos de vehículo
+            prenda: !!(r?.prenda ?? r?.prenda),
+            esVehiculo: !!(r?.es_vehiculo ?? r?.esVehiculo),
+            placa: (r?.es_vehiculo ?? r?.esVehiculo) ? (r?.placa ?? r?.placa ?? '') : undefined,
           } as Management;
         });
 

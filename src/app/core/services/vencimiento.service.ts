@@ -14,6 +14,8 @@ export interface VencimientoPayload {
   fecha_vencimiento?: string;
   aseguradora?: string;
   prenda?: boolean;
+  es_vehiculo?: boolean;
+  placa?: string;
 }
 
 @Injectable({ providedIn: 'root' })
