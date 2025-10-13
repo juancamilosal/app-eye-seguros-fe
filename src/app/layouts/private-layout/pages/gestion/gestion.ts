@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Management } from '../../../../core/models/Management';
 import { Router } from '@angular/router';
-import { VencimientoService } from '../../../../core/services/vencimiento.service';
+import { VencimientoService, VencimientoPayload } from '../../../../core/services/vencimiento.service';
 import { Subject, BehaviorSubject, of, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith } from 'rxjs/operators';
 import { NotificationModalComponent } from '../../../../components/notification-modal/notification-modal';
@@ -22,6 +22,9 @@ export class Gestion implements OnInit {
   isModalVisible = false;
   notification: NotificationData | null = null;
   vencimientoToDelete: { id: string; numeroPoliza?: string; titular?: string } | null = null;
+  editingRowId: string | null = null;
+  // Buffer para edición en línea por fila
+  editBuffer: Record<string, Partial<Management>> = {};
   // Búsqueda
   private search$ = new Subject<string>();
   // Paginación
@@ -153,6 +156,75 @@ export class Gestion implements OnInit {
 
   openForm() {
     this.router.navigateByUrl('/gestion/nuevo');
+  }
+
+  startInlineEdit(item: { id?: string } & Management) {
+    if (!item?.id) return;
+    this.editingRowId = item.id!;
+    this.editBuffer[item.id!] = {
+      numeroPoliza: item.numeroPoliza,
+      tipoPoliza: item.tipoPoliza,
+      formaPagoRenovacion: item.formaPagoRenovacion,
+      valorAnterior: item.valorAnterior,
+      valorActual: item.valorActual,
+      fechaVencimiento: item.fechaVencimiento,
+      aseguradora: item.aseguradora,
+      titular: item.titular,
+      tipoDocumento: item.tipoDocumento,
+      numeroDocumento: item.numeroDocumento,
+      prenda: item.prenda,
+    };
+  }
+
+  onInlineFieldChange(id: string, field: keyof Management, value: any) {
+    if (!this.editBuffer[id]) this.editBuffer[id] = {};
+    // Normalización básica: números para valorAnterior/valorActual
+    if (field === 'valorAnterior' || field === 'valorActual') {
+      const onlyDigits = String(value || '').replace(/\D+/g, '');
+      this.editBuffer[id][field] = Number(onlyDigits || 0);
+    } else {
+      this.editBuffer[id][field] = value;
+    }
+  }
+
+  confirmInlineUpdate(id: string) {
+    const data = this.editBuffer[id];
+    if (!id || !data) return;
+    const payload: Partial<VencimientoPayload> = {
+      numero_poliza: data.numeroPoliza,
+      tipo_poliza: data.tipoPoliza,
+      forma_pago: data.formaPagoRenovacion,
+      valor_poliza_anterior: data.valorAnterior,
+      valor_poliza_actual: data.valorActual,
+      fecha_vencimiento: data.fechaVencimiento,
+      aseguradora: data.aseguradora,
+      // Nota: titular/cliente no se actualiza desde inline aquí
+    };
+    this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
+      next: () => {
+        // Refleja cambios localmente
+        this.vencimientos = this.vencimientos.map(v => {
+          if (v.id === id) {
+            return { ...v, ...data };
+          }
+          return v;
+        });
+        this.editingRowId = null;
+        delete this.editBuffer[id];
+      },
+      error: () => {
+        // Si falla, simplemente salimos del modo edición sin cambios
+        this.editingRowId = null;
+        delete this.editBuffer[id];
+      }
+    });
+  }
+
+  cancelInlineEdit(id: string) {
+    this.editingRowId = null;
+    if (id) {
+      delete this.editBuffer[id];
+    }
   }
 
   eliminarVencimientoPrompt(item: { id?: string; numeroPoliza?: string; titular?: string }) {

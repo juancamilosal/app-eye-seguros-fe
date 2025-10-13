@@ -110,21 +110,98 @@
                     {{ vencimiento.tipoDocumento }} : {{ vencimiento.numeroDocumento }}
                   </div>
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.numeroPoliza }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.tipoPoliza }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.formaPagoRenovacion }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.valorAnterior | currency:'$':'symbol':'1.0-0' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.valorActual | currency:'$':'symbol':'1.0-0' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date: 'dd/MM/yyyy') : '—' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.aseguradora || '—' }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                           [value]="(editBuffer[editingRowId!]?.numeroPoliza ?? vencimiento.numeroPoliza)"
+                           (input)="onInlineFieldChange(editingRowId || '', 'numeroPoliza', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.numeroPoliza }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                           [value]="(editBuffer[editingRowId!]?.tipoPoliza ?? vencimiento.tipoPoliza)"
+                           (input)="onInlineFieldChange(editingRowId || '', 'tipoPoliza', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.tipoPoliza }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                           [value]="(editBuffer[editingRowId!]?.formaPagoRenovacion ?? vencimiento.formaPagoRenovacion)"
+                           (input)="onInlineFieldChange(editingRowId || '', 'formaPagoRenovacion', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.formaPagoRenovacion }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input inputmode="numeric" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                           [value]="(editBuffer[editingRowId!]?.valorAnterior ?? vencimiento.valorAnterior)"
+                           (input)="onInlineFieldChange(editingRowId || '', 'valorAnterior', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.valorAnterior | currency:'$':'symbol':'1.0-0' }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input inputmode="numeric" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                           [value]="(editBuffer[editingRowId!]?.valorActual ?? vencimiento.valorActual)"
+                           (input)="onInlineFieldChange(editingRowId || '', 'valorActual', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.valorActual | currency:'$':'symbol':'1.0-0' }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input type="date" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                           [value]="(editBuffer[editingRowId!]?.fechaVencimiento ?? (vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date:'yyyy-MM-dd') : ''))"
+                           (input)="onInlineFieldChange(editingRowId || '', 'fechaVencimiento', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date: 'dd/MM/yyyy') : '—' }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                           [value]="(editBuffer[editingRowId!]?.aseguradora ?? vencimiento.aseguradora)"
+                           (input)="onInlineFieldChange(editingRowId || '', 'aseguradora', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.aseguradora || '—' }}
+                  }
+                </td>
                 <td class="px-4 py-3 text-sm text-gray-900">
                   <div class="flex items-center gap-2">
-                    <button (click)="eliminarVencimientoPrompt(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                        <path d="M9 3.75A2.25 2.25 0 0111.25 1.5h1.5A2.25 2.25 0 0115 3.75v.75h3.75a.75.75 0 010 1.5H5.25a.75.75 0 010-1.5H9V3.75z" />
-                        <path d="M6.75 7.5h10.5l-.642 10.272a3 3 0 01-2.993 2.728H10.385a3 3 0 01-2.993-2.728L6.75 7.5z" />
-                      </svg>
-                    </button>
+                    @if (editingRowId === vencimiento.id) {
+                      <!-- Actualizar -->
+                      <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md text-green-600 hover:bg-green-50" title="Actualizar">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="w-5 h-5">
+                          <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                        </svg>
+                      </button>
+                      <!-- Volver (cancelar edición) -->
+                      <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:bg-gray-50" title="Volver">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" class="w-5 h-5">
+                          <path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                      </button>
+                    } @else {
+                      <button (click)="startInlineEdit(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                          <path d="M15.232 5.232a2.5 2.5 0 013.536 3.536l-9.193 9.193a4 4 0 01-1.414.94l-3.228 1.076a.75.75 0 01-.949-.949l1.076-3.228a4 4 0 01.94-1.414l9.193-9.193z" />
+                          <path d="M4.5 19.5h15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        </svg>
+                      </button>
+                      <button (click)="eliminarVencimientoPrompt(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                          <path d="M9 3.75A2.25 2.25 0 0111.25 1.5h1.5A2.25 2.25 0 0115 3.75v.75h3.75a.75.75 0 010 1.5H5.25a.75.75 0 010-1.5H9V3.75z" />
+                          <path d="M6.75 7.5h10.5l-.642 10.272a3 3 0 01-2.993 2.728H10.385a3 3 0 01-2.993-2.728L6.75 7.5z" />
+                        </svg>
+                      </button>
+                    }
                   </div>
                 </td>
               </tr>

@@ -35,6 +35,10 @@ export class VencimientoService {
     return this.http.get<ResponseAPI<any[]>>(this.url, { params: query });
   }
 
+  actualizarVencimiento(id: string, payload: Partial<VencimientoPayload>): Observable<ResponseAPI<any>> {
+    return this.http.patch<ResponseAPI<any>>(`${this.url}/${id}`, payload);
+  }
+
   eliminarVencimiento(id: string): Observable<void> {
     return this.http.delete<void>(`${this.url}/${id}`);
   }
