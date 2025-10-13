@@ -33,6 +33,12 @@ export const routes: Routes = [
       }
       ,
       {
+        path: 'vencimientos',
+        title: 'Euyenid & Edder | Vencimientos',
+        loadComponent: () => import('./layouts/private-layout/pages/vencimientos/vencimientos').then(m => m.Vencimientos)
+      }
+      ,
+      {
         path: 'gestion/nuevo',
         title: 'Euyenid & Edder | Nuevo Vencimiento',
         loadComponent: () => import('./layouts/private-layout/pages/gestion/gestion-create/gestion-create').then(m => m.GestionCreate)
