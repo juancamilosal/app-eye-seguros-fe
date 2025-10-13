@@ -27,8 +27,20 @@ export class Gestion implements OnInit {
   editingRowId: string | null = null;
   // Buffer para edición en línea por fila
   editBuffer: Record<string, Partial<Management>> = {};
+  // Visibilidad de filtros avanzados
+  showAdvancedFilters = false;
   // Búsqueda
   private search$ = new Subject<string>();
+  // Filtros avanzados
+  filters: GestionFilters = {
+    aseguradora: '',
+    tipoPoliza: '',
+    numeroPoliza: '',
+    formaPago: '',
+    fechaDesde: '',
+    fechaHasta: ''
+  };
+  private filters$ = new BehaviorSubject<GestionFilters>(this.filters);
   // Paginación
   page = 1;
   limit = 10;
@@ -43,11 +55,11 @@ export class Gestion implements OnInit {
       startWith('')
     );
 
-    combineLatest([term$, this.page$, this.limit$])
+    combineLatest([term$, this.page$, this.limit$, this.filters$])
       .pipe(
-        switchMap(([term, page, limit]) => {
+        switchMap(([term, page, limit, filters]) => {
           this.loading = true;
-          const params = this.buildFilterParams(term, page, limit);
+          const params = this.buildFilterParams(term, page, limit, filters);
           return this.vencimientoService.obtenerVencimientos(params).pipe(
             catchError(() => of({ data: [], meta: { filter_count: 0, page, limit } }))
           );
@@ -89,7 +101,7 @@ export class Gestion implements OnInit {
       });
   }
 
-  private buildFilterParams(term: string | undefined, page?: number, limit?: number): Record<string, string> {
+  private buildFilterParams(term: string | undefined, page?: number, limit?: number, filters?: GestionFilters): Record<string, string> {
     const q = (term ?? '').trim();
     const params: Record<string, string> = {
       page: String(page ?? this.page),
@@ -108,11 +120,49 @@ export class Gestion implements OnInit {
       // Número de documento vía relación cliente_id
       params['filter[_or][5][cliente_id][numero_documento][_icontains]'] = q;
     }
+    const f = filters || this.filters;
+    // Filtros avanzados (AND entre ellos)
+    if (f.aseguradora?.trim()) {
+      params['filter[aseguradora][_icontains]'] = f.aseguradora.trim();
+    }
+    if (f.tipoPoliza?.trim()) {
+      params['filter[tipo_poliza][_icontains]'] = f.tipoPoliza.trim();
+    }
+    if (f.numeroPoliza?.trim()) {
+      params['filter[numero_poliza][_icontains]'] = f.numeroPoliza.trim();
+    }
+    if (f.formaPago?.trim()) {
+      params['filter[forma_pago][_eq]'] = f.formaPago.trim();
+    }
+    // Rango de fechas para fecha_vencimiento
+    const desde = (f.fechaDesde ?? '').trim();
+    const hasta = (f.fechaHasta ?? '').trim();
+    if (desde) {
+      params['filter[fecha_vencimiento][_gte]'] = desde;
+    }
+    if (hasta) {
+      params['filter[fecha_vencimiento][_lte]'] = hasta;
+    }
     return params;
   }
 
   onSearchChange(value: string) {
     this.search$.next(value?.trim() ?? '');
+  }
+
+  onFilterChange(field: keyof GestionFilters, value: string) {
+    const v = (value ?? '').trim();
+    this.filters = { ...this.filters, [field]: v };
+    this.filters$.next(this.filters);
+  }
+
+  clearFilters() {
+    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', fechaDesde: '', fechaHasta: '' };
+    this.filters$.next(this.filters);
+  }
+
+  toggleAdvancedFilters() {
+    this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 
   onLimitChange(value: string) {
@@ -313,4 +363,13 @@ export class Gestion implements OnInit {
       .join(' ');
     return transformed + trailing;
   }
+}
+
+interface GestionFilters {
+  aseguradora: string;
+  tipoPoliza: string;
+  numeroPoliza: string;
+  formaPago: string;
+  fechaDesde: string;
+  fechaHasta: string;
 }
