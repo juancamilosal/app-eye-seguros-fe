@@ -1,0 +1,21 @@
+@if (isVisible) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/40" (click)="onClose()"></div>
+    <div class="relative bg-white rounded-xl shadow-xl w-[95%] max-w-lg p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="inline-flex items-center justify-center w-10 h-10" aria-hidden="true">
+          <img src="assets/icons/comentarios.png" alt="Comentarios" class="w-full h-full object-contain" />
+        </span>
+        <h3 class="text-lg font-semibold text-[#38338a]">Comentarios</h3>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Comentario</label>
+        <textarea [(ngModel)]="comentario" rows="6" class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#243B88]" placeholder="Escribe un comentario"></textarea>
+      </div>
+      <div class="mt-6 flex items-center justify-end gap-2">
+        <button (click)="onClose()" class="px-4 py-2 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50">Cancelar</button>
+        <button (click)="onSave()" class="px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">Guardar</button>
+      </div>
+    </div>
+  </div>
+}

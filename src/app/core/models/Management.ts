@@ -9,6 +9,8 @@ export interface Management {
   valorActual: number;
   fechaVencimiento?: string;
   aseguradora?: string;
+  estado?: string;
+  comentarios?: string;
   prenda?: boolean;
   esVehiculo?: boolean;
   placa?: string;

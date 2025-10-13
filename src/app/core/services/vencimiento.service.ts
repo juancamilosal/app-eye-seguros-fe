@@ -13,6 +13,8 @@ export interface VencimientoPayload {
   valor_poliza_actual?: number;
   fecha_vencimiento?: string;
   aseguradora?: string;
+  estado?: string;
+  comentarios?: string;
   prenda?: boolean;
   es_vehiculo?: boolean;
   placa?: string;

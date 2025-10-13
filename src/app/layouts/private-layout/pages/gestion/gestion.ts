@@ -7,12 +7,13 @@ import { FORMA_PAGO } from '../../../../core/const/FormaPagoConst';
 import { Subject, BehaviorSubject, of, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith } from 'rxjs/operators';
 import { NotificationModalComponent } from '../../../../components/notification-modal/notification-modal';
+import { ModalComentarioComponent } from '../../../../components/modal-comentario/modal-comentario';
 import { NotificationData } from '../../../../core/models/NotificationData';
 
 @Component({
   selector: 'app-gestion',
   standalone: true,
-  imports: [CommonModule, NotificationModalComponent],
+  imports: [CommonModule, NotificationModalComponent, ModalComentarioComponent],
   templateUrl: './gestion.html'
 })
 export class Gestion implements OnInit {
@@ -23,6 +24,9 @@ export class Gestion implements OnInit {
   loading = true;
   isModalVisible = false;
   notification: NotificationData | null = null;
+  // Modal de comentario
+  isComentarioVisible = false;
+  comentarioBuffer: { id: string | null; value: string } = { id: null, value: '' };
   vencimientoToDelete: { id: string; numeroPoliza?: string; titular?: string } | null = null;
   editingRowId: string | null = null;
   // Buffer para edición en línea por fila
@@ -85,6 +89,8 @@ export class Gestion implements OnInit {
             valorActual: Number(r?.valor_poliza_actual ?? r?.valorActual ?? 0),
             fechaVencimiento: r?.fecha_vencimiento ?? r?.fechaVencimiento ?? undefined,
             aseguradora: r?.aseguradora ?? undefined,
+            estado: r?.estado ?? undefined,
+            comentarios: r?.comentarios ?? undefined,
             // Campos de vehículo
             prenda: !!(r?.prenda ?? r?.prenda),
             esVehiculo: !!(r?.es_vehiculo ?? r?.esVehiculo),
@@ -226,6 +232,8 @@ export class Gestion implements OnInit {
       valorActual: item.valorActual,
       fechaVencimiento: item.fechaVencimiento,
       aseguradora: item.aseguradora,
+      estado: item.estado,
+      comentarios: item.comentarios,
       titular: item.titular,
       tipoDocumento: item.tipoDocumento,
       numeroDocumento: item.numeroDocumento,
@@ -280,6 +288,8 @@ export class Gestion implements OnInit {
       valor_poliza_actual: data.valorActual,
       fecha_vencimiento: data.fechaVencimiento,
       aseguradora: data.aseguradora,
+      estado: data.estado,
+      comentarios: data.comentarios,
       // Nota: titular/cliente no se actualiza desde inline aquí
       prenda,
       es_vehiculo: esVehiculo,
@@ -302,6 +312,36 @@ export class Gestion implements OnInit {
         // Si falla, simplemente salimos del modo edición sin cambios
         this.editingRowId = null;
         delete this.editBuffer[id];
+      }
+    });
+  }
+
+  // Comentarios modal control
+  openComentarios(item: { id?: string } & Management) {
+    if (!item?.id) return;
+    this.comentarioBuffer = { id: item.id!, value: item.comentarios ?? '' };
+    this.isComentarioVisible = true;
+  }
+
+  onComentarioClose() {
+    this.isComentarioVisible = false;
+    this.comentarioBuffer = { id: null, value: '' };
+  }
+
+  onComentarioSave(value: string) {
+    const id = this.comentarioBuffer.id;
+    if (!id) {
+      this.onComentarioClose();
+      return;
+    }
+    const payload: Partial<VencimientoPayload> = { comentarios: (value ?? '').trim() };
+    this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
+      next: () => {
+        this.vencimientos = this.vencimientos.map(v => v.id === id ? { ...v, comentarios: payload.comentarios } : v);
+        this.onComentarioClose();
+      },
+      error: () => {
+        this.onComentarioClose();
       }
     });
   }

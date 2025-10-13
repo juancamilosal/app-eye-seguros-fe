@@ -39,6 +39,7 @@ export class VencimientoCreate {
       valor_poliza_actual: item.valorActual,
       fecha_vencimiento: item.fechaVencimiento,
       aseguradora: item.aseguradora,
+      estado: item.estado,
       prenda: !!item.prenda,
       es_vehiculo: !!item.esVehiculo,
       placa: item.esVehiculo ? (item.placa || '') : undefined,
