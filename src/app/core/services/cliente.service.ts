@@ -15,8 +15,20 @@ export class ClienteService {
     return this.http.post<ResponseAPI<Client>>(this.urlClientes, cliente);
   }
 
-  obtenerClientes(): Observable<ResponseAPI<Client[] >> {
-    return this.http.get<ResponseAPI<Client[]>>(this.urlClientes);
+  obtenerClientes(params?: Record<string, string>): Observable<ResponseAPI<Client[] >> {
+    return this.http.get<ResponseAPI<Client[]>>(this.urlClientes, { params });
+  }
+
+  obtenerCliente(id: string): Observable<ResponseAPI<Client>> {
+    return this.http.get<ResponseAPI<Client>>(`${this.urlClientes}/${id}`);
+  }
+
+  actualizarCliente(id: string, cliente: Client): Observable<ResponseAPI<Client>> {
+    return this.http.patch<ResponseAPI<Client>>(`${this.urlClientes}/${id}` , cliente);
+  }
+
+  eliminarCliente(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.urlClientes}/${id}`);
   }
 
 }

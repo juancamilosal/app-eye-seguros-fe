@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '',
@@ -13,6 +14,7 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./layouts/private-layout/private-layout').then(m => m.PrivateLayout),
+    canActivate: [authGuard],
     children: [
       {
         path: 'dashboard',
@@ -40,6 +42,12 @@ export const routes: Routes = [
         path: 'clientes/nuevo',
         title: 'Euyenid & Edder | Nuevo Cliente',
         loadComponent: () => import('./layouts/private-layout/pages/clientes/cliente-create/cliente-create').then(m => m.ClienteCreate)
+      }
+      ,
+      {
+        path: 'clientes/:id/editar',
+        title: 'Euyenid & Edder | Editar Cliente',
+        loadComponent: () => import('./layouts/private-layout/pages/clientes/cliente-edit/cliente-edit').then(m => m.ClienteEdit)
       }
     ]
   },

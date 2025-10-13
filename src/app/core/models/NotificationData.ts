@@ -3,4 +3,8 @@ export class NotificationData {
   title: string;
   message: string;
   duration?: number;
+  // Opcionales para confirmación
+  confirmable?: boolean;
+  confirmText?: string;
+  cancelText?: string;
 }

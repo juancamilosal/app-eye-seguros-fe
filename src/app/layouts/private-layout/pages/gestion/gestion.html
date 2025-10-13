@@ -1,41 +1,367 @@
-<div class="min-h-screen bg-white">
+<div class="min-h-screen">
   <div class="w-full mx-auto px-6 py-10">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h1 class="text-3xl font-bold text-[#243B88]">Gestión</h1>
+      <div class="flex items-center gap-8 sm:gap-6">
+        <span class="inline-flex items-center justify-center w-12 h-12" aria-hidden="true">
+          <img src="assets/icons/gestion.png" alt="Clientes" class="w-full h-full object-contain" />
+        </span>
+        <h1 class="text-3xl font-bold text-[#38338a]">Gestión</h1>
+      </div>
       <button (click)="openForm()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">
-        Crear Vencimiento
+        + Crear Registro
       </button>
     </div>
+    <!-- Descripción de la pantalla -->
+    <div class="mt-2 text-base text-gray-700 mb-16 sm:mb-10">
+      <p class="text-lg">
+        Lleva un seguimiento de los portafolios de tus clientes.
+      </p>
+    </div>
+    <!-- Buscador y filtros -->
+    <div class="mt-4 flex flex-col gap-3">
+      <!-- Búsqueda global -->
+      <div class="w-full sm:w-96 relative">
+        <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path fill-rule="evenodd" d="M10.5 3a7.5 7.5 0 105.22 12.96l3.16 3.16a.75.75 0 101.06-1.06l-3.16-3.16A7.5 7.5 0 0010.5 3zm0 1.5a6 6 0 100 12 6 6 0 000-12z" clip-rule="evenodd" />
+          </svg>
+        </span>
+        <input type="text" (input)="onSearchChange($event.target.value)" placeholder="Buscar por póliza, tipo, aseguradora o titular" class="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+      </div>
 
-    <div class="mt-6 w-full overflow-x-auto rounded-xl shadow-sm ring-1 ring-black/5 bg-white">
+      <!-- Toggle Búsqueda Avanzada -->
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="toggleAdvancedFilters()" class="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white shadow-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path fill-rule="evenodd" d="M3 5.25A.75.75 0 013.75 4.5h16.5a.75.75 0 01.53 1.28l-6.22 6.22v4.75a.75.75 0 01-1.2.6l-3-2.25a.75.75 0 01-.3-.6V11.99L3.22 5.78A.75.75 0 013 5.25z" clip-rule="evenodd" />
+          </svg>
+          <span>{{ showAdvancedFilters ? 'Ocultar Búsqueda Avanzada' : 'Búsqueda Avanzada' }}</span>
+        </button>
+      </div>
+
+      <!-- Filtros avanzados -->
+      @if (showAdvancedFilters) {
+        <div class="rounded-lg border border-gray-200 bg-white p-4">
+          <div class="mb-7">
+            <h3 class="text-base font-semibold">Filtros Avanzados</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Número de Póliza</label>
+              <input type="text" [value]="filters.numeroPoliza" (input)="onFilterChange('numeroPoliza', $any($event.target).value)" placeholder="Ej: 123456" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Tipo de Póliza</label>
+              <input type="text" [value]="filters.tipoPoliza" (input)="onFilterChange('tipoPoliza', $any($event.target).value)" placeholder="Ej: SOAT" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Aseguradora</label>
+              <input type="text" [value]="filters.aseguradora" (input)="onFilterChange('aseguradora', $any($event.target).value)" placeholder="Ej: SURA" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Forma de Pago</label>
+              <select [value]="filters.formaPago" (change)="onFilterChange('formaPago', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]">
+                <option value="">Todas</option>
+                @for (fp of formaPago; track fp) {
+                  <option [value]="fp">{{ fp }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Fecha de Vencimiento (Inicio)</label>
+              <input type="date" [value]="filters.fechaDesde" (input)="onFilterChange('fechaDesde', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Fecha de Vencimiento (Fin)</label>
+              <input type="date" [value]="filters.fechaHasta" (input)="onFilterChange('fechaHasta', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button type="button" (click)="clearFilters()" class="px-3 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50">Limpiar filtros</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Controles de paginación (arriba) -->
+    <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-2 text-sm text-gray-700">
+        <span class="text-gray-600">Mostrar</span>
+        <select (change)="onLimitChange($any($event.target).value)" [value]="limit" class="border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#243B88]">
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        <span class="text-gray-600">por página</span>
+      </div>
+      <div class="text-sm text-gray-700">
+        <span class="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+          <img src="assets/icons/gestion.png" alt="Total vencimientos" class="w-5 h-5 object-contain" />
+          Total: {{ total }}
+        </span>
+      </div>
+    </div>
+
+    <div class="mt-3 w-full overflow-x-auto rounded-xl shadow-sm ring-1 ring-black/5 bg-white">
       <table class="w-full table-auto divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-        <tr>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Titular</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Número Póliza</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Tipo de Póliza</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Forma de Pago Renovación</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Valor Póliza (Año Anterior)</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Valor Póliza (Año Actual)</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Fecha de Vencimiento</th>
-          <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700">Aseguradora</th>
-        </tr>
+        <thead class="bg-[#38338a]">
+          <tr>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Titular</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Número Póliza</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Tipo de Póliza</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Forma de Pago</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Valor Póliza (Año Anterior)</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Valor Póliza (Año Actual)</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Fecha de Vencimiento</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Aseguradora</th>
+            <th class="px-4 py-3 text-left text-sm font-semibold text-white">Estado</th>
+            <th class="px-4 py-3 text-center text-sm font-semibold text-white sticky right-0 z-20 bg-[#38338a]">Acción</th>
+          </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
-          @for (vencimiento of vencimientos; track vencimiento.numeroPoliza) {
-            <tr class="hover:bg-gray-50">
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.titular }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.numeroPoliza }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.tipoPoliza }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.formaPagoRenovacion }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.valorAnterior | currency:'$':'symbol':'1.0-0' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">{{ vencimiento.valorActual | currency:'$':'symbol':'1.0-0' }}</td>
-              <td class="px-4 py-3 text-sm text-gray-900">—</td>
-              <td class="px-4 py-3 text-sm text-gray-900">—</td>
+          @if (loading) {
+            <!-- Skeleton rows while loading -->
+            @for (i of [1,2,3,4]; track i) {
+              <tr>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-40 bg-gray-200 animate-pulse rounded"></div>
+                  <div class="h-3 w-32 bg-gray-100 animate-pulse rounded mt-2"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-28 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-28 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-40 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-16 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+              </tr>
+            }
+          } @else if (!loading && vencimientos.length === 0) {
+            <!-- Empty state -->
+            <tr>
+              <td colspan="10" class="px-4 py-8 text-center text-sm text-gray-600">
+                No hay datos para mostrar.
+              </td>
             </tr>
+          } @else {
+            @for (vencimiento of vencimientos; track vencimiento.numeroPoliza) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  <div class="font-medium">{{ vencimiento.titular }}</div>
+                  @if (vencimiento.tipoDocumento || vencimiento.numeroDocumento) {
+                    <div class="text-xs text-gray-600 mt-1">
+                      {{ vencimiento.tipoDocumento }} : {{ vencimiento.numeroDocumento }}
+                    </div>
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.numeroPoliza ?? vencimiento.numeroPoliza)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'numeroPoliza', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.numeroPoliza }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  <div class="flex flex-col">
+                    <span>{{ vencimiento.tipoPoliza }}</span>
+                    @if (editingRowId === vencimiento.id) {
+                      <div class="mt-1 text-xs text-gray-700">
+                        @if (vencimiento.esVehiculo) {
+                          <div class="flex items-center gap-2 mb-1">
+                            <label class="inline-flex items-center gap-2 select-none cursor-pointer">
+                              <input type="checkbox" [checked]="(editBuffer[editingRowId!]?.prenda ?? vencimiento.prenda)" (change)="onInlineFieldChange(editingRowId || '', 'prenda', $any($event.target).checked)" class="peer sr-only" />
+                              <span class="inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 bg-gray-300 peer-checked:bg-[#243B88] p-0.5 justify-start peer-checked:justify-end">
+                                <span class="h-4 w-4 rounded-full bg-white shadow"></span>
+                              </span>
+                              <span class="text-xs">Prenda</span>
+                            </label>
+                          </div>
+                          <div class="flex items-center gap-2 mb-1">
+                            <input class="w-44 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88] uppercase"
+                              placeholder="Placa"
+                              [value]="(editBuffer[editingRowId!]?.placa ?? vencimiento.placa) ?? ''"
+                              (input)="onInlineFieldChange(editingRowId || '', 'placa', $any($event.target).value)" />
+                          </div>
+                          @if ((editBuffer[editingRowId!]?.prenda ?? vencimiento.prenda)) {
+                            <div class="flex items-center gap-2">
+                              <input class="w-64 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                                placeholder="Entidad Prendaria"
+                                [value]="((editBuffer[editingRowId!]?.entidadPrendaria ?? vencimiento.entidadPrendaria) ?? '')"
+                                (input)="onInlineFieldChange(editingRowId || '', 'entidadPrendaria', $any($event.target).value)" />
+                            </div>
+                          }
+                        }
+                      </div>
+                    } @else if (vencimiento.esVehiculo) {
+                      <div class="mt-1 text-xs text-gray-600">
+                        <span>
+                          {{ vencimiento.prenda ? 'Con Prenda' : 'Sin Prenda' }}
+                          @if (vencimiento.placa) {
+                            — Placa: {{ vencimiento.placa }}
+                          }
+                        </span>
+                        @if (vencimiento.prenda && vencimiento.entidadPrendaria) {
+                          <div class="mt-0.5">Entidad Prendaria: {{ vencimiento.entidadPrendaria }}</div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <select class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.formaPagoRenovacion ?? vencimiento.formaPagoRenovacion)"
+                      (change)="onInlineFieldChange(editingRowId || '', 'formaPagoRenovacion', $any($event.target).value)">
+                      @for (fp of formaPago; track fp) {
+                        <option [value]="fp">{{ fp }}</option>
+                      }
+                    </select>
+                  } @else {
+                    {{ vencimiento.formaPagoRenovacion }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input inputmode="numeric" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.valorAnterior ?? vencimiento.valorAnterior)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'valorAnterior', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.valorAnterior | currency:'$':'symbol':'1.0-0' }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input inputmode="numeric" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.valorActual ?? vencimiento.valorActual)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'valorActual', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.valorActual | currency:'$':'symbol':'1.0-0' }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input type="date" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.fechaVencimiento ?? (vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date:'yyyy-MM-dd') : ''))"
+                      (input)="onInlineFieldChange(editingRowId || '', 'fechaVencimiento', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date: 'dd/MM/yyyy') : '—' }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.aseguradora ?? vencimiento.aseguradora)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'aseguradora', $any($event.target).value)" />
+                  } @else {
+                    {{ vencimiento.aseguradora || '—' }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === vencimiento.id) {
+                    <select class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.estado ?? vencimiento.estado ?? '')"
+                      (change)="onInlineFieldChange(editingRowId || '', 'estado', $any($event.target).value)">
+                      <option value="">Seleccione</option>
+                      <option value="Pagada">Pagada</option>
+                      <option value="Pendiente">Pendiente</option>
+                    </select>
+                  } @else {
+                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ring-1"
+                          [ngClass]="{
+                            'bg-green-50 text-green-700 ring-green-600/20': (vencimiento.estado ?? '').toLocaleLowerCase('es-ES') === 'pagada',
+                            'bg-orange-50 text-orange-800 ring-orange-700/20': (vencimiento.estado ?? '').toLocaleLowerCase('es-ES') === 'pendiente',
+                            'bg-gray-50 text-gray-600 ring-gray-400/20': !(vencimiento.estado)
+                          }">
+                      {{ vencimiento.estado || '—' }}
+                    </span>
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900 sticky right-0 z-10 bg-white min-w-[140px] border-l border-gray-200">
+                  <div class="flex items-center justify-center gap-2">
+                    @if (editingRowId === vencimiento.id) {
+                      <!-- Actualizar -->
+                      <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
+                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
+                      </button>
+                      <!-- Volver (cancelar edición) -->
+                      <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
+                        <img src="assets/icons/regresar.png" alt="Regresar" class="w-5 h-5" />
+                      </button>
+                    } @else {
+                      <button (click)="startInlineEdit(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
+                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5" />
+                      </button>
+                      <button (click)="openComentarios(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-50" title="Comentarios">
+                        <img src="assets/icons/comentarios.png" alt="Comentarios" class="w-5 h-5" />
+                      </button>
+                      <button (click)="eliminarVencimientoPrompt(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
+                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5" />
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
           }
         </tbody>
       </table>
     </div>
+
+    <!-- Paginador (abajo) -->
+    <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="text-sm text-gray-700">
+        Mostrando <span class="font-medium">{{ startIndex }}</span> - <span class="font-medium">{{ endIndex }}</span> de <span class="font-medium">{{ total }}</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="prevPage()" class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50" [disabled]="page <= 1">
+          <span class="inline-flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M15.75 19.5L8.25 12l7.5-7.5"/></svg>
+            Anterior
+          </span>
+        </button>
+        <span class="px-2 py-1 text-sm text-gray-600">Página {{ page }} de {{ totalPages }}</span>
+        <button (click)="nextPage()" class="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50" [disabled]="page >= totalPages">
+          <span class="inline-flex items-center gap-1">
+            Siguiente
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M8.25 4.5L15.75 12 8.25 19.5"/></svg>
+          </span>
+        </button>
+      </div>
+    </div>
   </div>
+  <app-notification-modal
+    [isVisible]="isModalVisible"
+    [notification]="notification"
+    (close)="onModalClosed()"
+    (confirm)="onModalConfirm()"
+  ></app-notification-modal>
+  <app-modal-comentario
+    [isVisible]="isComentarioVisible"
+    [initialComentario]="comentarioBuffer.value"
+    (close)="onComentarioClose()"
+    (save)="onComentarioSave($event)"
+  ></app-modal-comentario>
 </div>
