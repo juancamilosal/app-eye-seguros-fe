@@ -8,7 +8,7 @@ import {GestionModel} from '../models/GestionModel';
 
 @Injectable({ providedIn: 'root' })
 export class GestionService {
-  private url = environment.vencimientos;
+  private url = environment.polizas;
 
   constructor(private http: HttpClient) {}
 
