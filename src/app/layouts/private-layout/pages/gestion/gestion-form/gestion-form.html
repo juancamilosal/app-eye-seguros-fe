@@ -1,5 +1,5 @@
 <div class="w-full">
-  <form [formGroup]="vencimientoForm" (ngSubmit)="onSubmit()" class="space-y-8">
+  <form [formGroup]="gestionForm" (ngSubmit)="onSubmit()" class="space-y-8">
     <!-- Sección: Información Titular -->
     <div>
       <h3 class="text-xl font-semibold text-[#243B88] mb-6">Información Titular</h3>
@@ -134,7 +134,7 @@
           </label>
         </div>
         <!-- Prenda y Placa visibles solo si es Vehículo -->
-        @if (vencimientoForm.get('esVehiculo')?.value) {
+        @if (gestionForm.get('esVehiculo')?.value) {
           <div class="relative mb-5">
             <label class="block text-sm font-medium text-gray-700">Placa</label>
             <input type="text" formControlName="placa" (input)="onUppercaseInput($event, 'placa')" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4] uppercase" />
@@ -154,7 +154,7 @@
             </label>
             <p class="mt-1 text-xs text-gray-500">Si el vehículo tiene prenda, active este campo.</p>
           </div>
-          @if (vencimientoForm.get('prenda')?.value) {
+          @if (gestionForm.get('prenda')?.value) {
             <div class="relative mb-5">
               <label class="block text-sm font-medium text-gray-700">Entidad Prendaria</label>
               <input type="text" formControlName="entidadPrendaria" (input)="onCapitalizeInput($event, 'entidadPrendaria')" class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]" />

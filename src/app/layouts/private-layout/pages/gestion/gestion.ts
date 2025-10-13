@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Management } from '../../../../core/models/Management';
 import { Router } from '@angular/router';
-import { VencimientoService, VencimientoPayload } from '../../../../core/services/vencimiento.service';
+import { GestionService } from '../../../../core/services/gestion.service';
 import { FORMA_PAGO } from '../../../../core/const/FormaPagoConst';
 import { Subject, BehaviorSubject, of, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith } from 'rxjs/operators';
 import { NotificationModalComponent } from '../../../../components/notification-modal/notification-modal';
 import { ModalComentarioComponent } from '../../../../components/modal-comentario/modal-comentario';
 import { NotificationData } from '../../../../core/models/NotificationData';
+import {GestionModel} from '../../../../core/models/GestionModel';
 
 @Component({
   selector: 'app-gestion',
@@ -17,7 +18,6 @@ import { NotificationData } from '../../../../core/models/NotificationData';
   templateUrl: './gestion.html'
 })
 export class Gestion implements OnInit {
-  constructor(private router: Router, private vencimientoService: VencimientoService) {}
 
   vencimientos: Array<Management & { id?: string }> = [];
   formaPago = FORMA_PAGO;
@@ -52,6 +52,7 @@ export class Gestion implements OnInit {
   private page$ = new BehaviorSubject<number>(1);
   private limit$ = new BehaviorSubject<number>(10);
 
+  constructor(private router: Router, private vencimientoService: GestionService) {}
   ngOnInit(): void {
     const term$ = this.search$.pipe(
       debounceTime(300),
@@ -280,7 +281,7 @@ export class Gestion implements OnInit {
       this.isModalVisible = true;
       return;
     }
-    const payload: Partial<VencimientoPayload> = {
+    const payload: Partial<GestionModel> = {
       numero_poliza: data.numeroPoliza,
       tipo_poliza: data.tipoPoliza,
       forma_pago: data.formaPagoRenovacion,
@@ -334,7 +335,7 @@ export class Gestion implements OnInit {
       this.onComentarioClose();
       return;
     }
-    const payload: Partial<VencimientoPayload> = { comentarios: (value ?? '').trim() };
+    const payload: Partial<GestionModel> = { comentarios: (value ?? '').trim() };
     this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
       next: () => {
         this.vencimientos = this.vencimientos.map(v => v.id === id ? { ...v, comentarios: payload.comentarios } : v);

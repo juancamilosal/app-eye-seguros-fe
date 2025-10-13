@@ -35,7 +35,7 @@ export const routes: Routes = [
       {
         path: 'gestion/nuevo',
         title: 'Euyenid & Edder | Nuevo Vencimiento',
-        loadComponent: () => import('./layouts/private-layout/pages/gestion/vencimiento-create/vencimiento-create').then(m => m.VencimientoCreate)
+        loadComponent: () => import('./layouts/private-layout/pages/gestion/gestion-create/gestion-create').then(m => m.GestionCreate)
       }
       ,
       {

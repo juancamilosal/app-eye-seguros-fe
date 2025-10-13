@@ -9,18 +9,18 @@ import {TIPO_DOCUMENTO} from '../../../../../core/const/TipoDocumentoConst';
 import {FORMA_PAGO} from '../../../../../core/const/FormaPagoConst';
 
 @Component({
-  selector: 'app-vencimiento-form',
+  selector: 'app-gestion-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './vencimiento-form.html'
+  templateUrl: './gestion-form.html'
 })
-export class VencimientoForm implements OnInit {
+export class GestionForm implements OnInit {
   @Output() cancel = new EventEmitter<void>();
   @Output() save = new EventEmitter<Management & { titularId?: string }>();
   @Input() isSubmitting = false;
   tiposDocumento = TIPO_DOCUMENTO;
   formaPago = FORMA_PAGO;
-  vencimientoForm: FormGroup;
+  gestionForm: FormGroup;
   private clienteIdEncontrado: string | null = null;
   submitted = false;
 
@@ -28,7 +28,7 @@ export class VencimientoForm implements OnInit {
   }
 
   ngOnInit(): void {
-    this.vencimientoForm = this.fb.group({
+    this.gestionForm = this.fb.group({
       tipoDocumento: [null, Validators.required],
       numeroDocumento: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
       nombre: [{ value: null, disabled: true }, Validators.required],
@@ -49,10 +49,10 @@ export class VencimientoForm implements OnInit {
     this.setupAutoFill();
 
     // Toggle Prenda and Placa based on esVehiculo
-    const esVehiculoCtrl = this.vencimientoForm.get('esVehiculo');
-    const prendaCtrl = this.vencimientoForm.get('prenda');
-    const entidadCtrl = this.vencimientoForm.get('entidadPrendaria');
-    const placaCtrl = this.vencimientoForm.get('placa');
+    const esVehiculoCtrl = this.gestionForm.get('esVehiculo');
+    const prendaCtrl = this.gestionForm.get('prenda');
+    const entidadCtrl = this.gestionForm.get('entidadPrendaria');
+    const placaCtrl = this.gestionForm.get('placa');
     esVehiculoCtrl?.valueChanges.subscribe((isVehiculo: boolean) => {
       if (isVehiculo) {
         prendaCtrl?.enable({ emitEvent: false });
@@ -92,13 +92,13 @@ export class VencimientoForm implements OnInit {
   }
 
   get isNitSelected(): boolean {
-    const val = this.vencimientoForm?.get('tipoDocumento')?.value;
+    const val = this.gestionForm?.get('tipoDocumento')?.value;
     return String(val || '').toUpperCase() === 'NIT';
   }
 
   private setupAutoFill() {
-    const tipoDocCtrl = this.vencimientoForm.get('tipoDocumento');
-    const numeroDocCtrl = this.vencimientoForm.get('numeroDocumento');
+    const tipoDocCtrl = this.gestionForm.get('tipoDocumento');
+    const numeroDocCtrl = this.gestionForm.get('numeroDocumento');
     if (!tipoDocCtrl || !numeroDocCtrl) return;
 
     combineLatest([
@@ -124,7 +124,7 @@ export class VencimientoForm implements OnInit {
         const nombre = c?.nombre ?? '';
         const apellido = c?.apellido ?? '';
         this.clienteIdEncontrado = c?.id ?? null;
-        this.vencimientoForm.patchValue({ nombre, apellido });
+        this.gestionForm.patchValue({ nombre, apellido });
       });
   }
   onCancel() {
@@ -133,12 +133,12 @@ export class VencimientoForm implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-    if (this.vencimientoForm.invalid) {
-      this.vencimientoForm.markAllAsTouched();
+    if (this.gestionForm.invalid) {
+      this.gestionForm.markAllAsTouched();
       return;
     }
 
-    const v = this.vencimientoForm.getRawValue() as {
+    const v = this.gestionForm.getRawValue() as {
       tipoDocumento: string;
       numeroDocumento: string;
       nombre: string;
@@ -176,12 +176,12 @@ export class VencimientoForm implements OnInit {
   }
 
   isInvalid(name: string): boolean {
-    const c = this.vencimientoForm.get(name);
+    const c = this.gestionForm.get(name);
     return !!(c && c.invalid && (c.touched || this.submitted));
   }
 
   getError(name: string): string | null {
-    const c = this.vencimientoForm.get(name);
+    const c = this.gestionForm.get(name);
     if (!c || !c.errors) return null;
     if (c.errors['required']) {
       const requiredMessages: Record<string, string> = {
@@ -217,7 +217,7 @@ export class VencimientoForm implements OnInit {
     if (typeof maxLen === 'number') {
       onlyDigits = onlyDigits.slice(0, maxLen);
     }
-    const ctrl = this.vencimientoForm.get(controlName as string);
+    const ctrl = this.gestionForm.get(controlName as string);
     // Para mostrar puntos de miles en los campos de valor (vista) y guardar solo dígitos (modelo)
     if (controlName === 'valorAnterior' || controlName === 'valorActual') {
       const formatted = onlyDigits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
@@ -249,7 +249,7 @@ export class VencimientoForm implements OnInit {
     const target = event.target as HTMLInputElement | null;
     if (!target) return;
     const transformed = this.toTitleCaseSpanish(target.value || '');
-    const ctrl = this.vencimientoForm.get(controlName as string);
+    const ctrl = this.gestionForm.get(controlName as string);
     ctrl?.setValue(transformed, { emitEvent: false });
   }
 
@@ -257,7 +257,7 @@ export class VencimientoForm implements OnInit {
     const target = event.target as HTMLInputElement | null;
     if (!target) return;
     const upper = (target.value || '').toLocaleUpperCase('es-ES');
-    const ctrl = this.vencimientoForm.get(controlName as string);
+    const ctrl = this.gestionForm.get(controlName as string);
     ctrl?.setValue(upper, { emitEvent: false });
     target.value = upper;
   }
