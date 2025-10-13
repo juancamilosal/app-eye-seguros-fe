@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { ClienteForm, Cliente } from '../cliente-form/cliente-form';
+import { ClienteForm } from '../cliente-form/cliente-form';
 import { ClienteService } from '../../../../../core/services/cliente.service';
 import { Client } from '../../../../../core/models/Client';
 
@@ -14,7 +14,7 @@ import { Client } from '../../../../../core/models/Client';
 export class ClienteEdit implements OnInit {
   isSubmitting = false;
   id!: string;
-  initialValue: Cliente | null = null;
+  initialValue: Client | null = null;
 
   constructor(private route: ActivatedRoute, private router: Router, private clienteService: ClienteService) {}
 
@@ -29,13 +29,13 @@ export class ClienteEdit implements OnInit {
         const c = resp.data;
         if (!c) return;
         this.initialValue = {
-          tipoDocumento: c.tipo_documento,
-          numeroDocumento: c.numero_documento,
+          tipo_documento: c.tipo_documento,
+          numero_documento: c.numero_documento,
           nombre: c.nombre,
           apellido: c.apellido,
-          fechaNacimiento: c.fecha_nacimiento,
+          fecha_nacimiento: c.fecha_nacimiento,
           direccion: c.direccion,
-          numeroContacto: c.numero_contacto,
+          numero_contacto: c.numero_contacto,
           email: c.email,
         };
       },
@@ -53,15 +53,15 @@ export class ClienteEdit implements OnInit {
     this.goBack();
   }
 
-  onSave(item: Cliente) {
+  onSave(item: Client) {
     const payload: Client = {
-      tipo_documento: item.tipoDocumento,
-      numero_documento: item.numeroDocumento,
+      tipo_documento: item.tipo_documento,
+      numero_documento: item.numero_documento,
       nombre: item.nombre,
       apellido: item.apellido,
-      fecha_nacimiento: item.fechaNacimiento,
+      fecha_nacimiento: item.fecha_nacimiento,
       direccion: item.direccion,
-      numero_contacto: item.numeroContacto,
+      numero_contacto: item.numero_contacto,
       email: item.email,
     };
 

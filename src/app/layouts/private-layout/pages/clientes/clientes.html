@@ -95,7 +95,7 @@
               </td>
             </tr>
           } @else {
-            @for (cliente of clientes; track cliente.email) {
+            @for (cliente of clientes; track cliente.id) {
               <tr class="hover:bg-gray-50">
                 <td class="px-4 py-3 text-sm text-gray-900">
                   <div class="font-medium">{{ cliente.nombre }} {{ cliente.apellido }}</div>

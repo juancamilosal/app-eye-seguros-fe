@@ -10,6 +10,7 @@ import { NotificationModalComponent } from '../../../../components/notification-
 import { ModalComentarioComponent } from '../../../../components/modal-comentario/modal-comentario';
 import { NotificationData } from '../../../../core/models/NotificationData';
 import {GestionModel} from '../../../../core/models/GestionModel';
+import {Filtro} from '../../../../core/models/Filter';
 
 @Component({
   selector: 'app-vencimientos',
@@ -36,7 +37,7 @@ export class Vencimientos implements OnInit {
   // Búsqueda
   private search$ = new Subject<string>();
   // Filtros avanzados
-  filters: GestionFilters = {
+  filters: Filtro = {
     aseguradora: '',
     tipoPoliza: '',
     numeroPoliza: '',
@@ -44,7 +45,7 @@ export class Vencimientos implements OnInit {
     fechaDesde: '',
     fechaHasta: ''
   };
-  private filters$ = new BehaviorSubject<GestionFilters>(this.filters);
+  private filters$ = new BehaviorSubject<Filtro>(this.filters);
   // Paginación
   page = 1;
   limit = 10;
@@ -108,7 +109,7 @@ export class Vencimientos implements OnInit {
       });
   }
 
-  private buildFilterParams(term: string | undefined, page?: number, limit?: number, filters?: GestionFilters): Record<string, string> {
+  private buildFilterParams(term: string | undefined, page?: number, limit?: number, filters?: Filtro): Record<string, string> {
     const q = (term ?? '').trim();
     const params: Record<string, string> = {
       page: String(page ?? this.page),
@@ -144,11 +145,21 @@ export class Vencimientos implements OnInit {
     // Rango de fechas para fecha_vencimiento
     const desde = (f.fechaDesde ?? '').trim();
     const hasta = (f.fechaHasta ?? '').trim();
-    if (desde) {
-      params['filter[fecha_vencimiento][_gte]'] = desde;
-    }
-    if (hasta) {
-      params['filter[fecha_vencimiento][_lte]'] = hasta;
+    if (desde || hasta) {
+      if (desde) {
+        params['filter[fecha_vencimiento][_gte]'] = desde;
+      }
+      if (hasta) {
+        params['filter[fecha_vencimiento][_lte]'] = hasta;
+      }
+    } else {
+      // Si no hay filtros manuales, aplicar automáticamente el siguiente mes completo
+      const now = new Date();
+      const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+      const fmt = (d: Date) => d.toISOString().slice(0, 10);
+      params['filter[fecha_vencimiento][_gte]'] = fmt(nextMonthStart);
+      params['filter[fecha_vencimiento][_lte]'] = fmt(nextMonthEnd);
     }
     return params;
   }
@@ -157,7 +168,7 @@ export class Vencimientos implements OnInit {
     this.search$.next(value?.trim() ?? '');
   }
 
-  onFilterChange(field: keyof GestionFilters, value: string) {
+  onFilterChange(field: keyof Filtro, value: string) {
     const v = (value ?? '').trim();
     this.filters = { ...this.filters, [field]: v };
     this.filters$.next(this.filters);
@@ -404,13 +415,4 @@ export class Vencimientos implements OnInit {
       .join(' ');
     return transformed + trailing;
   }
-}
-
-interface GestionFilters {
-  aseguradora: string;
-  tipoPoliza: string;
-  numeroPoliza: string;
-  formaPago: string;
-  fechaDesde: string;
-  fechaHasta: string;
 }
