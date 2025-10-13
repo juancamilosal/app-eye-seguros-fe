@@ -77,6 +77,7 @@ export class Gestion implements OnInit {
             prenda: !!(r?.prenda ?? r?.prenda),
             esVehiculo: !!(r?.es_vehiculo ?? r?.esVehiculo),
             placa: (r?.es_vehiculo ?? r?.esVehiculo) ? (r?.placa ?? r?.placa ?? '') : undefined,
+            entidadPrendaria: r?.entidad_prendaria ?? r?.entidadPrendaria ?? undefined,
           } as Management;
         });
 
@@ -179,6 +180,8 @@ export class Gestion implements OnInit {
       tipoDocumento: item.tipoDocumento,
       numeroDocumento: item.numeroDocumento,
       prenda: item.prenda,
+      placa: item.placa ?? '',
+      entidadPrendaria: item.entidadPrendaria ?? '',
     };
   }
 
@@ -188,6 +191,12 @@ export class Gestion implements OnInit {
     if (field === 'valorAnterior' || field === 'valorActual') {
       const onlyDigits = String(value || '').replace(/\D+/g, '');
       this.editBuffer[id][field] = Number(onlyDigits || 0);
+    } else if (field === 'placa') {
+      const upper = String(value ?? '').toLocaleUpperCase('es-ES');
+      this.editBuffer[id][field] = upper;
+    } else if (field === 'entidadPrendaria') {
+      const transformed = this.toTitleCaseSpanish(String(value ?? ''));
+      this.editBuffer[id][field] = transformed;
     } else {
       this.editBuffer[id][field] = value;
     }
@@ -196,6 +205,23 @@ export class Gestion implements OnInit {
   confirmInlineUpdate(id: string) {
     const data = this.editBuffer[id];
     if (!id || !data) return;
+    const current = this.vencimientos.find(v => v.id === id);
+    const esVehiculo = !!(current?.esVehiculo);
+    const prenda = !!(data.prenda ?? current?.prenda ?? false);
+    const placa = esVehiculo ? (String((data.placa ?? current?.placa ?? '')) || '') : undefined;
+    let entidad = prenda ? (String((data.entidadPrendaria ?? current?.entidadPrendaria ?? ''))).trim() : '';
+    entidad = prenda ? this.toTitleCaseSpanish(entidad) : '';
+    // Validación: si prenda es true, entidad prendaria debe existir
+    if (prenda && (!entidad || entidad.trim().length === 0)) {
+      this.notification = {
+        type: 'warning',
+        title: 'Entidad prendaria requerida',
+        message: 'Si Prenda está activo, debe diligenciar la Entidad prendaria para actualizar.',
+        confirmable: false
+      };
+      this.isModalVisible = true;
+      return;
+    }
     const payload: Partial<VencimientoPayload> = {
       numero_poliza: data.numeroPoliza,
       tipo_poliza: data.tipoPoliza,
@@ -205,13 +231,17 @@ export class Gestion implements OnInit {
       fecha_vencimiento: data.fechaVencimiento,
       aseguradora: data.aseguradora,
       // Nota: titular/cliente no se actualiza desde inline aquí
+      prenda,
+      es_vehiculo: esVehiculo,
+      placa,
+      entidad_prendaria: prenda ? entidad : null,
     };
     this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
       next: () => {
         // Refleja cambios localmente
         this.vencimientos = this.vencimientos.map(v => {
           if (v.id === id) {
-            return { ...v, ...data };
+            return { ...v, ...data, prenda, esVehiculo, placa, entidadPrendaria: prenda ? entidad : undefined };
           }
           return v;
         });
@@ -268,5 +298,19 @@ export class Gestion implements OnInit {
         this.onModalClosed();
       }
     });
+  }
+
+  private toTitleCaseSpanish(value: string): string {
+    const raw = value || '';
+    const trailingMatch = raw.match(/\s+$/);
+    const trailing = trailingMatch ? trailingMatch[0] : '';
+    const words = raw.trim()
+      .toLocaleLowerCase('es-ES')
+      .split(/\s+/)
+      .filter(w => w.length > 0);
+    const transformed = words
+      .map(w => w.charAt(0).toLocaleUpperCase('es-ES') + w.slice(1))
+      .join(' ');
+    return transformed + trailing;
   }
 }
