@@ -3,8 +3,8 @@
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex items-center gap-8 sm:gap-6">
         <span class="inline-flex items-center justify-center w-12 h-12" aria-hidden="true">
-              <img src="assets/icons/gestion.png" alt="Clientes" class="w-full h-full object-contain" />
-            </span>
+          <img src="assets/icons/gestion.png" alt="Clientes" class="w-full h-full object-contain" />
+        </span>
         <h1 class="text-3xl font-bold text-[#38338a]">Gestión</h1>
       </div>
       <button (click)="openForm()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">
@@ -41,45 +41,45 @@
 
       <!-- Filtros avanzados -->
       @if (showAdvancedFilters) {
-      <div class="rounded-lg border border-gray-200 bg-white p-4">
-        <div class="mb-7">
-          <h3 class="text-base font-semibold">Filtros Avanzados</h3>
+        <div class="rounded-lg border border-gray-200 bg-white p-4">
+          <div class="mb-7">
+            <h3 class="text-base font-semibold">Filtros Avanzados</h3>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Número de Póliza</label>
+              <input type="text" [value]="filters.numeroPoliza" (input)="onFilterChange('numeroPoliza', $any($event.target).value)" placeholder="Ej: 123456" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Tipo de Póliza</label>
+              <input type="text" [value]="filters.tipoPoliza" (input)="onFilterChange('tipoPoliza', $any($event.target).value)" placeholder="Ej: SOAT" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Aseguradora</label>
+              <input type="text" [value]="filters.aseguradora" (input)="onFilterChange('aseguradora', $any($event.target).value)" placeholder="Ej: SURA" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Forma de Pago</label>
+              <select [value]="filters.formaPago" (change)="onFilterChange('formaPago', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]">
+                <option value="">Todas</option>
+                @for (fp of formaPago; track fp) {
+                  <option [value]="fp">{{ fp }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Fecha de Vencimiento (Inicio)</label>
+              <input type="date" [value]="filters.fechaDesde" (input)="onFilterChange('fechaDesde', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Fecha de Vencimiento (Fin)</label>
+              <input type="date" [value]="filters.fechaHasta" (input)="onFilterChange('fechaHasta', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+            </div>
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button type="button" (click)="clearFilters()" class="px-3 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50">Limpiar filtros</button>
+          </div>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
-          <div>
-            <label class="block text-sm font-medium text-[#38338a] mb-1">Número de Póliza</label>
-            <input type="text" [value]="filters.numeroPoliza" (input)="onFilterChange('numeroPoliza', $any($event.target).value)" placeholder="Ej: 123456" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-[#38338a] mb-1">Tipo de Póliza</label>
-            <input type="text" [value]="filters.tipoPoliza" (input)="onFilterChange('tipoPoliza', $any($event.target).value)" placeholder="Ej: SOAT" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-[#38338a] mb-1">Aseguradora</label>
-            <input type="text" [value]="filters.aseguradora" (input)="onFilterChange('aseguradora', $any($event.target).value)" placeholder="Ej: SURA" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-[#38338a] mb-1">Forma de Pago</label>
-            <select [value]="filters.formaPago" (change)="onFilterChange('formaPago', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]">
-              <option value="">Todas</option>
-              @for (fp of formaPago; track fp) {
-                <option [value]="fp">{{ fp }}</option>
-              }
-            </select>
-          </div>
-          <div>
-          <label class="block text-sm font-medium text-[#38338a] mb-1">Fecha de Vencimiento (Inicio)</label>
-            <input type="date" [value]="filters.fechaDesde" (input)="onFilterChange('fechaDesde', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
-          </div>
-          <div>
-          <label class="block text-sm font-medium text-[#38338a] mb-1">Fecha de Vencimiento (Fin)</label>
-            <input type="date" [value]="filters.fechaHasta" (input)="onFilterChange('fechaHasta', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
-          </div>
-        </div>
-        <div class="mt-3 flex gap-2">
-          <button type="button" (click)="clearFilters()" class="px-3 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50">Limpiar filtros</button>
-        </div>
-      </div>
       }
     </div>
 
@@ -169,15 +169,17 @@
               <tr class="hover:bg-gray-50">
                 <td class="px-4 py-3 text-sm text-gray-900">
                   <div class="font-medium">{{ vencimiento.titular }}</div>
-                  <div class="text-xs text-gray-600 mt-1" *ngIf="vencimiento.tipoDocumento || vencimiento.numeroDocumento">
-                    {{ vencimiento.tipoDocumento }} : {{ vencimiento.numeroDocumento }}
-                  </div>
+                  @if (vencimiento.tipoDocumento || vencimiento.numeroDocumento) {
+                    <div class="text-xs text-gray-600 mt-1">
+                      {{ vencimiento.tipoDocumento }} : {{ vencimiento.numeroDocumento }}
+                    </div>
+                  }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900">
                   @if (editingRowId === vencimiento.id) {
                     <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                           [value]="(editBuffer[editingRowId!]?.numeroPoliza ?? vencimiento.numeroPoliza)"
-                           (input)="onInlineFieldChange(editingRowId || '', 'numeroPoliza', $any($event.target).value)" />
+                      [value]="(editBuffer[editingRowId!]?.numeroPoliza ?? vencimiento.numeroPoliza)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'numeroPoliza', $any($event.target).value)" />
                   } @else {
                     {{ vencimiento.numeroPoliza }}
                   }
@@ -199,16 +201,18 @@
                           </div>
                           <div class="flex items-center gap-2 mb-1">
                             <input class="w-44 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88] uppercase"
-                                   placeholder="Placa"
-                                   [value]="(editBuffer[editingRowId!]?.placa ?? vencimiento.placa) ?? ''"
-                                   (input)="onInlineFieldChange(editingRowId || '', 'placa', $any($event.target).value)" />
+                              placeholder="Placa"
+                              [value]="(editBuffer[editingRowId!]?.placa ?? vencimiento.placa) ?? ''"
+                              (input)="onInlineFieldChange(editingRowId || '', 'placa', $any($event.target).value)" />
                           </div>
-                          <div class="flex items-center gap-2" *ngIf="(editBuffer[editingRowId!]?.prenda ?? vencimiento.prenda)">
-                            <input class="w-64 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                                   placeholder="Entidad Prendaria"
-                                   [value]="((editBuffer[editingRowId!]?.entidadPrendaria ?? vencimiento.entidadPrendaria) ?? '')"
-                                   (input)="onInlineFieldChange(editingRowId || '', 'entidadPrendaria', $any($event.target).value)" />
-                          </div>
+                          @if ((editBuffer[editingRowId!]?.prenda ?? vencimiento.prenda)) {
+                            <div class="flex items-center gap-2">
+                              <input class="w-64 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                                placeholder="Entidad Prendaria"
+                                [value]="((editBuffer[editingRowId!]?.entidadPrendaria ?? vencimiento.entidadPrendaria) ?? '')"
+                                (input)="onInlineFieldChange(editingRowId || '', 'entidadPrendaria', $any($event.target).value)" />
+                            </div>
+                          }
                         }
                       </div>
                     } @else if (vencimiento.esVehiculo) {
@@ -229,8 +233,8 @@
                 <td class="px-4 py-3 text-sm text-gray-900">
                   @if (editingRowId === vencimiento.id) {
                     <select class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                            [value]="(editBuffer[editingRowId!]?.formaPagoRenovacion ?? vencimiento.formaPagoRenovacion)"
-                            (change)="onInlineFieldChange(editingRowId || '', 'formaPagoRenovacion', $any($event.target).value)">
+                      [value]="(editBuffer[editingRowId!]?.formaPagoRenovacion ?? vencimiento.formaPagoRenovacion)"
+                      (change)="onInlineFieldChange(editingRowId || '', 'formaPagoRenovacion', $any($event.target).value)">
                       @for (fp of formaPago; track fp) {
                         <option [value]="fp">{{ fp }}</option>
                       }
@@ -242,8 +246,8 @@
                 <td class="px-4 py-3 text-sm text-gray-900">
                   @if (editingRowId === vencimiento.id) {
                     <input inputmode="numeric" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                           [value]="(editBuffer[editingRowId!]?.valorAnterior ?? vencimiento.valorAnterior)"
-                           (input)="onInlineFieldChange(editingRowId || '', 'valorAnterior', $any($event.target).value)" />
+                      [value]="(editBuffer[editingRowId!]?.valorAnterior ?? vencimiento.valorAnterior)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'valorAnterior', $any($event.target).value)" />
                   } @else {
                     {{ vencimiento.valorAnterior | currency:'$':'symbol':'1.0-0' }}
                   }
@@ -251,8 +255,8 @@
                 <td class="px-4 py-3 text-sm text-gray-900">
                   @if (editingRowId === vencimiento.id) {
                     <input inputmode="numeric" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                           [value]="(editBuffer[editingRowId!]?.valorActual ?? vencimiento.valorActual)"
-                           (input)="onInlineFieldChange(editingRowId || '', 'valorActual', $any($event.target).value)" />
+                      [value]="(editBuffer[editingRowId!]?.valorActual ?? vencimiento.valorActual)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'valorActual', $any($event.target).value)" />
                   } @else {
                     {{ vencimiento.valorActual | currency:'$':'symbol':'1.0-0' }}
                   }
@@ -260,8 +264,8 @@
                 <td class="px-4 py-3 text-sm text-gray-900">
                   @if (editingRowId === vencimiento.id) {
                     <input type="date" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                           [value]="(editBuffer[editingRowId!]?.fechaVencimiento ?? (vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date:'yyyy-MM-dd') : ''))"
-                           (input)="onInlineFieldChange(editingRowId || '', 'fechaVencimiento', $any($event.target).value)" />
+                      [value]="(editBuffer[editingRowId!]?.fechaVencimiento ?? (vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date:'yyyy-MM-dd') : ''))"
+                      (input)="onInlineFieldChange(editingRowId || '', 'fechaVencimiento', $any($event.target).value)" />
                   } @else {
                     {{ vencimiento.fechaVencimiento ? (vencimiento.fechaVencimiento | date: 'dd/MM/yyyy') : '—' }}
                   }
@@ -269,8 +273,8 @@
                 <td class="px-4 py-3 text-sm text-gray-900">
                   @if (editingRowId === vencimiento.id) {
                     <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                           [value]="(editBuffer[editingRowId!]?.aseguradora ?? vencimiento.aseguradora)"
-                           (input)="onInlineFieldChange(editingRowId || '', 'aseguradora', $any($event.target).value)" />
+                      [value]="(editBuffer[editingRowId!]?.aseguradora ?? vencimiento.aseguradora)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'aseguradora', $any($event.target).value)" />
                   } @else {
                     {{ vencimiento.aseguradora || '—' }}
                   }
@@ -278,8 +282,8 @@
                 <td class="px-4 py-3 text-sm text-gray-900">
                   @if (editingRowId === vencimiento.id) {
                     <select class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
-                            [value]="(editBuffer[editingRowId!]?.estado ?? vencimiento.estado ?? '')"
-                            (change)="onInlineFieldChange(editingRowId || '', 'estado', $any($event.target).value)">
+                      [value]="(editBuffer[editingRowId!]?.estado ?? vencimiento.estado ?? '')"
+                      (change)="onInlineFieldChange(editingRowId || '', 'estado', $any($event.target).value)">
                       <option value="">Seleccione</option>
                       <option value="Pagada">Pagada</option>
                       <option value="Pendiente">Pendiente</option>

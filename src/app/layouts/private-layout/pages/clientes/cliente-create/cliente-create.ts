@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { ClienteForm, Cliente } from '../cliente-form/cliente-form';
 import { ClienteService } from '../../../../../core/services/cliente.service';
@@ -10,7 +10,7 @@ import { NotificationData } from '../../../../../core/models/NotificationData';
 @Component({
   selector: 'app-cliente-create',
   standalone: true,
-  imports: [CommonModule, ClienteForm, NotificationModalComponent],
+  imports: [ClienteForm, NotificationModalComponent],
   templateUrl: './cliente-create.html'
 })
 export class ClienteCreate {

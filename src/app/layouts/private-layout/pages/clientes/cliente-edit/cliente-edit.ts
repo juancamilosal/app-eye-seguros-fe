@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClienteForm, Cliente } from '../cliente-form/cliente-form';
 import { ClienteService } from '../../../../../core/services/cliente.service';
@@ -8,7 +8,7 @@ import { Client } from '../../../../../core/models/Client';
 @Component({
   selector: 'app-cliente-edit',
   standalone: true,
-  imports: [CommonModule, ClienteForm],
+  imports: [ClienteForm],
   templateUrl: './cliente-edit.html'
 })
 export class ClienteEdit implements OnInit {

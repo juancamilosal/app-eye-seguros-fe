@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { Router } from '@angular/router';
 import { VencimientoForm } from '../vencimiento-form/vencimiento-form';
 import { NotificationModalComponent } from '../../../../../components/notification-modal/notification-modal';
@@ -10,7 +10,7 @@ import { Management } from '../../../../../core/models/Management';
 @Component({
   selector: 'app-vencimiento-create',
   standalone: true,
-  imports: [CommonModule, VencimientoForm, NotificationModalComponent],
+  imports: [VencimientoForm, NotificationModalComponent],
   templateUrl: './vencimiento-create.html'
 })
 export class VencimientoCreate {
