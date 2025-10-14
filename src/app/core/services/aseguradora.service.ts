@@ -37,4 +37,16 @@ export class AseguradoraService {
     } as Record<string, string>;
     return this.http.get<{ data: Aseguradora[] }>(this.url, { params: query });
   }
+
+  crearAseguradora(data: Partial<Aseguradora>): Observable<any> {
+    return this.http.post(this.url, data);
+  }
+
+  actualizarAseguradora(id: string | number, data: Partial<Aseguradora>): Observable<any> {
+    return this.http.patch(`${this.url}/${id}`, data);
+  }
+
+  eliminarAseguradora(id: string | number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
 }

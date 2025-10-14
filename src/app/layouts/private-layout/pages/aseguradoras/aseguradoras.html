@@ -1,21 +1,69 @@
-<div class="p-4 sm:p-6">
-  <div class="flex items-center justify-between mb-4">
-    <div class="flex items-center gap-2">
-      <h1 class="text-2xl font-semibold text-[#38338a]">Aseguradoras</h1>
-      <img src="assets/icons/aseguradoras.png" alt="Aseguradoras" class="w-7 h-7" />
+<div class="min-h-screen">
+  <div class="w-full mx-auto px-6 py-10">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center gap-8 sm:gap-6">
+        <span class="inline-flex items-center justify-center w-12 h-12" aria-hidden="true">
+          <img src="assets/icons/aseguradora.png" alt="Aseguradoras" class="w-full h-full object-contain" />
+        </span>
+        <h1 class="text-3xl font-bold text-[#38338a]">Aseguradoras</h1>
+      </div>
+      <a routerLink="/aseguradoras/nuevo" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">
+        + Crear Aseguradora
+      </a>
     </div>
-    <span class="text-sm text-gray-600">Listado de aseguradoras desde Directus</span>
-  </div>
 
-  @if (loading) {
-    <div class="text-gray-600 text-sm">Cargando aseguradoras...</div>
-  } @else if (aseguradoras.length === 0) {
-    <div class="text-gray-600 text-sm">No hay aseguradoras registradas.</div>
-  } @else {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      @for (a of aseguradoras; track a.id) {
-        <app-aseguradora-card [aseguradora]="a"></app-aseguradora-card>
+    <div class="mt-2 text-base text-gray-700 mb-16 sm:mb-10">
+      <p class="text-lg">Listado de aseguradoras registradas.</p>
+    </div>
+
+    <!-- Buscador -->
+    <div class="mt-4 flex flex-col gap-3">
+      <div class="w-full sm:w-96 relative">
+        <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path fill-rule="evenodd" d="M10.5 3a7.5 7.5 0 105.22 12.96l3.16 3.16a.75.75 0 101.06-1.06l-3.16-3.16A7.5 7.5 0 0010.5 3zm0 1.5a6 6 0 100 12 6 6 0 000-12z" clip-rule="evenodd" />
+          </svg>
+        </span>
+        <input type="text" (input)="onSearchChange($event.target.value)" placeholder="Buscar aseguradora por nombre" class="w-full pl-10 pr-3 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+      </div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="mt-6">
+      @if (loading) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="bg-white rounded-xl shadow p-4 border border-gray-200 animate-pulse">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="h-6 w-40 bg-gray-200 rounded"></div>
+                <div class="h-6 w-6 bg-gray-200 rounded-full"></div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="p-2 rounded-md bg-gray-50">
+                  <div class="h-3 w-24 bg-gray-200 rounded mb-2"></div>
+                  <div class="h-4 w-32 bg-gray-200 rounded"></div>
+                </div>
+                <div class="p-2 rounded-md bg-gray-50">
+                  <div class="h-3 w-20 bg-gray-200 rounded mb-2"></div>
+                  <div class="h-4 w-28 bg-gray-200 rounded"></div>
+                </div>
+                <div class="p-2 rounded-md bg-gray-50">
+                  <div class="h-3 w-16 bg-gray-200 rounded mb-2"></div>
+                  <div class="h-4 w-24 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (aseguradoras.length === 0) {
+        <div class="text-gray-600 text-sm">No hay aseguradoras registradas.</div>
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (a of aseguradoras; track a.id) {
+            <app-aseguradora-card [aseguradora]="a" (updated)="onCardUpdated($event)" (deleted)="onCardDeleted($event)"></app-aseguradora-card>
+          }
+        </div>
       }
     </div>
-  }
+  </div>
 </div>

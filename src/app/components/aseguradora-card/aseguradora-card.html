@@ -1,14 +1,51 @@
 <div class="bg-white rounded-xl shadow p-4 border border-gray-200">
   <div class="flex items-center gap-2 mb-3">
     <h3 class="text-xl font-semibold text-[#243B88]">{{ aseguradora?.nombre || 'Aseguradora' }}</h3>
-    <img src="assets/icons/aseguradoras.png" alt="Aseguradora" class="w-6 h-6" />
+    <img src="assets/icons/aseguradora.png" alt="Aseguradora" class="w-6 h-6" />
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
     @for (entry of displayedEntries; track entry.key) {
       <div class="flex flex-col p-2 rounded-md bg-gray-50">
-        <span class="text-xs text-gray-600">{{ entry.key }}</span>
-        <span class="text-sm text-gray-900 break-words">{{ toValue(entry.value) }}</span>
+        <span class="text-xs text-gray-600">{{ entry.label }}</span>
+        @if (!editMode) {
+          <span class="text-sm text-gray-900 break-words">{{ toValue(entry.value) }}</span>
+        } @else {
+          <input
+            class="mt-1 w-full px-2 py-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4] text-sm"
+            [type]="entry.key === 'email' ? 'email' : 'text'"
+            [value]="$any(editBuffer)[entry.key] || ''"
+            (input)="onEditChange(entry.key, $any($event.target).value)"
+          />
+        }
       </div>
     }
   </div>
+  <div class="mt-4 flex items-center justify-center gap-3">
+    @if (!editMode) {
+      <button (click)="startEdit()" class="inline-flex items-center justify-center px-3 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50" title="Editar">
+        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5 mr-2" />
+        Editar
+      </button>
+      <button (click)="eliminar()" class="inline-flex items-center justify-center px-3 py-2 rounded-md border border-red-300 text-red-700 hover:bg-red-50" title="Eliminar">
+        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5 mr-2" />
+        Eliminar
+      </button>
+    } @else {
+      <button (click)="confirmUpdate()" class="inline-flex items-center justify-center px-3 py-2 rounded-md border border-green-300 text-green-700 hover:bg-green-50" title="Actualizar">
+        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5 mr-2" />
+        Guardar
+      </button>
+      <button (click)="cancelEdit()" class="inline-flex items-center justify-center px-3 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50" title="Volver">
+        <img src="assets/icons/regresar.png" alt="Regresar" class="w-5 h-5 mr-2" />
+        Cancelar
+      </button>
+    }
+  </div>
+  <!-- Modal de confirmación -->
+  <app-notification-modal
+    [isVisible]="isModalVisible"
+    [notification]="notification"
+    (close)="onModalClosed()"
+    (confirm)="onModalConfirm()"
+  ></app-notification-modal>
 </div>
