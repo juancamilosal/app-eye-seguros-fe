@@ -85,7 +85,7 @@ export class Dashboard implements OnInit {
           const titular = `${nombre} ${apellido}`.trim();
           return {
             titular,
-            aseguradora: r?.aseguradora ?? undefined,
+            aseguradora: (r?.aseguradora ?? r?.aseguradora_id?.nombre ?? undefined),
             numeroPoliza: r?.numero_poliza ?? '',
             fechaVencimiento: r?.fecha_vencimiento ?? undefined,
           };
@@ -124,14 +124,14 @@ export class Dashboard implements OnInit {
 
   private loadPolizasPorAseguradora(): void {
     this.loadingAseguradoras = true;
-    const params: Record<string, string> = { limit: '-1', fields: 'aseguradora' };
+    const params: Record<string, string> = { limit: '-1', fields: 'aseguradora_id.nombre' };
     // Consulta básica para minimizar payload
     this.gestionService.obtenerPolizasRaw(params).subscribe({
       next: (resp) => {
-        const data = (resp?.data ?? []) as Array<{ aseguradora?: string }>;
+        const data = (resp?.data ?? []) as any[];
         const counts = new Map<string, number>();
         for (const item of data) {
-          const key = (item?.aseguradora ?? '').trim();
+          const key = (item?.aseguradora ?? item?.aseguradora_id?.nombre ?? '').trim();
           if (!key) continue;
           counts.set(key, (counts.get(key) ?? 0) + 1);
         }
