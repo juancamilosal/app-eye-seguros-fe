@@ -25,6 +25,11 @@ export class GestionService {
     return this.http.get<ResponseAPI<any[]>>(this.url, { params: query });
   }
 
+  // Consulta ligera de pólizas, permitiendo especificar campos.
+  obtenerPolizasRaw(params?: Record<string, string>): Observable<ResponseAPI<any[]>> {
+    return this.http.get<ResponseAPI<any[]>>(this.url, { params });
+  }
+
   actualizarVencimiento(id: string, payload: Partial<GestionModel>): Observable<ResponseAPI<any>> {
     return this.http.patch<ResponseAPI<any>>(`${this.url}/${id}`, payload);
   }
