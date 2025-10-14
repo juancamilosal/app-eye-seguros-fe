@@ -1,24 +1,26 @@
 import { Component } from '@angular/core';
 
 import { Router } from '@angular/router';
-import { VencimientoForm } from '../vencimiento-form/vencimiento-form';
+import { GestionForm } from '../gestion-form/gestion-form';
 import { NotificationModalComponent } from '../../../../../components/notification-modal/notification-modal';
 import { NotificationData } from '../../../../../core/models/NotificationData';
-import { VencimientoService, VencimientoPayload } from '../../../../../core/services/vencimiento.service';
+import { GestionService } from '../../../../../core/services/gestion.service';
 import { Management } from '../../../../../core/models/Management';
+import {GestionModel} from '../../../../../core/models/GestionModel';
 
 @Component({
-  selector: 'app-vencimiento-create',
+  selector: 'app-gestion-create',
   standalone: true,
-  imports: [VencimientoForm, NotificationModalComponent],
-  templateUrl: './vencimiento-create.html'
+  imports: [GestionForm, NotificationModalComponent],
+  templateUrl: './gestion-create.html'
 })
-export class VencimientoCreate {
+export class GestionCreate {
+
   isSubmitting = false;
   isModalVisible = false;
   notification: NotificationData | null = null;
 
-  constructor(private router: Router, private vencimientoService: VencimientoService) {}
+  constructor(private router: Router, private vencimientoService: GestionService) {}
 
   goBack() {
     this.router.navigateByUrl('/gestion');
@@ -28,9 +30,9 @@ export class VencimientoCreate {
     this.goBack();
   }
 
-  onSave(item: Management & { titularId?: string }) {
+  onSave(item: Management & { titularId?: string; aseguradoraId?: string }) {
     // Se espera que el formulario provea el ID del titular (cliente) en item.titularId
-    const payload: VencimientoPayload = {
+    const payload: GestionModel = {
       cliente_id: item.titularId || '',
       numero_poliza: item.numeroPoliza,
       tipo_poliza: item.tipoPoliza,
@@ -39,6 +41,7 @@ export class VencimientoCreate {
       valor_poliza_actual: item.valorActual,
       fecha_vencimiento: item.fechaVencimiento,
       aseguradora: item.aseguradora,
+      aseguradora_id: item.aseguradoraId || undefined,
       estado: item.estado,
       prenda: !!item.prenda,
       es_vehiculo: !!item.esVehiculo,

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 import { Router } from '@angular/router';
-import { ClienteForm, Cliente } from '../cliente-form/cliente-form';
+import { ClienteForm } from '../cliente-form/cliente-form';
 import { ClienteService } from '../../../../../core/services/cliente.service';
 import { Client } from '../../../../../core/models/Client';
 import { NotificationModalComponent } from '../../../../../components/notification-modal/notification-modal';
@@ -28,16 +28,16 @@ export class ClienteCreate {
     this.goBack();
   }
 
-  onSave(item: Cliente) {
+  onSave(item: Client) {
     // Mapear a Client (API) con snake_case para fecha_nacimiento
     const payload: Client = {
-      tipo_documento: item.tipoDocumento,
-      numero_documento: item.numeroDocumento,
+      tipo_documento: item.tipo_documento,
+      numero_documento: item.numero_documento,
       nombre: item.nombre,
       apellido: item.apellido,
-      fecha_nacimiento: item.fechaNacimiento,
+      fecha_nacimiento: item.fecha_nacimiento,
       direccion: item.direccion,
-      numero_contacto: item.numeroContacto,
+      numero_contacto: item.numero_contacto,
       email: item.email,
     };
 

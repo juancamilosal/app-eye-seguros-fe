@@ -1,6 +1,258 @@
 <div class="min-h-screen">
-  <div class="max-w-6xl mx-auto px-6 py-10">
-    <h1 class="text-3xl font-bold text-[#243B88]">Dashboard</h1>
-    <p class="mt-4 text-gray-700">Bienvenido al panel privado.</p>
+  <div class="w-full mx-auto px-6 py-10">
+    <div class="flex items-center gap-8 sm:gap-6 mb-6">
+      <span class="inline-flex items-center justify-center w-12 h-12" aria-hidden="true">
+        <img src="assets/icons/analisis-de-datos.png" alt="Dashboard" class="w-full h-full object-contain" />
+      </span>
+      <h1 class="text-3xl font-bold text-[#243B88]">Dashboard</h1>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Bloque Izquierda: Vencimientos y Cumpleaños -->
+      <div class="flex flex-col gap-8">
+        <!-- Sección: Tablero de Tareas -->
+        <div class="p-6">
+          <app-lista-tareas></app-lista-tareas>
+        </div>
+        <!-- Sección: Vencimientos próximo mes -->
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <h2 class="text-2xl font-semibold text-[#38338a]">Vencimientos</h2>
+              <img src="assets/icons/vencimientos.png" alt="Vencimientos" class="w-7 h-7 opacity-80 hover:opacity-100" />
+            </div>
+            <span class="text-sm text-gray-600 sm:text-right">Pólizas que vencen en {{ nextMonthName }}</span>
+          </div>
+          @if (loadingVencimientos) {
+            <div class="text-gray-600 text-sm">Cargando vencimientos...</div>
+          } @else if (proximosVencimientos.length === 0) {
+            <div class="text-gray-600 text-sm">No hay pólizas próximas a vencer en {{ nextMonthName }}.</div>
+          } @else {
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Titular</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Aseguradora</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">No. Póliza</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Fecha Vencimiento</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  @for (item of proximosVencimientosPreview; track $index) {
+                    <tr>
+                      <td class="px-4 py-2">{{ item.titular }}</td>
+                      <td class="px-4 py-2">{{ item.aseguradora || '-' }}</td>
+                      <td class="px-4 py-2">{{ item.numeroPoliza }}</td>
+                      <td class="px-4 py-2">{{ item.fechaVencimiento || '-' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            @if (proximosVencimientos.length > 3) {
+              <div class="flex justify-center mt-3">
+                <button (click)="openVencimientosModal()" class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200">
+                  <span class="text-2xl leading-none">···</span>
+                </button>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Bloque Derecha: Pólizas por aseguradora -->
+      <div class="flex flex-col gap-8">
+        <!-- Sección: Pólizas con las aseguradoras -->
+        <!-- Sección: Cumpleaños hoy -->
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <h2 class="text-2xl font-semibold text-[#38338a]">Cumpleaños</h2>
+              <img src="assets/icons/feliz-cumpleanos.png" alt="Feliz cumpleaños" class="w-7 h-7" />
+            </div>
+            <span class="text-sm text-gray-600 sm:text-right">Clientes que cumplen años hoy</span>
+          </div>
+          @if (loadingCumpleanos) {
+            <div class="text-gray-600 text-sm">Cargando cumpleañeros...</div>
+          } @else if (cumpleanerosHoy.length === 0) {
+            <div class="text-gray-600 text-sm">No hay clientes que cumplan años hoy.</div>
+          } @else {
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                <tr class="bg-gray-50">
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Nombre</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Apellido</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Documento</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Contacto</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Felicitar</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  @for (c of cumpleanerosHoyPreview; track c.id) {
+                    <tr>
+                      <td class="px-4 py-2">{{ c.nombre }}</td>
+                      <td class="px-4 py-2">{{ c.apellido }}</td>
+                      <td class="px-4 py-2">{{ c.tipo_documento }} {{ c.numero_documento }}</td>
+                      <td class="px-4 py-2">{{ c.numero_contacto || '-' }}</td>
+                      <td class="px-4 py-2">
+                        @if (c.email) {
+                          <a [href]="'mailto:' + c.email + '?subject=Feliz%20cumplea%C3%B1os%21'" class="inline-flex items-center gap-1 text-[#243B88] hover:underline" title="Enviar email">
+                            <img src="assets/icons/enviar-email.png" alt="Enviar email" class="w-7 h-7 object-contain" />
+                          </a>
+                        } @else {
+                          <div class="inline-flex items-center gap-1 text-gray-400 cursor-not-allowed" title="Sin email">
+                            <img src="assets/icons/enviar-email.png" alt="Enviar email" class="w-5 h-5 object-contain opacity-40" />
+                          </div>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            @if (cumpleanerosHoy.length > 3) {
+              <div class="flex justify-center mt-3">
+                <button (click)="openCumpleanosModal()" class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200">
+                  <span class="text-2xl leading-none">···</span>
+                </button>
+              </div>
+            }
+          }
+        </div>
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+          <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <h2 class="text-2xl font-semibold text-[#38338a]">Pólizas con las aseguradoras</h2>
+              <img src="assets/icons/aseguradora.png" alt="Aseguradora" class="w-7 h-7" />
+            </div>
+            <span class="text-sm text-gray-600 sm:text-right">Total de pólizas por aseguradora</span>
+          </div>
+          @if (loadingAseguradoras) {
+            <div class="text-gray-600 text-sm">Cargando totales...</div>
+          } @else if (polizasPorAseguradora.length === 0) {
+            <div class="text-gray-600 text-sm">No hay pólizas registradas.</div>
+          } @else {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4">
+              @for (item of polizasPorAseguradoraPreview; track $index) {
+                <div class="border rounded-lg p-4">
+                  <div class="text-sm text-gray-600">Aseguradora</div>
+                  <div class="text-xl font-semibold text-[#243B88]">{{ item.aseguradora }}</div>
+                  <div class="mt-2 text-sm text-gray-600">Total pólizas</div>
+                  <div class="text-2xl font-bold">{{ item.total }}</div>
+                </div>
+              }
+            </div>
+            @if (polizasPorAseguradora.length > 3) {
+              <div class="flex justify-center mt-3">
+                <button (click)="openAseguradorasModal()" class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200">
+                  <span class="text-2xl leading-none">···</span>
+                </button>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
   </div>
 </div>
+  <!-- Modales -->
+  @if (showVencimientosModal) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" (click)="closeVencimientosModal()">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between p-4 border-b">
+          <h3 class="text-xl font-semibold text-[#38338a]">Vencimientos en {{ nextMonthName }}</h3>
+          <button (click)="closeVencimientosModal()" class="text-gray-600 hover:text-gray-800">✕</button>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Titular</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Aseguradora</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">No. Póliza</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Fecha Vencimiento</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              @for (item of proximosVencimientos; track $index) {
+                <tr>
+                  <td class="px-4 py-2">{{ item.titular }}</td>
+                  <td class="px-4 py-2">{{ item.aseguradora || '-' }}</td>
+                  <td class="px-4 py-2">{{ item.numeroPoliza }}</td>
+                  <td class="px-4 py-2">{{ item.fechaVencimiento || '-' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showCumpleanosModal) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" (click)="closeCumpleanosModal()">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-4" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between p-4 border-b">
+          <h3 class="text-xl font-semibold text-[#38338a]">Cumpleaños de hoy</h3>
+          <button (click)="closeCumpleanosModal()" class="text-gray-600 hover:text-gray-800">✕</button>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Nombre</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Apellido</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Documento</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Contacto</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Felicitar</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              @for (c of cumpleanerosHoy; track c.id) {
+                <tr>
+                  <td class="px-4 py-2">{{ c.nombre }}</td>
+                  <td class="px-4 py-2">{{ c.apellido }}</td>
+                  <td class="px-4 py-2">{{ c.tipo_documento }} {{ c.numero_documento }}</td>
+                  <td class="px-4 py-2">{{ c.numero_contacto || '-' }}</td>
+                  <td class="px-4 py-2">
+                    @if (c.email) {
+                      <a [href]="'mailto:' + c.email + '?subject=Feliz%20cumplea%C3%B1os%21'" class="inline-flex items-center gap-1 text-[#243B88] hover:underline" title="Enviar email">
+                        <img src="assets/icons/enviar-email.png" alt="Enviar email" class="w-5 h-5 object-contain" />
+                        <span class="text-xs">Felicitar</span>
+                      </a>
+                    } @else {
+                      <div class="inline-flex items-center gap-1 text-gray-400 cursor-not-allowed" title="Sin email">
+                        <img src="assets/icons/enviar-email.png" alt="Enviar email" class="w-5 h-5 object-contain opacity-40" />
+                      </div>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showAseguradorasModal) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" (click)="closeAseguradorasModal()">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-xl mx-4" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between p-4 border-b">
+          <h3 class="text-xl font-semibold text-[#38338a]">Pólizas por aseguradora</h3>
+          <button (click)="closeAseguradorasModal()" class="text-gray-600 hover:text-gray-800">✕</button>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[60vh]">
+          <div class="space-y-3">
+            @for (item of polizasPorAseguradora; track $index) {
+              <div class="flex items-center justify-between border rounded-lg p-3">
+                <div class="text-[#243B88] font-medium">{{ item.aseguradora }}</div>
+                <div class="text-gray-700 font-semibold">{{ item.total }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }

@@ -3,7 +3,9 @@ const apiUrl = 'http://directus-tckww440wkcsos0o0csk8kwk.92.113.149.220.sslip.io
 export const environment = {
   production: true,
   clientes: apiUrl + 'items/clientes',
-  vencimientos: apiUrl + 'items/vencimientos',
+  polizas: apiUrl + 'items/polizas',
+  aseguradoras: apiUrl + 'items/aseguradoras',
+  lista_tarea: apiUrl + 'items/lista_tareas',
   seguridad: {
     login: apiUrl + 'auth/login',
     logout: apiUrl + 'auth/logout',

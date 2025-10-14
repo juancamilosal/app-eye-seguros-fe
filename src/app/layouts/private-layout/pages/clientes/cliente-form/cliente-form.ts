@@ -2,17 +2,8 @@ import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TIPO_DOCUMENTO } from '../../../../../core/const/TipoDocumentoConst';
+import {Client} from '../../../../../core/models/Client';
 
-export interface Cliente {
-  tipoDocumento: string;
-  numeroDocumento: string;
-  nombre: string;
-  apellido: string;
-  fechaNacimiento: string;
-  direccion: string;
-  numeroContacto: string;
-  email: string;
-}
 
 @Component({
   selector: 'app-cliente-form',
@@ -22,10 +13,10 @@ export interface Cliente {
 })
 export class ClienteForm implements OnInit {
   @Output() cancel = new EventEmitter<void>();
-  @Output() save = new EventEmitter<Cliente>();
+  @Output() save = new EventEmitter<Client>();
   @Input() isSubmitting = false;
-  private _initialValue: Cliente | null = null;
-  @Input() set initialValue(value: Cliente | null) {
+  private _initialValue: Client | null = null;
+  @Input() set initialValue(value: Client | null) {
     this._initialValue = value;
     if (value && this.clienteForm) {
       this.clienteForm.patchValue(value);
@@ -41,13 +32,13 @@ export class ClienteForm implements OnInit {
 
   ngOnInit(): void {
     this.clienteForm = this.fb.group({
-      tipoDocumento: ['', [Validators.required]],
-      numeroDocumento: [null, [Validators.required, Validators.minLength(5), Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
+      tipo_documento: ['', [Validators.required]],
+      numero_documento: [null, [Validators.required, Validators.minLength(5), Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
       nombre: [null, [Validators.required, Validators.minLength(2)]],
       apellido: [null, [Validators.required, Validators.minLength(2)]],
-      fechaNacimiento: [null, [Validators.required]],
+      fecha_nacimiento: [null, [Validators.required]],
       direccion: [null, [Validators.required, Validators.minLength(5)]],
-      numeroContacto: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
+      numero_contacto: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
       email: [null, [Validators.required, Validators.email]]
     });
 
@@ -73,11 +64,11 @@ export class ClienteForm implements OnInit {
       return;
     }
 
-    const v = this.clienteForm.value as Cliente;
+    const v = this.clienteForm.value as Client;
     this.save.emit(v);
   }
 
-  onNumericInput(event: Event, controlName: keyof Cliente, maxLen = 10) {
+  onNumericInput(event: Event, controlName: keyof Client, maxLen = 10) {
     const target = event.target as HTMLInputElement | null;
     if (!target) return;
     const onlyDigits = (target.value || '').replace(/\D+/g, '').slice(0, maxLen);
@@ -99,7 +90,7 @@ export class ClienteForm implements OnInit {
     return transformed + trailing;
   }
 
-  onCapitalizeInput(event: Event, controlName: keyof Cliente) {
+  onCapitalizeInput(event: Event, controlName: keyof Client) {
     const target = event.target as HTMLInputElement | null;
     if (!target) return;
     const transformed = this.toTitleCaseSpanish(target.value || '');
@@ -107,7 +98,7 @@ export class ClienteForm implements OnInit {
     ctrl?.setValue(transformed, { emitEvent: false });
   }
 
-  onLowercaseInput(event: Event, controlName: keyof Cliente) {
+  onLowercaseInput(event: Event, controlName: keyof Client) {
     const target = event.target as HTMLInputElement | null;
     if (!target) return;
     const lowered = (target.value || '').toLocaleLowerCase('es-ES');

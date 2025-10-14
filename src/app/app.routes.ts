@@ -27,15 +27,31 @@ export const routes: Routes = [
         loadComponent: () => import('./layouts/private-layout/pages/clientes/clientes').then(m => m.Clientes)
       },
       {
+        path: 'aseguradoras',
+        title: 'Euyenid & Edder | Aseguradoras',
+        loadComponent: () => import('./layouts/private-layout/pages/aseguradoras/aseguradoras').then(m => m.Aseguradoras)
+      },
+      {
+        path: 'aseguradoras/nuevo',
+        title: 'Euyenid & Edder | Nueva Aseguradora',
+        loadComponent: () => import('./layouts/private-layout/pages/aseguradoras/aseguradora-create/aseguradora-create').then(m => m.AseguradoraCreate)
+      },
+      {
         path: 'gestion',
         title: 'Euyenid & Edder | Gestión',
         loadComponent: () => import('./layouts/private-layout/pages/gestion/gestion').then(m => m.Gestion)
       }
       ,
       {
+        path: 'vencimientos',
+        title: 'Euyenid & Edder | Vencimientos',
+        loadComponent: () => import('./layouts/private-layout/pages/vencimientos/vencimientos').then(m => m.Vencimientos)
+      }
+      ,
+      {
         path: 'gestion/nuevo',
         title: 'Euyenid & Edder | Nuevo Vencimiento',
-        loadComponent: () => import('./layouts/private-layout/pages/gestion/vencimiento-create/vencimiento-create').then(m => m.VencimientoCreate)
+        loadComponent: () => import('./layouts/private-layout/pages/gestion/gestion-create/gestion-create').then(m => m.GestionCreate)
       }
       ,
       {
@@ -43,12 +59,7 @@ export const routes: Routes = [
         title: 'Euyenid & Edder | Nuevo Cliente',
         loadComponent: () => import('./layouts/private-layout/pages/clientes/cliente-create/cliente-create').then(m => m.ClienteCreate)
       }
-      ,
-      {
-        path: 'clientes/:id/editar',
-        title: 'Euyenid & Edder | Editar Cliente',
-        loadComponent: () => import('./layouts/private-layout/pages/clientes/cliente-edit/cliente-edit').then(m => m.ClienteEdit)
-      }
+      
     ]
   },
   { path: '**', redirectTo: 'login' }

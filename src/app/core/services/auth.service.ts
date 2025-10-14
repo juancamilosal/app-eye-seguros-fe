@@ -3,33 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, of, BehaviorSubject } from 'rxjs';
 import { filter, take, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-
-interface DirectusLoginResponse {
-  data: {
-    access_token: string;
-    refresh_token?: string;
-    expires?: number;
-  };
-}
-
-interface DirectusUserMe {
-  data: {
-    id: string;
-    email: string;
-    first_name?: string;
-    last_name?: string;
-    role?: string;
-  };
-}
+import {DirectusLoginResponse, DirectusUserMe} from '../models/Login';
 
 @Injectable({ providedIn: 'root' })
+
 export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
   private readonly TOKEN_REFRESH_KEY = 'refresh_token';
   private refreshing = false;
   private refreshSubject = new BehaviorSubject<string | null>(null);
   private refreshTimerId: number | null = null;
-  private readonly REFRESH_SKEW_MS = 60_000; // refrescar 60s antes de expirar
+  private readonly REFRESH_SKEW_MS = 60_000;
 
   constructor(private http: HttpClient) {
     const existingToken = localStorage.getItem(this.TOKEN_KEY);
@@ -43,7 +27,7 @@ export class AuthService {
       tap((resp) => {
         const token = resp?.data?.access_token;
         const refresh = resp?.data?.refresh_token;
-        const expires = resp?.data?.expires; // segundos hasta expiración (Directus)
+        const expires = resp?.data?.expires;
         if (token) {
           localStorage.setItem(this.TOKEN_KEY, token);
         }
@@ -57,7 +41,6 @@ export class AuthService {
     );
   }
 
-  // Obtiene datos del usuario actual
   me(): Observable<DirectusUserMe> {
     return this.http.get<DirectusUserMe>(environment.seguridad.me);
   }

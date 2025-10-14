@@ -11,38 +11,28 @@ import { ModalComentarioComponent } from '../../../../components/modal-comentari
 import { NotificationData } from '../../../../core/models/NotificationData';
 import {GestionModel} from '../../../../core/models/GestionModel';
 import {Filtro} from '../../../../core/models/Filter';
-import { AseguradoraService } from '../../../../core/services/aseguradora.service';
-import {Aseguradora} from '../../../../core/models/Aseguradora';
+import {MESES} from '../../../../core/const/MesesConst';
 
 @Component({
-  selector: 'app-gestion',
+  selector: 'app-vencimientos',
   standalone: true,
   imports: [CommonModule, NotificationModalComponent, ModalComentarioComponent],
-  templateUrl: './gestion.html'
+  templateUrl: './vencimientos.html'
 })
-export class Gestion implements OnInit {
+export class Vencimientos implements OnInit {
 
   vencimientos: Array<Management & { id?: string }> = [];
   formaPago = FORMA_PAGO;
   loading = true;
   isModalVisible = false;
   notification: NotificationData | null = null;
-  // Modal de comentario
   isComentarioVisible = false;
   comentarioBuffer: { id: string | null; value: string } = { id: null, value: '' };
   vencimientoToDelete: { id: string; numeroPoliza?: string; titular?: string } | null = null;
   editingRowId: string | null = null;
-  // Buffer para edición en línea por fila
-  editBuffer: Record<string, Partial<Management> & { aseguradoraId?: string }> = {};
-  // Autocomplete aseguradora en edición inline
-  aseguradorasSug: Record<string, Aseguradora[]> = {};
-  asegLoadingRow: Record<string, boolean> = {};
-  asegNoResultsRow: Record<string, boolean> = {};
-  // Visibilidad de filtros avanzados
+  editBuffer: Record<string, Partial<Management>> = {};
   showAdvancedFilters = false;
-  // Búsqueda
   private search$ = new Subject<string>();
-  // Filtros avanzados
   filters: Filtro = {
     aseguradora: '',
     tipoPoliza: '',
@@ -53,16 +43,16 @@ export class Gestion implements OnInit {
     fechaHasta: ''
   };
   private filters$ = new BehaviorSubject<Filtro>(this.filters);
-  // Filtro de Aseguradora (sin autocomplete)
-  // Nota: se filtra por nombre vía relación aseguradora_id.nombre
   // Paginación
   page = 1;
   limit = 10;
   total = 0;
   private page$ = new BehaviorSubject<number>(1);
   private limit$ = new BehaviorSubject<number>(10);
+  meses = MESES;
 
-  constructor(private router: Router, private vencimientoService: GestionService, private aseguradoraService: AseguradoraService) {}
+
+  constructor(private router: Router, private vencimientoService: GestionService) {}
   ngOnInit(): void {
     const term$ = this.search$.pipe(
       debounceTime(300),
@@ -82,6 +72,7 @@ export class Gestion implements OnInit {
       )
       .subscribe((resp: any) => {
         const raw = resp?.data ?? [];
+        // Mapear a Management
         this.vencimientos = raw.map((r: any) => {
           const nombre = (r?.cliente_id?.nombre ?? r?.nombre ?? '').trim();
           const apellido = (r?.cliente_id?.apellido ?? r?.apellido ?? '').trim();
@@ -99,16 +90,15 @@ export class Gestion implements OnInit {
             valorActual: Number(r?.valor_poliza_actual ?? r?.valorActual ?? 0),
             fechaVencimiento: r?.fecha_vencimiento ?? r?.fechaVencimiento ?? undefined,
             aseguradora: (r?.aseguradora ?? r?.aseguradora_id?.nombre ?? undefined),
-            aseguradoraId: r?.aseguradora_id ?? undefined,
             estado: r?.estado ?? undefined,
             comentarios: r?.comentarios ?? undefined,
+            // Campos de vehículo
             prenda: !!(r?.prenda ?? r?.prenda),
             esVehiculo: !!(r?.es_vehiculo ?? r?.esVehiculo),
             placa: (r?.es_vehiculo ?? r?.esVehiculo) ? (r?.placa ?? r?.placa ?? '') : undefined,
             entidadPrendaria: r?.entidad_prendaria ?? r?.entidadPrendaria ?? undefined,
           } as Management;
         });
-
 
         const meta = resp?.meta ?? {};
         this.total = (meta?.filter_count ?? meta?.total_count ?? 0) as number;
@@ -130,7 +120,7 @@ export class Gestion implements OnInit {
       // Buscar por titular (nombre/apellido), o número de póliza
       params['filter[_or][0][numero_poliza][_icontains]'] = q;
       params['filter[_or][1][tipo_poliza][_icontains]'] = q;
-      // Buscar por nombre de la relación aseguradora_id (no por campo aseguradora directo)
+      // Buscar por nombre de la relación aseguradora_id
       params['filter[_or][2][aseguradora_id][nombre][_icontains]'] = q;
       // Nombre y apellido vía relación cliente_id
       params['filter[_or][3][cliente_id][nombre][_icontains]'] = q;
@@ -141,9 +131,8 @@ export class Gestion implements OnInit {
     const f = filters || this.filters;
     // Filtros avanzados (AND entre ellos)
     if (f.aseguradora?.trim()) {
-      const v = f.aseguradora.trim();
       // Filtrar por nombre de la relación aseguradora_id
-      params['filter[aseguradora_id][nombre][_icontains]'] = v;
+      params['filter[aseguradora_id][nombre][_icontains]'] = f.aseguradora.trim();
     }
     if (f.tipoPoliza?.trim()) {
       params['filter[tipo_poliza][_icontains]'] = f.tipoPoliza.trim();
@@ -154,13 +143,30 @@ export class Gestion implements OnInit {
     if (f.formaPago?.trim()) {
       params['filter[forma_pago][_eq]'] = f.formaPago.trim();
     }
+    // Filtro por mes de vencimiento
+    const mes = (f.mesVencimiento ?? '').trim();
     const desde = (f.fechaDesde ?? '').trim();
     const hasta = (f.fechaHasta ?? '').trim();
-    if (desde) {
-      params['filter[fecha_vencimiento][_gte]'] = desde;
-    }
-    if (hasta) {
-      params['filter[fecha_vencimiento][_lte]'] = hasta;
+    if (mes) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const monthIndex = Number(mes) - 1; // mes en 1..12
+      const monthStart = new Date(year, monthIndex, 1);
+      const monthEnd = new Date(year, monthIndex + 1, 0);
+      const fmt = (d: Date) => d.toISOString().slice(0, 10);
+      params['filter[fecha_vencimiento][_gte]'] = fmt(monthStart);
+      params['filter[fecha_vencimiento][_lte]'] = fmt(monthEnd);
+    } else if (desde || hasta) {
+      if (desde) params['filter[fecha_vencimiento][_gte]'] = desde;
+      if (hasta) params['filter[fecha_vencimiento][_lte]'] = hasta;
+    } else {
+      // Por defecto: próximo mes completo
+      const now = new Date();
+      const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+      const fmt = (d: Date) => d.toISOString().slice(0, 10);
+      params['filter[fecha_vencimiento][_gte]'] = fmt(nextMonthStart);
+      params['filter[fecha_vencimiento][_lte]'] = fmt(nextMonthEnd);
     }
     return params;
   }
@@ -226,7 +232,6 @@ export class Gestion implements OnInit {
     const total = this.total || 0;
     return Math.min(total, this.page * this.limit);
   }
-  // Autocomplete removido: el filtro de aseguradora funciona por texto
   trackByNumero(index: number, item: Management) {
     return item.numeroPoliza;
   }
@@ -274,43 +279,6 @@ export class Gestion implements OnInit {
     }
   }
 
-  onInlineAseguradoraInput(id: string, value: string) {
-    if (!id) return;
-    const term = (value || '').trim();
-    if (!this.editBuffer[id]) this.editBuffer[id] = {};
-    this.editBuffer[id].aseguradora = term;
-    this.editBuffer[id].aseguradoraId = undefined;
-    if (term.length < 2) {
-      this.aseguradorasSug[id] = [];
-      this.asegNoResultsRow[id] = false;
-      this.asegLoadingRow[id] = false;
-      return;
-    }
-    this.asegLoadingRow[id] = true;
-    this.aseguradoraService.buscarPorNombre(term, 7).subscribe({
-      next: (resp) => {
-        const list = (resp?.data ?? []) as Aseguradora[];
-        this.aseguradorasSug[id] = list;
-        this.asegLoadingRow[id] = false;
-        this.asegNoResultsRow[id] = list.length === 0;
-      },
-      error: () => {
-        this.aseguradorasSug[id] = [];
-        this.asegLoadingRow[id] = false;
-        this.asegNoResultsRow[id] = false;
-      }
-    });
-  }
-
-  onInlineAseguradoraSelect(id: string, item: Aseguradora) {
-    if (!id || !item) return;
-    if (!this.editBuffer[id]) this.editBuffer[id] = {};
-    this.editBuffer[id].aseguradora = item.nombre;
-    this.editBuffer[id].aseguradoraId = item.id;
-    this.aseguradorasSug[id] = [];
-    this.asegNoResultsRow[id] = false;
-  }
-
   confirmInlineUpdate(id: string) {
     const data = this.editBuffer[id];
     if (!id || !data) return;
@@ -339,7 +307,6 @@ export class Gestion implements OnInit {
       valor_poliza_actual: data.valorActual,
       fecha_vencimiento: data.fechaVencimiento,
       aseguradora: data.aseguradora,
-      aseguradora_id: data.aseguradoraId,
       estado: data.estado,
       comentarios: data.comentarios,
       // Nota: titular/cliente no se actualiza desde inline aquí

@@ -1,4 +1,4 @@
-export interface Management {
+export class Management {
   titular: string;
   tipoDocumento?: string;
   numeroDocumento?: string;
