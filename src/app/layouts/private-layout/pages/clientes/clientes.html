@@ -98,23 +98,94 @@
             @for (cliente of clientes; track cliente.id) {
               <tr class="hover:bg-gray-50">
                 <td class="px-4 py-3 text-sm text-gray-900">
-                  <div class="font-medium">{{ cliente.nombre }} {{ cliente.apellido }}</div>
-                  <div class="text-xs text-gray-600 mt-1">{{ cliente.tipo_documento }} : {{ cliente.numero_documento }}</div>
+                  @if (editingRowId === cliente.id) {
+                    <div class="grid grid-cols-1 gap-1">
+                      <div class="flex items-center gap-2">
+                        <select class="w-40 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                                [value]="(editBuffer[editingRowId!]?.tipo_documento ?? cliente.tipo_documento)"
+                                (change)="onInlineFieldChange(editingRowId || '', 'tipo_documento', $any($event.target).value)">
+                          <option value="" disabled>Tipo Doc</option>
+                          @for (td of tiposDocumento; track td.id) {
+                            <option [value]="td.id">{{ td.name }}</option>
+                          }
+                        </select>
+                        <input class="w-40 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                               placeholder="Número"
+                               inputmode="numeric"
+                               maxlength="10"
+                               [value]="(editBuffer[editingRowId!]?.numero_documento ?? cliente.numero_documento)"
+                               (input)="onInlineFieldChange(editingRowId || '', 'numero_documento', $any($event.target).value)" />
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <input class="w-44 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                               placeholder="Nombre"
+                               [value]="(editBuffer[editingRowId!]?.nombre ?? cliente.nombre)"
+                               (input)="onInlineFieldChange(editingRowId || '', 'nombre', $any($event.target).value)" />
+                        <input class="w-44 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                               placeholder="Apellido"
+                               [value]="(editBuffer[editingRowId!]?.apellido ?? cliente.apellido)"
+                               (input)="onInlineFieldChange(editingRowId || '', 'apellido', $any($event.target).value)" />
+                      </div>
+                    </div>
+                  } @else {
+                    <div class="font-medium">{{ cliente.nombre }} {{ cliente.apellido }}</div>
+                    <div class="text-xs text-gray-600 mt-1">{{ cliente.tipo_documento }} : {{ cliente.numero_documento }}</div>
+                  }
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ cliente.fecha_nacimiento | date: 'dd/MM/yyyy' }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ cliente.direccion }}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">{{ cliente.numero_contacto }}</td>
                 <td class="px-4 py-3 text-sm text-gray-900">
-                 {{cliente.email }}
+                  @if (editingRowId === cliente.id) {
+                    <input type="date" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.fecha_nacimiento ?? (cliente.fecha_nacimiento ? (cliente.fecha_nacimiento | date:'yyyy-MM-dd') : ''))"
+                      (input)="onInlineFieldChange(editingRowId || '', 'fecha_nacimiento', $any($event.target).value)" />
+                  } @else {
+                    {{ cliente.fecha_nacimiento | date: 'dd/MM/yyyy' }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === cliente.id) {
+                    <input class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.direccion ?? cliente.direccion)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'direccion', $any($event.target).value)" />
+                  } @else {
+                    {{ cliente.direccion }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === cliente.id) {
+                    <input inputmode="numeric" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      maxlength="10"
+                      [value]="(editBuffer[editingRowId!]?.numero_contacto ?? cliente.numero_contacto)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'numero_contacto', $any($event.target).value)" />
+                  } @else {
+                    {{ cliente.numero_contacto }}
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  @if (editingRowId === cliente.id) {
+                    <input type="email" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88] lowercase"
+                      [value]="(editBuffer[editingRowId!]?.email ?? cliente.email)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'email', $any($event.target).value)" />
+                  } @else {
+                    {{ cliente.email }}
+                  }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 sticky right-0 z-10 bg-white min-w-[120px] border-l border-gray-200">
                   <div class="flex items-center justify-center gap-2">
-                    <button (click)="editCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
-                      <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5" />
-                    </button>
-                    <button (click)="eliminarCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
-                      <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5" />
-                    </button>
+                    @if (editingRowId === cliente.id) {
+                      <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
+                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
+                      </button>
+                      <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
+                        <img src="assets/icons/regresar.png" alt="Regresar" class="w-5 h-5" />
+                      </button>
+                    } @else {
+                      <button (click)="editCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
+                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5" />
+                      </button>
+                      <button (click)="eliminarCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
+                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5" />
+                      </button>
+                    }
                   </div>
                 </td>
               </tr>

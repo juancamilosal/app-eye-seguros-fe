@@ -7,6 +7,7 @@ import { NotificationModalComponent } from '../../../../components/notification-
 import { NotificationData } from '../../../../core/models/NotificationData';
 import { Subject, BehaviorSubject, of, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith } from 'rxjs/operators';
+import { TIPO_DOCUMENTO } from '../../../../core/const/TipoDocumentoConst';
 
 @Component({
   selector: 'app-clientes',
@@ -21,6 +22,10 @@ export class Clientes implements OnInit {
   notification: NotificationData | null = null;
   clienteToDelete: Client | null = null;
   private search$ = new Subject<string>();
+  // Edición en línea
+  editingRowId: string | null = null;
+  editBuffer: Record<string, Partial<Client>> = {};
+  tiposDocumento = TIPO_DOCUMENTO;
   // Paginación
   page = 1;
   limit = 10;
@@ -129,8 +134,9 @@ export class Clientes implements OnInit {
   }
 
   editCliente(cliente: Client) {
+    // Cambiar a edición en línea en lugar de navegar
     if (!cliente.id) return;
-    this.router.navigateByUrl(`/clientes/${cliente.id}/editar`);
+    this.startInlineEdit(cliente);
   }
 
   eliminarCliente(cliente: Client) {
@@ -145,6 +151,85 @@ export class Clientes implements OnInit {
       cancelText: 'Cancelar'
     };
     this.isModalVisible = true;
+  }
+
+  // --- Edición en línea ---
+  startInlineEdit(cliente: Client) {
+    if (!cliente?.id) return;
+    this.editingRowId = cliente.id!;
+    this.editBuffer[cliente.id!] = {
+      tipo_documento: cliente.tipo_documento,
+      numero_documento: cliente.numero_documento,
+      nombre: cliente.nombre,
+      apellido: cliente.apellido,
+      fecha_nacimiento: cliente.fecha_nacimiento,
+      direccion: cliente.direccion,
+      email: cliente.email,
+      numero_contacto: cliente.numero_contacto,
+    };
+  }
+
+  onInlineFieldChange(id: string, field: keyof Client, value: any) {
+    if (!this.editBuffer[id]) this.editBuffer[id] = {};
+    if (field === 'numero_contacto' || field === 'numero_documento') {
+      const onlyDigits = String(value || '').replace(/\D+/g, '').slice(0, 10);
+      this.editBuffer[id][field] = onlyDigits;
+    } else if (field === 'email') {
+      const lowered = String(value ?? '').toLocaleLowerCase('es-ES');
+      this.editBuffer[id][field] = lowered;
+    } else if (field === 'nombre' || field === 'apellido' || field === 'direccion') {
+      const transformed = this.toTitleCaseSpanish(String(value ?? ''));
+      this.editBuffer[id][field] = transformed;
+    } else {
+      this.editBuffer[id][field] = value;
+    }
+  }
+
+  confirmInlineUpdate(id: string) {
+    const data = this.editBuffer[id];
+    if (!id || !data) return;
+    const payload: Partial<Client> = {
+      tipo_documento: data.tipo_documento,
+      numero_documento: data.numero_documento,
+      nombre: data.nombre,
+      apellido: data.apellido,
+      fecha_nacimiento: data.fecha_nacimiento,
+      direccion: data.direccion,
+      email: data.email,
+      numero_contacto: data.numero_contacto,
+    };
+    this.clienteService.actualizarCliente(id, payload as Client).subscribe({
+      next: () => {
+        this.clientes = this.clientes.map(c => c.id === id ? { ...c, ...data } as Client : c);
+        this.editingRowId = null;
+        delete this.editBuffer[id];
+      },
+      error: () => {
+        this.editingRowId = null;
+        delete this.editBuffer[id];
+      }
+    });
+  }
+
+  cancelInlineEdit(id: string) {
+    this.editingRowId = null;
+    if (id) {
+      delete this.editBuffer[id];
+    }
+  }
+
+  private toTitleCaseSpanish(value: string): string {
+    const raw = value || '';
+    const trailingMatch = raw.match(/\s+$/);
+    const trailing = trailingMatch ? trailingMatch[0] : '';
+    const words = raw.trim()
+      .toLocaleLowerCase('es-ES')
+      .split(/\s+/)
+      .filter(w => w.length > 0);
+    const transformed = words
+      .map(w => w.charAt(0).toLocaleUpperCase('es-ES') + w.slice(1))
+      .join(' ');
+    return transformed + trailing;
   }
 
   onModalClosed() {

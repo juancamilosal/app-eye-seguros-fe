@@ -49,12 +49,7 @@ export const routes: Routes = [
         title: 'Euyenid & Edder | Nuevo Cliente',
         loadComponent: () => import('./layouts/private-layout/pages/clientes/cliente-create/cliente-create').then(m => m.ClienteCreate)
       }
-      ,
-      {
-        path: 'clientes/:id/editar',
-        title: 'Euyenid & Edder | Editar Cliente',
-        loadComponent: () => import('./layouts/private-layout/pages/clientes/cliente-edit/cliente-edit').then(m => m.ClienteEdit)
-      }
+      
     ]
   },
   { path: '**', redirectTo: 'login' }
