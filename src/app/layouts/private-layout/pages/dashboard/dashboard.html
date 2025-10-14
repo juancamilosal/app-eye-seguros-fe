@@ -9,10 +9,17 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Bloque Izquierda: Vencimientos y Cumpleaños -->
       <div class="flex flex-col gap-8">
+        <!-- Sección: Tablero de Tareas -->
+        <div class="p-6">
+          <app-lista-tareas></app-lista-tareas>
+        </div>
         <!-- Sección: Vencimientos próximo mes -->
         <div class="bg-white rounded-2xl shadow-xl p-6">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-semibold text-[#38338a]">Vencimientos</h2>
+            <div class="flex items-center gap-2">
+              <h2 class="text-2xl font-semibold text-[#38338a]">Vencimientos</h2>
+              <img src="assets/icons/vencimientos.png" alt="Vencimientos" class="w-7 h-7 opacity-80 hover:opacity-100" />
+            </div>
             <span class="text-sm text-gray-600">Pólizas que vencen en {{ nextMonthName }}</span>
           </div>
           @if (loadingVencimientos) {
@@ -44,11 +51,18 @@
             </div>
           }
         </div>
+      </div>
 
+      <!-- Bloque Derecha: Pólizas por aseguradora -->
+      <div class="flex flex-col gap-8">
+        <!-- Sección: Pólizas con las aseguradoras -->
         <!-- Sección: Cumpleaños hoy -->
         <div class="bg-white rounded-2xl shadow-xl p-6">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-semibold text-[#38338a]">Cumpleaños</h2>
+            <div class="flex items-center gap-2">
+              <h2 class="text-2xl font-semibold text-[#38338a]">Cumpleaños</h2>
+              <img src="assets/icons/feliz-cumpleanos.png" alt="Feliz cumpleaños" class="w-7 h-7 opacity-80 hover:opacity-100" />
+            </div>
             <span class="text-sm text-gray-600">Clientes que cumplen años hoy</span>
           </div>
           @if (loadingCumpleanos) {
@@ -59,12 +73,12 @@
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead>
-                  <tr class="bg-gray-50">
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Nombre</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Apellido</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Documento</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Contacto</th>
-                  </tr>
+                <tr class="bg-gray-50">
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Nombre</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Apellido</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Documento</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Contacto</th>
+                </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                   @for (c of cumpleanerosHoy; track c.id) {
@@ -80,14 +94,12 @@
             </div>
           }
         </div>
-      </div>
-
-      <!-- Bloque Derecha: Pólizas por aseguradora -->
-      <div class="flex flex-col gap-8">
-        <!-- Sección: Pólizas con las aseguradoras -->
         <div class="bg-white rounded-2xl shadow-xl p-6">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-2xl font-semibold text-[#38338a]">Pólizas con las aseguradoras</h2>
+            <div class="flex items-center gap-2">
+              <h2 class="text-2xl font-semibold text-[#38338a]">Pólizas con las aseguradoras</h2>
+              <img src="assets/icons/aseguradora.png" alt="Aseguradora" class="w-7 h-7 opacity-80 hover:opacity-100" />
+            </div>
             <span class="text-sm text-gray-600">Total de pólizas por aseguradora</span>
           </div>
           @if (loadingAseguradoras) {

@@ -1,0 +1,72 @@
+/* Fuente divertida sólo para el tablero de tareas */
+.taskboard-fun {
+  font-family: 'Patrick Hand', 'Comic Sans MS', 'Comic Neue', cursive, ui-rounded, system-ui;
+  letter-spacing: 0.2px;
+}
+
+/* Estilos del tablero de tareas con apariencia de hoja rayada */
+.sheet-paper {
+  position: relative;
+  /* margen vertical roja a la izquierda + líneas horizontales suaves */
+  /* Orden de capas (de frente a fondo):
+     1) Agujeros blancos (centro)
+     2) Aro suave de perforación
+     3) Margen roja
+     4) Rayas
+   */
+  background:
+    radial-gradient(circle 7px at 30px 18px, #ffffff 99%, transparent 100%),
+    radial-gradient(circle 9px at 30px 18px, transparent 0 70%, rgba(0, 0, 0, 0.12) 72%, transparent 100%),
+    linear-gradient(to right, #f8b4b4 60px, transparent 60px),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 32px,
+      rgba(0, 0, 0, 0.06) 33px,
+      transparent 34px
+    );
+  background-color: #fff9c4; /* amarillo pálido */
+  border-radius: 12px;
+  border: 1px solid #e5e7eb; /* gray-200 */
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  padding-left: 80px; /* contenido después del margen vertical y agujeros */
+  padding-right: 0; /* sin espacio reservado a la derecha */
+  /* posicionar capas: agujeros, aro, margen roja, rayas */
+  background-position: 0 0, 0 0, 0 0, 0 22px;
+  background-repeat: repeat-y, repeat-y, no-repeat, repeat;
+  /* tamaño de repetición de las perforaciones: ancho del margen (60px) y altura de línea (34px) */
+  background-size: 60px 34px, 60px 34px, auto auto, auto auto;
+}
+
+.sheet-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  line-height: 34px; /* alinear con la raya */
+  padding: 0 0.75rem;
+  color: #111827; /* gray-900 */
+}
+
+.sheet-input::placeholder {
+  color: #6b7280; /* gray-500 */
+}
+
+.sheet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sheet-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 34px; /* cada item ocupa una línea */
+  padding: 0 0.75rem;
+}
+
+.sheet-list li .line-through {
+  text-decoration-thickness: 2px;
+}

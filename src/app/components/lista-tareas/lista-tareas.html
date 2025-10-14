@@ -1,0 +1,25 @@
+<div class="taskboard-fun">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+      <h2 class="text-2xl font-semibold text-[#38338a]">Tablero de Tareas</h2>
+      <img src="assets/icons/lapiz.png" alt="Lápiz" class="w-7 h-7 opacity-80 hover:opacity-100" />
+    </div>
+    <span class="text-sm text-gray-600">Notas y pendientes</span>
+  </div>
+  <div class="relative rounded-xl overflow-hidden shadow-inner">
+    <div class="sheet-paper p-4">
+      <input [(ngModel)]="newTaskText" (keyup.enter)="addTask()" type="text" placeholder="Escribe y presiona Enter para agregar" class="sheet-input mb-2" />
+      <ul class="sheet-list">
+        @for (t of tasks; track t.id) {
+          <li class="gap-2">
+            <input type="checkbox" [checked]="t.completed" (change)="toggleTaskCompleted(t.id)" class="w-4 h-4 rounded border-gray-400" />
+            <span class="flex-1 text-gray-800" [ngClass]="{ 'line-through text-gray-500': t.completed }">{{ t.text }}</span>
+            <button (click)="removeTask(t.id)" class="ml-2" title="Eliminar">
+              <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5 opacity-80 hover:opacity-100" />
+            </button>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+</div>

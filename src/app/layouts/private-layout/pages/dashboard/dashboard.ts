@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { GestionService } from '../../../../core/services/gestion.service';
 import { ClienteService } from '../../../../core/services/cliente.service';
 import { Client } from '../../../../core/models/Client';
 import { MESES } from '../../../../core/const/MesesConst';
+import { ListaTareasComponent } from '../../../../components/lista-tareas/lista-tareas';
 
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, ListaTareasComponent],
   templateUrl: './dashboard.html'
 })
 export class Dashboard implements OnInit {
@@ -32,6 +34,8 @@ export class Dashboard implements OnInit {
 
   // Mes siguiente (nombre)
   nextMonthName = '';
+
+  // Sección: Tablero de Tareas ahora se maneja en el componente ListaTareasComponent
 
   constructor(private gestionService: GestionService, private clienteService: ClienteService) {}
 
@@ -137,4 +141,5 @@ export class Dashboard implements OnInit {
       }
     });
   }
+
 }
