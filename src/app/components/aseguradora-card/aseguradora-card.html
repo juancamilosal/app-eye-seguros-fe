@@ -1,0 +1,14 @@
+<div class="bg-white rounded-xl shadow p-4 border border-gray-200">
+  <div class="flex items-center gap-2 mb-3">
+    <h3 class="text-xl font-semibold text-[#243B88]">{{ aseguradora?.nombre || 'Aseguradora' }}</h3>
+    <img src="assets/icons/aseguradoras.png" alt="Aseguradora" class="w-6 h-6" />
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    @for (entry of displayedEntries; track entry.key) {
+      <div class="flex flex-col p-2 rounded-md bg-gray-50">
+        <span class="text-xs text-gray-600">{{ entry.key }}</span>
+        <span class="text-sm text-gray-900 break-words">{{ toValue(entry.value) }}</span>
+      </div>
+    }
+  </div>
+</div>

@@ -53,6 +53,17 @@
             <span class="ml-auto text-right">Vencimientos</span>
           </a>
         </li>
+        <li>
+          <a (click)="onSelect()" #rlaAseguradoras="routerLinkActive" routerLink="/aseguradoras" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
+             [routerLinkActiveOptions]="{ exact: true }"
+             class="flex items-center gap-3 px-3 py-4 text-2xl font-light w-full"
+             [ngClass]="{ 'hover:bg-[#3E1F78]': !rlaAseguradoras.isActive }">
+            <span class="inline-flex items-center justify-center w-12 h-12" aria-hidden="true">
+              <img src="assets/icons/aseguradora.png" alt="Aseguradoras" class="w-full h-full object-contain" />
+            </span>
+            <span class="ml-auto text-right">Aseguradoras</span>
+          </a>
+        </li>
         <!-- Agrega más enlaces aquí -->
       </ul>
     </nav>

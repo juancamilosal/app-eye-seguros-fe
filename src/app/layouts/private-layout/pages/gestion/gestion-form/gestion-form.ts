@@ -5,9 +5,10 @@ import { Management } from '../../../../../core/models/Management';
 import { ClienteService } from '../../../../../core/services/cliente.service';
 import { combineLatest, of, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith, filter as rxFilter } from 'rxjs/operators';
-import { AseguradoraService, AseguradoraItem } from '../../../../../core/services/aseguradora.service';
+import { AseguradoraService } from '../../../../../core/services/aseguradora.service';
 import {TIPO_DOCUMENTO} from '../../../../../core/const/TipoDocumentoConst';
 import {FORMA_PAGO} from '../../../../../core/const/FormaPagoConst';
+import {Aseguradora} from '../../../../../core/models/Aseguradora';
 
 @Component({
   selector: 'app-gestion-form',
@@ -71,7 +72,7 @@ export class GestionForm implements OnInit {
       )
       .subscribe({
         next: (resp) => {
-          const list = (resp?.data ?? []) as AseguradoraItem[];
+          const list = (resp?.data ?? []) as Aseguradora[];
           this.asegOptions = list;
           this.asegLoading = false;
           const inputVal = String(this.gestionForm.get('aseguradora')?.value || '').trim();
@@ -249,12 +250,12 @@ export class GestionForm implements OnInit {
 
   // --- Autocomplete de aseguradora ---
   aseguradoraIdSeleccionada: string | null = null;
-  asegOptions: AseguradoraItem[] = [];
+  asegOptions: Aseguradora[] = [];
   asegLoading = false;
   asegNoResults = false;
   private asegSearch$ = new Subject<string>();
 
-  onAseguradoraSelect(item: AseguradoraItem): void {
+  onAseguradoraSelect(item: Aseguradora): void {
     if (!item) return;
     this.aseguradoraIdSeleccionada = item.id;
     this.gestionForm.get('aseguradora')?.setValue(item.nombre, { emitEvent: false });

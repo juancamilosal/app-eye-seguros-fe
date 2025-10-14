@@ -1,0 +1,21 @@
+<div class="p-4 sm:p-6">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2">
+      <h1 class="text-2xl font-semibold text-[#38338a]">Aseguradoras</h1>
+      <img src="assets/icons/aseguradoras.png" alt="Aseguradoras" class="w-7 h-7" />
+    </div>
+    <span class="text-sm text-gray-600">Listado de aseguradoras desde Directus</span>
+  </div>
+
+  @if (loading) {
+    <div class="text-gray-600 text-sm">Cargando aseguradoras...</div>
+  } @else if (aseguradoras.length === 0) {
+    <div class="text-gray-600 text-sm">No hay aseguradoras registradas.</div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      @for (a of aseguradoras; track a.id) {
+        <app-aseguradora-card [aseguradora]="a"></app-aseguradora-card>
+      }
+    </div>
+  }
+</div>

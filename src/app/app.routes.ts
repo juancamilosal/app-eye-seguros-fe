@@ -27,6 +27,11 @@ export const routes: Routes = [
         loadComponent: () => import('./layouts/private-layout/pages/clientes/clientes').then(m => m.Clientes)
       },
       {
+        path: 'aseguradoras',
+        title: 'Euyenid & Edder | Aseguradoras',
+        loadComponent: () => import('./layouts/private-layout/pages/aseguradoras/aseguradoras').then(m => m.Aseguradoras)
+      },
+      {
         path: 'gestion',
         title: 'Euyenid & Edder | Gestión',
         loadComponent: () => import('./layouts/private-layout/pages/gestion/gestion').then(m => m.Gestion)

@@ -11,7 +11,8 @@ import { ModalComentarioComponent } from '../../../../components/modal-comentari
 import { NotificationData } from '../../../../core/models/NotificationData';
 import {GestionModel} from '../../../../core/models/GestionModel';
 import {Filtro} from '../../../../core/models/Filter';
-import { AseguradoraService, AseguradoraItem } from '../../../../core/services/aseguradora.service';
+import { AseguradoraService } from '../../../../core/services/aseguradora.service';
+import {Aseguradora} from '../../../../core/models/Aseguradora';
 
 @Component({
   selector: 'app-gestion',
@@ -34,7 +35,7 @@ export class Gestion implements OnInit {
   // Buffer para edición en línea por fila
   editBuffer: Record<string, Partial<Management> & { aseguradoraId?: string }> = {};
   // Autocomplete aseguradora en edición inline
-  aseguradorasSug: Record<string, AseguradoraItem[]> = {};
+  aseguradorasSug: Record<string, Aseguradora[]> = {};
   asegLoadingRow: Record<string, boolean> = {};
   asegNoResultsRow: Record<string, boolean> = {};
   // Visibilidad de filtros avanzados
@@ -288,7 +289,7 @@ export class Gestion implements OnInit {
     this.asegLoadingRow[id] = true;
     this.aseguradoraService.buscarPorNombre(term, 7).subscribe({
       next: (resp) => {
-        const list = (resp?.data ?? []) as AseguradoraItem[];
+        const list = (resp?.data ?? []) as Aseguradora[];
         this.aseguradorasSug[id] = list;
         this.asegLoadingRow[id] = false;
         this.asegNoResultsRow[id] = list.length === 0;
@@ -301,7 +302,7 @@ export class Gestion implements OnInit {
     });
   }
 
-  onInlineAseguradoraSelect(id: string, item: AseguradoraItem) {
+  onInlineAseguradoraSelect(id: string, item: Aseguradora) {
     if (!id || !item) return;
     if (!this.editBuffer[id]) this.editBuffer[id] = {};
     this.editBuffer[id].aseguradora = item.nombre;
