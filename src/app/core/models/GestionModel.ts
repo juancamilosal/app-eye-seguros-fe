@@ -7,6 +7,7 @@ export class GestionModel {
   valor_poliza_actual?: number;
   fecha_vencimiento?: string;
   aseguradora?: string;
+  aseguradora_id?: string;
   estado?: string;
   comentarios?: string;
   prenda?: boolean;

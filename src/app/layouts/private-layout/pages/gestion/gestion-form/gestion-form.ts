@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Management } from '../../../../../core/models/Management';
 import { ClienteService } from '../../../../../core/services/cliente.service';
-import { combineLatest, of } from 'rxjs';
+import { combineLatest, of, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith, filter as rxFilter } from 'rxjs/operators';
+import { AseguradoraService, AseguradoraItem } from '../../../../../core/services/aseguradora.service';
 import {TIPO_DOCUMENTO} from '../../../../../core/const/TipoDocumentoConst';
 import {FORMA_PAGO} from '../../../../../core/const/FormaPagoConst';
 
@@ -24,7 +25,7 @@ export class GestionForm implements OnInit {
   private clienteIdEncontrado: string | null = null;
   submitted = false;
 
-  constructor(private fb: FormBuilder, private clienteService: ClienteService) {
+  constructor(private fb: FormBuilder, private clienteService: ClienteService, private aseguradoraService: AseguradoraService) {
   }
 
   ngOnInit(): void {
@@ -47,6 +48,41 @@ export class GestionForm implements OnInit {
     });
 
     this.setupAutoFill();
+
+    // Autocomplete aseguradora
+    const aseguradoraCtrl = this.gestionForm.get('aseguradora');
+    aseguradoraCtrl?.valueChanges.subscribe((value: string) => {
+      const term = (value || '').trim();
+      this.aseguradoraIdSeleccionada = null; // Reset ID si el usuario edita manual
+      if (term.length < 2) {
+        this.asegOptions = [];
+        this.asegNoResults = false;
+        this.asegLoading = false;
+        return;
+      }
+      this.asegLoading = true;
+      this.asegSearch$.next(term);
+    });
+    this.asegSearch$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        switchMap((term) => this.aseguradoraService.buscarPorNombre(term, 7))
+      )
+      .subscribe({
+        next: (resp) => {
+          const list = (resp?.data ?? []) as AseguradoraItem[];
+          this.asegOptions = list;
+          this.asegLoading = false;
+          const inputVal = String(this.gestionForm.get('aseguradora')?.value || '').trim();
+          this.asegNoResults = inputVal.length >= 2 && list.length === 0;
+        },
+        error: () => {
+          this.asegOptions = [];
+          this.asegLoading = false;
+          this.asegNoResults = false;
+        }
+      });
 
     // Toggle Prenda and Placa based on esVehiculo
     const esVehiculoCtrl = this.gestionForm.get('esVehiculo');
@@ -156,7 +192,7 @@ export class GestionForm implements OnInit {
       entidadPrendaria?: string;
     };
 
-    const data: Management & { titularId?: string } = {
+    const data: Management & { titularId?: string; aseguradoraId?: string } = {
       titular: `${(v.nombre || '').trim()} ${(v.apellido || '').trim()}`.trim(),
       numeroPoliza: v.numeroPoliza,
       tipoPoliza: v.tipoPoliza,
@@ -165,6 +201,7 @@ export class GestionForm implements OnInit {
       valorActual: Number(v.valorActual ?? 0),
       fechaVencimiento: v.fechaVencimiento || undefined,
       aseguradora: v.aseguradora || undefined,
+      aseguradoraId: this.aseguradoraIdSeleccionada ?? undefined,
       prenda: !!v.prenda,
       // Campos vehículo
       esVehiculo: !!v.esVehiculo,
@@ -208,6 +245,26 @@ export class GestionForm implements OnInit {
       return 'Formato inválido';
     }
     return 'Valor inválido';
+  }
+
+  // --- Autocomplete de aseguradora ---
+  aseguradoraIdSeleccionada: string | null = null;
+  asegOptions: AseguradoraItem[] = [];
+  asegLoading = false;
+  asegNoResults = false;
+  private asegSearch$ = new Subject<string>();
+
+  onAseguradoraSelect(item: AseguradoraItem): void {
+    if (!item) return;
+    this.aseguradoraIdSeleccionada = item.id;
+    this.gestionForm.get('aseguradora')?.setValue(item.nombre, { emitEvent: false });
+    this.asegOptions = [];
+    this.asegNoResults = false;
+  }
+
+  clearAsegOptions(): void {
+    this.asegOptions = [];
+    this.asegNoResults = false;
   }
 
   onNumericInput(event: Event, controlName: keyof Management | 'numeroDocumento' | 'valorAnterior' | 'valorActual', maxLen?: number) {

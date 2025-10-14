@@ -30,7 +30,7 @@ export class GestionCreate {
     this.goBack();
   }
 
-  onSave(item: Management & { titularId?: string }) {
+  onSave(item: Management & { titularId?: string; aseguradoraId?: string }) {
     // Se espera que el formulario provea el ID del titular (cliente) en item.titularId
     const payload: GestionModel = {
       cliente_id: item.titularId || '',
@@ -41,6 +41,7 @@ export class GestionCreate {
       valor_poliza_actual: item.valorActual,
       fecha_vencimiento: item.fechaVencimiento,
       aseguradora: item.aseguradora,
+      aseguradora_id: item.aseguradoraId || undefined,
       estado: item.estado,
       prenda: !!item.prenda,
       es_vehiculo: !!item.esVehiculo,

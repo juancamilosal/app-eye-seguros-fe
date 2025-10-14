@@ -19,7 +19,7 @@ export class GestionService {
   obtenerVencimientos(params?: Record<string, string>): Observable<ResponseAPI<any[]>> {
     const query = {
       ...params,
-      fields: '*,cliente_id.*'
+      fields: '*,cliente_id.*, aseguradora_id.*'
     };
 
     return this.http.get<ResponseAPI<any[]>>(this.url, { params: query });
