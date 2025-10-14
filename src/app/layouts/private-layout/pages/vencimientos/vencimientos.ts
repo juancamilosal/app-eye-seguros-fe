@@ -89,7 +89,7 @@ export class Vencimientos implements OnInit {
             valorAnterior: Number(r?.valor_poliza_anterior ?? r?.valorAnterior ?? 0),
             valorActual: Number(r?.valor_poliza_actual ?? r?.valorActual ?? 0),
             fechaVencimiento: r?.fecha_vencimiento ?? r?.fechaVencimiento ?? undefined,
-            aseguradora: r?.aseguradora ?? undefined,
+            aseguradora: (r?.aseguradora ?? r?.aseguradora_id?.nombre ?? undefined),
             estado: r?.estado ?? undefined,
             comentarios: r?.comentarios ?? undefined,
             // Campos de vehículo
@@ -120,7 +120,8 @@ export class Vencimientos implements OnInit {
       // Buscar por titular (nombre/apellido), o número de póliza
       params['filter[_or][0][numero_poliza][_icontains]'] = q;
       params['filter[_or][1][tipo_poliza][_icontains]'] = q;
-      params['filter[_or][2][aseguradora][_icontains]'] = q;
+      // Buscar por nombre de la relación aseguradora_id
+      params['filter[_or][2][aseguradora_id][nombre][_icontains]'] = q;
       // Nombre y apellido vía relación cliente_id
       params['filter[_or][3][cliente_id][nombre][_icontains]'] = q;
       params['filter[_or][4][cliente_id][apellido][_icontains]'] = q;
@@ -130,7 +131,8 @@ export class Vencimientos implements OnInit {
     const f = filters || this.filters;
     // Filtros avanzados (AND entre ellos)
     if (f.aseguradora?.trim()) {
-      params['filter[aseguradora][_icontains]'] = f.aseguradora.trim();
+      // Filtrar por nombre de la relación aseguradora_id
+      params['filter[aseguradora_id][nombre][_icontains]'] = f.aseguradora.trim();
     }
     if (f.tipoPoliza?.trim()) {
       params['filter[tipo_poliza][_icontains]'] = f.tipoPoliza.trim();

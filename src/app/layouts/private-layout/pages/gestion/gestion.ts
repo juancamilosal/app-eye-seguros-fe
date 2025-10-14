@@ -52,6 +52,8 @@ export class Gestion implements OnInit {
     fechaHasta: ''
   };
   private filters$ = new BehaviorSubject<Filtro>(this.filters);
+  // Filtro de Aseguradora (sin autocomplete)
+  // Nota: se filtra por nombre vía relación aseguradora_id.nombre
   // Paginación
   page = 1;
   limit = 10;
@@ -127,7 +129,8 @@ export class Gestion implements OnInit {
       // Buscar por titular (nombre/apellido), o número de póliza
       params['filter[_or][0][numero_poliza][_icontains]'] = q;
       params['filter[_or][1][tipo_poliza][_icontains]'] = q;
-      params['filter[_or][2][aseguradora][_icontains]'] = q;
+      // Buscar por nombre de la relación aseguradora_id (no por campo aseguradora directo)
+      params['filter[_or][2][aseguradora_id][nombre][_icontains]'] = q;
       // Nombre y apellido vía relación cliente_id
       params['filter[_or][3][cliente_id][nombre][_icontains]'] = q;
       params['filter[_or][4][cliente_id][apellido][_icontains]'] = q;
@@ -137,7 +140,9 @@ export class Gestion implements OnInit {
     const f = filters || this.filters;
     // Filtros avanzados (AND entre ellos)
     if (f.aseguradora?.trim()) {
-      params['filter[aseguradora][_icontains]'] = f.aseguradora.trim();
+      const v = f.aseguradora.trim();
+      // Filtrar por nombre de la relación aseguradora_id
+      params['filter[aseguradora_id][nombre][_icontains]'] = v;
     }
     if (f.tipoPoliza?.trim()) {
       params['filter[tipo_poliza][_icontains]'] = f.tipoPoliza.trim();
@@ -220,6 +225,7 @@ export class Gestion implements OnInit {
     const total = this.total || 0;
     return Math.min(total, this.page * this.limit);
   }
+  // Autocomplete removido: el filtro de aseguradora funciona por texto
   trackByNumero(index: number, item: Management) {
     return item.numeroPoliza;
   }
