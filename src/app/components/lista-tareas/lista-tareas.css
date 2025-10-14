@@ -70,3 +70,14 @@
 .sheet-list li .line-through {
   text-decoration-thickness: 2px;
 }
+
+/* Checkbox verde y redondo */
+.sheet-list input[type="checkbox"] {
+  accent-color: #16a34a; /* green-600 */
+  border-radius: 9999px;
+}
+
+.sheet-list input[type="checkbox"]:focus {
+  outline: 2px solid rgba(22, 163, 74, 0.3);
+  outline-offset: 2px;
+}

@@ -4,6 +4,7 @@ export const environment = {
   production: true,
   clientes: apiUrl + 'items/clientes',
   polizas: apiUrl + 'items/polizas',
+  lista_tarea: apiUrl + 'items/lista_tareas',
   seguridad: {
     login: apiUrl + 'auth/login',
     logout: apiUrl + 'auth/logout',
