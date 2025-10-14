@@ -25,16 +25,14 @@
       rgba(0, 0, 0, 0.06) 33px,
       transparent 34px
     );
-  background-color: #fff9c4; /* amarillo pálido */
+  background-color: #fff9c4;
   border-radius: 12px;
-  border: 1px solid #e5e7eb; /* gray-200 */
+  border: 1px solid #e5e7eb;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  padding-left: 80px; /* contenido después del margen vertical y agujeros */
-  padding-right: 0; /* sin espacio reservado a la derecha */
-  /* posicionar capas: agujeros, aro, margen roja, rayas */
+  padding-left: 80px;
+  padding-right: 0;
   background-position: 0 0, 0 0, 0 0, 0 22px;
   background-repeat: repeat-y, repeat-y, no-repeat, repeat;
-  /* tamaño de repetición de las perforaciones: ancho del margen (60px) y altura de línea (34px) */
   background-size: 60px 34px, 60px 34px, auto auto, auto auto;
 }
 

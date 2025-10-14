@@ -35,6 +35,11 @@ export class Dashboard implements OnInit {
   // Mes siguiente (nombre)
   nextMonthName = '';
 
+  // Estado de modales de detalle
+  showVencimientosModal = false;
+  showCumpleanosModal = false;
+  showAseguradorasModal = false;
+
   // Sección: Tablero de Tareas ahora se maneja en el componente ListaTareasComponent
 
   constructor(private gestionService: GestionService, private clienteService: ClienteService) {}
@@ -141,5 +146,18 @@ export class Dashboard implements OnInit {
       }
     });
   }
+
+  // Abrir/cerrar modales y helpers de preview
+  openVencimientosModal(): void { this.showVencimientosModal = true; }
+  closeVencimientosModal(): void { this.showVencimientosModal = false; }
+  get proximosVencimientosPreview() { return (this.proximosVencimientos ?? []).slice(0, 3); }
+
+  openCumpleanosModal(): void { this.showCumpleanosModal = true; }
+  closeCumpleanosModal(): void { this.showCumpleanosModal = false; }
+  get cumpleanerosHoyPreview() { return (this.cumpleanerosHoy ?? []).slice(0, 3); }
+
+  openAseguradorasModal(): void { this.showAseguradorasModal = true; }
+  closeAseguradorasModal(): void { this.showAseguradorasModal = false; }
+  get polizasPorAseguradoraPreview() { return (this.polizasPorAseguradora ?? []).slice(0, 3); }
 
 }
