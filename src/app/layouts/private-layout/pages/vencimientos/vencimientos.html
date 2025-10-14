@@ -65,12 +65,13 @@
               </select>
             </div>
             <div>
-              <label class="block text-sm font-medium text-[#38338a] mb-1">Fecha de Vencimiento (Inicio)</label>
-              <input type="date" [value]="filters.fechaDesde" (input)="onFilterChange('fechaDesde', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-[#38338a] mb-1">Fecha de Vencimiento (Fin)</label>
-              <input type="date" [value]="filters.fechaHasta" (input)="onFilterChange('fechaHasta', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]" />
+              <label class="block text-sm font-medium text-[#38338a] mb-1">Mes del Vencimiento</label>
+              <select [value]="filters.mesVencimiento" (change)="onFilterChange('mesVencimiento', $any($event.target).value)" class="w-full h-10 px-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#243B88]">
+                <option value="" disabled>Seleccione un Mes</option>
+                @for (mes of meses; track mes.value){
+                  <option [value]="mes.value">{{mes.name}}</option>
+                }
+              </select>
             </div>
           </div>
           <div class="mt-3 flex gap-2">
@@ -298,26 +299,9 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 sticky right-0 z-10 bg-white min-w-[140px] border-l border-gray-200">
                   <div class="flex items-center justify-center gap-2">
-                    @if (editingRowId === vencimiento.id) {
-                      <!-- Actualizar -->
-                      <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
-                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
-                      </button>
-                      <!-- Volver (cancelar edición) -->
-                      <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
-                        <img src="assets/icons/regresar.png" alt="Regresar" class="w-5 h-5" />
-                      </button>
-                    } @else {
-                      <button (click)="startInlineEdit(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
-                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5" />
-                      </button>
                       <button (click)="openComentarios(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-50" title="Comentarios">
                         <img src="assets/icons/comentarios.png" alt="Comentarios" class="w-5 h-5" />
                       </button>
-                      <button (click)="eliminarVencimientoPrompt(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
-                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5" />
-                      </button>
-                    }
                   </div>
                 </td>
               </tr>

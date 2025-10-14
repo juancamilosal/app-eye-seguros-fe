@@ -3,6 +3,7 @@ export class Filtro{
   tipoPoliza: string;
   numeroPoliza: string;
   formaPago: string;
+  mesVencimiento?: string;
   fechaDesde: string;
   fechaHasta: string;
 }

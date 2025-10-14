@@ -11,6 +11,7 @@ import { ModalComentarioComponent } from '../../../../components/modal-comentari
 import { NotificationData } from '../../../../core/models/NotificationData';
 import {GestionModel} from '../../../../core/models/GestionModel';
 import {Filtro} from '../../../../core/models/Filter';
+import {MESES} from '../../../../core/const/MesesConst';
 
 @Component({
   selector: 'app-vencimientos',
@@ -25,23 +26,19 @@ export class Vencimientos implements OnInit {
   loading = true;
   isModalVisible = false;
   notification: NotificationData | null = null;
-  // Modal de comentario
   isComentarioVisible = false;
   comentarioBuffer: { id: string | null; value: string } = { id: null, value: '' };
   vencimientoToDelete: { id: string; numeroPoliza?: string; titular?: string } | null = null;
   editingRowId: string | null = null;
-  // Buffer para edición en línea por fila
   editBuffer: Record<string, Partial<Management>> = {};
-  // Visibilidad de filtros avanzados
   showAdvancedFilters = false;
-  // Búsqueda
   private search$ = new Subject<string>();
-  // Filtros avanzados
   filters: Filtro = {
     aseguradora: '',
     tipoPoliza: '',
     numeroPoliza: '',
     formaPago: '',
+    mesVencimiento: '',
     fechaDesde: '',
     fechaHasta: ''
   };
@@ -52,6 +49,8 @@ export class Vencimientos implements OnInit {
   total = 0;
   private page$ = new BehaviorSubject<number>(1);
   private limit$ = new BehaviorSubject<number>(10);
+  meses = MESES;
+
 
   constructor(private router: Router, private vencimientoService: GestionService) {}
   ngOnInit(): void {
@@ -142,18 +141,24 @@ export class Vencimientos implements OnInit {
     if (f.formaPago?.trim()) {
       params['filter[forma_pago][_eq]'] = f.formaPago.trim();
     }
-    // Rango de fechas para fecha_vencimiento
+    // Filtro por mes de vencimiento
+    const mes = (f.mesVencimiento ?? '').trim();
     const desde = (f.fechaDesde ?? '').trim();
     const hasta = (f.fechaHasta ?? '').trim();
-    if (desde || hasta) {
-      if (desde) {
-        params['filter[fecha_vencimiento][_gte]'] = desde;
-      }
-      if (hasta) {
-        params['filter[fecha_vencimiento][_lte]'] = hasta;
-      }
+    if (mes) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const monthIndex = Number(mes) - 1; // mes en 1..12
+      const monthStart = new Date(year, monthIndex, 1);
+      const monthEnd = new Date(year, monthIndex + 1, 0);
+      const fmt = (d: Date) => d.toISOString().slice(0, 10);
+      params['filter[fecha_vencimiento][_gte]'] = fmt(monthStart);
+      params['filter[fecha_vencimiento][_lte]'] = fmt(monthEnd);
+    } else if (desde || hasta) {
+      if (desde) params['filter[fecha_vencimiento][_gte]'] = desde;
+      if (hasta) params['filter[fecha_vencimiento][_lte]'] = hasta;
     } else {
-      // Si no hay filtros manuales, aplicar automáticamente el siguiente mes completo
+      // Por defecto: próximo mes completo
       const now = new Date();
       const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
       const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0);
@@ -175,7 +180,7 @@ export class Vencimientos implements OnInit {
   }
 
   clearFilters() {
-    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', fechaDesde: '', fechaHasta: '' };
+    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', mesVencimiento: '', fechaDesde: '', fechaHasta: '' };
     this.filters$.next(this.filters);
   }
 

@@ -28,7 +28,7 @@
         </div>
         <div class="relative mb-5" [ngClass]="{'md:col-span-2': isNitSelected}">
           <label class="block text-sm font-medium text-gray-700 ">{{ isNitSelected ? 'Nombre o Razón Social' : 'Nombre' }}</label>
-          <input type="text" formControlName="nombre" placeholder="Campo se llena automáticamente" [disabled]="true" class="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500 placeholder:text-gray-400 cursor-not-allowed" />
+          <input type="text" formControlName="nombre" placeholder="Campo se llena automáticamente" class="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500 placeholder:text-gray-400 cursor-not-allowed" />
           <div class="absolute left-0 top-full h-5 pointer-events-none">
             @if (isInvalid('nombre')) {
               <span class="text-xs text-red-600">{{ getError('nombre') }}</span>
@@ -38,7 +38,7 @@
         @if (!isNitSelected) {
           <div class="relative mb-5">
             <label class="block text-sm font-medium text-gray-700 ">Apellido</label>
-            <input type="text" formControlName="apellido" placeholder="Campo se llena automáticamente" [disabled]="true" class="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500 placeholder:text-gray-400 cursor-not-allowed" />
+            <input type="text" formControlName="apellido" placeholder="Campo se llena automáticamente" class="w-full px-3 py-2 border rounded-md bg-gray-100 text-gray-500 placeholder:text-gray-400 cursor-not-allowed" />
             <div class="absolute left-0 top-full h-5 pointer-events-none">
               @if (isInvalid('apellido')) {
                 <span class="text-xs text-red-600">{{ getError('apellido') }}</span>

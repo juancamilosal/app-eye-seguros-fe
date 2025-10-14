@@ -42,6 +42,7 @@ export class Gestion implements OnInit {
     tipoPoliza: '',
     numeroPoliza: '',
     formaPago: '',
+    mesVencimiento: '',
     fechaDesde: '',
     fechaHasta: ''
   };
@@ -164,7 +165,7 @@ export class Gestion implements OnInit {
   }
 
   clearFilters() {
-    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', fechaDesde: '', fechaHasta: '' };
+    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', mesVencimiento: '', fechaDesde: '', fechaHasta: '' };
     this.filters$.next(this.filters);
   }
 
