@@ -85,6 +85,7 @@
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Apellido</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Documento</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Contacto</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Felicitar</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -94,6 +95,17 @@
                       <td class="px-4 py-2">{{ c.apellido }}</td>
                       <td class="px-4 py-2">{{ c.tipo_documento }} {{ c.numero_documento }}</td>
                       <td class="px-4 py-2">{{ c.numero_contacto || '-' }}</td>
+                      <td class="px-4 py-2">
+                        @if (c.email) {
+                          <a [href]="'mailto:' + c.email + '?subject=Feliz%20cumplea%C3%B1os%21'" class="inline-flex items-center gap-1 text-[#243B88] hover:underline" title="Enviar email">
+                            <img src="assets/icons/enviar-email.png" alt="Enviar email" class="w-7 h-7 object-contain" />
+                          </a>
+                        } @else {
+                          <div class="inline-flex items-center gap-1 text-gray-400 cursor-not-allowed" title="Sin email">
+                            <img src="assets/icons/enviar-email.png" alt="Enviar email" class="w-5 h-5 object-contain opacity-40" />
+                          </div>
+                        }
+                      </td>
                     </tr>
                   }
                 </tbody>
@@ -193,6 +205,7 @@
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Apellido</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Documento</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Contacto</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Felicitar</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -202,6 +215,18 @@
                   <td class="px-4 py-2">{{ c.apellido }}</td>
                   <td class="px-4 py-2">{{ c.tipo_documento }} {{ c.numero_documento }}</td>
                   <td class="px-4 py-2">{{ c.numero_contacto || '-' }}</td>
+                  <td class="px-4 py-2">
+                    @if (c.email) {
+                      <a [href]="'mailto:' + c.email + '?subject=Feliz%20cumplea%C3%B1os%21'" class="inline-flex items-center gap-1 text-[#243B88] hover:underline" title="Enviar email">
+                        <img src="assets/icons/enviar-email.png" alt="Enviar email" class="w-5 h-5 object-contain" />
+                        <span class="text-xs">Felicitar</span>
+                      </a>
+                    } @else {
+                      <div class="inline-flex items-center gap-1 text-gray-400 cursor-not-allowed" title="Sin email">
+                        <img src="assets/icons/enviar-email.png" alt="Enviar email" class="w-5 h-5 object-contain opacity-40" />
+                      </div>
+                    }
+                  </td>
                 </tr>
               }
             </tbody>
