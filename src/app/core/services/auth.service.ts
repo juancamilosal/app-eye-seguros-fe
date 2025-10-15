@@ -10,16 +10,33 @@ import {DirectusLoginResponse, DirectusUserMe} from '../models/Login';
 export class AuthService {
   private readonly TOKEN_KEY = 'auth_token';
   private readonly TOKEN_REFRESH_KEY = 'refresh_token';
+  private readonly SESSION_PERSIST_KEY = 'session_persist';
   private refreshing = false;
   private refreshSubject = new BehaviorSubject<string | null>(null);
   private refreshTimerId: number | null = null;
   private readonly REFRESH_SKEW_MS = 60_000;
 
   constructor(private http: HttpClient) {
+    // Verificar si hay un token existente y programar su refresco
     const existingToken = localStorage.getItem(this.TOKEN_KEY);
     if (existingToken) {
       this.scheduleProactiveRefresh(existingToken);
     }
+    
+    // Establecer persistencia de sesión por defecto
+    if (localStorage.getItem(this.SESSION_PERSIST_KEY) === null) {
+      localStorage.setItem(this.SESSION_PERSIST_KEY, 'true');
+    }
+  }
+  
+  // Método para verificar si la persistencia de sesión está activada
+  isPersistentSession(): boolean {
+    return localStorage.getItem(this.SESSION_PERSIST_KEY) === 'true';
+  }
+  
+  // Método para activar/desactivar la persistencia de sesión
+  setPersistentSession(persist: boolean): void {
+    localStorage.setItem(this.SESSION_PERSIST_KEY, persist ? 'true' : 'false');
   }
 
   login(email: string, password: string): Observable<DirectusLoginResponse> {
@@ -28,6 +45,8 @@ export class AuthService {
         const token = resp?.data?.access_token;
         const refresh = resp?.data?.refresh_token;
         const expires = resp?.data?.expires;
+        
+        // Guardar tokens según la configuración de persistencia
         if (token) {
           localStorage.setItem(this.TOKEN_KEY, token);
         }
@@ -134,6 +153,7 @@ export class AuthService {
           const token = resp?.data?.access_token ?? null;
           const refreshNew = resp?.data?.refresh_token;
           const expires = resp?.data?.expires;
+          
           this.setToken(token);
           this.setRefreshToken(refreshNew);
           this.refreshSubject.next(token);
