@@ -24,34 +24,64 @@
           </div>
           @if (loadingVencimientos) {
             <div class="text-gray-600 text-sm">Cargando vencimientos...</div>
-          } @else if (proximosVencimientos.length === 0) {
+          } @else if (vencimientosPorAseguradora.length === 0) {
             <div class="text-gray-600 text-sm">No hay pólizas próximas a vencer en {{ nextMonthName }}.</div>
           } @else {
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead>
-                  <tr class="bg-gray-50">
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Titular</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Aseguradora</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">No. Póliza</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Fecha Vencimiento</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                  @for (item of proximosVencimientosPreview; track $index) {
-                    <tr>
-                      <td class="px-4 py-2">{{ item.titular }}</td>
-                      <td class="px-4 py-2">{{ item.aseguradora || '-' }}</td>
-                      <td class="px-4 py-2">{{ item.numeroPoliza }}</td>
-                      <td class="px-4 py-2">{{ item.fechaVencimiento || '-' }}</td>
-                    </tr>
+            <!-- Acordeón de aseguradoras -->
+            <div class="space-y-5">
+              @for (grupo of vencimientosPorAseguradoraPreview; track $index) {
+                <div class="border border-gray-200 rounded-lg overflow-hidden">
+                  <!-- Header del acordeón -->
+                  <button
+                    (click)="toggleAseguradora($index)"
+                    class="w-full px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors duration-200">
+                    <div class="flex items-center gap-3">
+                      <span class="font-medium text-gray-900">{{ grupo.aseguradora }}</span>
+                      <span class="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                        {{ grupo.vencimientos.length }} póliza{{ grupo.vencimientos.length !== 1 ? 's' : '' }}
+                      </span>
+                    </div>
+                    <svg
+                      class="w-5 h-5 text-gray-500 transition-transform duration-200"
+                      [class.rotate-180]="grupo.expanded"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+
+                  <!-- Contenido del acordeón -->
+                  @if (grupo.expanded) {
+                    <div class="border-t border-gray-200 mt-5">
+                      <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                          <thead>
+                            <tr class="bg-[#38338a]">
+                              <th class="px-4 py-2 text-left text-xs font-medium text-white">Titular</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-white">No. Póliza</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-white">Fecha Vencimiento</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-200 bg-white">
+                            @for (vencimiento of grupo.vencimientos; track $index) {
+                              <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ vencimiento.titular }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ vencimiento.numeroPoliza }}</td>
+                                <td class="px-4 py-2 text-sm text-gray-900">{{ vencimiento.fechaVencimiento || '-' }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   }
-                </tbody>
-              </table>
+                </div>
+              }
             </div>
-            @if (proximosVencimientos.length > 3) {
+            @if (vencimientosPorAseguradora.length > 5) {
               <div class="flex justify-center mt-3">
-                <button (click)="openVencimientosModal()" class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200">
+                <button (click)="openVencimientosAccordionModal()" class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-gray-100 hover:bg-gray-200">
                   <span class="text-2xl leading-none">···</span>
                 </button>
               </div>
@@ -246,9 +276,74 @@
         <div class="p-4 overflow-y-auto max-h-[60vh]">
           <div class="space-y-3">
             @for (item of polizasPorAseguradora; track $index) {
-              <div class="flex items-center justify-between border rounded-lg p-3">
+              <div class="flex items-center justify-between border rounded-lg p-5">
                 <div class="text-[#243B88] font-medium">{{ item.aseguradora }}</div>
                 <div class="text-gray-700 font-semibold">{{ item.total }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (showVencimientosAccordionModal) {
+    <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50" (click)="closeVencimientosAccordionModal()">
+      <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between p-4 border-b">
+          <h3 class="text-xl font-semibold text-[#38338a]">Todos los Vencimientos en {{ nextMonthName }}</h3>
+          <button (click)="closeVencimientosAccordionModal()" class="text-gray-600 hover:text-gray-800">✕</button>
+        </div>
+        <div class="p-4 overflow-y-auto max-h-[70vh]">
+          <!-- Acordeón de aseguradoras en modal -->
+          <div class="space-y-2 ">
+            @for (grupo of vencimientosPorAseguradoraModal; track $index) {
+              <div class="border border-gray-200 rounded-lg overflow-hidden">
+                <!-- Header del acordeón -->
+                <button
+                  (click)="toggleAseguradoraModal($index)"
+                  class="w-full px-4 py-3 text-left bg-gray-50 hover:bg-gray-100 flex items-center justify-between transition-colors duration-200">
+                  <div class="flex items-center gap-3">
+                    <span class="font-medium text-gray-900">{{ grupo.aseguradora }}</span>
+                    <span class="text-sm text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                      {{ grupo.vencimientos.length }} póliza{{ grupo.vencimientos.length !== 1 ? 's' : '' }}
+                    </span>
+                  </div>
+                  <svg
+                    class="w-5 h-5 text-gray-500 transition-transform duration-200"
+                    [class.rotate-180]="grupo.expanded"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+
+                <!-- Contenido del acordeón -->
+                @if (grupo.expanded) {
+                  <div class="border-t border-gray-200">
+                    <div class="overflow-x-auto">
+                      <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                          <tr class="bg-[#38338a]">
+                            <th class="px-4 py-2 text-left text-xs font-medium text-white">Titular</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-white">No. Póliza</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-white">Fecha Vencimiento</th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                          @for (vencimiento of grupo.vencimientos; track $index) {
+                            <tr class="hover:bg-gray-50">
+                              <td class="px-4 py-2 text-sm text-gray-900">{{ vencimiento.titular }}</td>
+                              <td class="px-4 py-2 text-sm text-gray-900">{{ vencimiento.numeroPoliza }}</td>
+                              <td class="px-4 py-2 text-sm text-gray-900">{{ vencimiento.fechaVencimiento || '-' }}</td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                }
               </div>
             }
           </div>
