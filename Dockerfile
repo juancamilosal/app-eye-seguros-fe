@@ -29,8 +29,7 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copiar los archivos compilados desde la etapa de build
 COPY --from=builder /app/dist/app-eye-seguros-fe/browser /usr/share/nginx/html
 
-# (Opcional) Copiar configuración personalizada de NGINX para SPA (Angular routing)
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Exponer el puerto 80
 EXPOSE 80
