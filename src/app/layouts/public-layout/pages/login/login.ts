@@ -1,4 +1,4 @@
-import { Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { NotificationModalComponent } from '../../../../components/notification-modal/notification-modal';
@@ -14,7 +14,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   templateUrl: './login.html',
   styleUrls: ['./login.css']
 })
-export class Login {
+export class Login implements OnInit {
   isSubmitting = false;
   currentYear = new Date().getFullYear();
   isModalVisible = false;
@@ -86,4 +86,12 @@ export class Login {
   onModalClosed() {
     this.isModalVisible = false;
   }
+
+  ngOnInit(): void {
+    // Si el usuario ya está logueado, lo redirigimos al dashboard
+    if (this.auth.isLoggedIn()) {
+      this.router.navigateByUrl('/dashboard');
+    }
+  }
+
 }
