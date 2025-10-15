@@ -24,12 +24,14 @@ export class ListaTareasComponent implements OnInit {
   addTask(): void {
     const text = (this.newTaskText || '').trim();
     if (!text) return;
+    
     const currentUser = StorageServices.getCurrentUser();
     const usuario_id: string = currentUser?.id ?? '';
     if (!usuario_id) {
       // Si no hay usuario, no crear en backend; opcionalmente se podría mostrar una notificación
       return;
     }
+    
     this.listaTareaService
       .crearTarea({ tarea: text, usuario_id, completada: false })
       .subscribe({
@@ -39,7 +41,7 @@ export class ListaTareasComponent implements OnInit {
           this.tasks = [{ id, text, completed: !!created?.completada }, ...this.tasks];
           this.newTaskText = '';
         },
-        error: () => {
+        error: (error) => {
           // fallback: añadir localmente si falla
           const id = Date.now();
           this.tasks = [{ id, text, completed: false }, ...this.tasks];

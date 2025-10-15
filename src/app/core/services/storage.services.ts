@@ -88,7 +88,9 @@ export class StorageServices {
   }
 
   static setUserData(current_user: any): void {
-    this.saveObjectInLocalStorage(this.CURRENT_USER, current_user);
+    if (this.isLocalStorageAvailable) {
+      this.saveObjectInLocalStorage(this.CURRENT_USER, current_user);
+    }
   }
 
   static getCurrentUser(): any {
