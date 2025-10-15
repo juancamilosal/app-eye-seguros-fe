@@ -57,7 +57,7 @@ export class Login {
               StorageServices.saveObjectInSessionStorage(StorageServices.CURRENT_USER, meResp?.data);
             } catch {}
             this.isSubmitting = false;
-            this.isModalVisible = true;
+            // Eliminamos la línea que activa el modal en caso de éxito
             this.router.navigateByUrl('/dashboard')
           },
           error: () => {
@@ -67,6 +67,7 @@ export class Login {
               title: 'Acceso denegado',
               message: 'No tienes permisos para ingresar.'
             };
+            this.isModalVisible = true; // Activamos el modal para mostrar el error
           }
         });
       },
@@ -77,6 +78,7 @@ export class Login {
           title: 'Error al iniciar sesión',
           message: 'Credenciales inválidas.'
         };
+        this.isModalVisible = true; // Activamos el modal para mostrar el error
       }
     });
   }
