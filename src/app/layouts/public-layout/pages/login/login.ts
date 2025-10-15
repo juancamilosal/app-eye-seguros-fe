@@ -88,10 +88,8 @@ export class Login implements OnInit {
   }
 
   ngOnInit(): void {
-    // Si el usuario ya está logueado, lo redirigimos al dashboard
     if (this.auth.isLoggedIn()) {
       this.router.navigateByUrl('/dashboard');
     }
   }
-
 }
