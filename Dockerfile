@@ -24,8 +24,8 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copiar los archivos compilados desde el builder
 COPY --from=builder /app/dist/app-eye-seguros-fe/browser /usr/share/nginx/html
 
-# Copiar configuración personalizada de NGINX si la tienes
-# COPY nginx.conf /etc/nginx/nginx.conf
+# Copiar configuración personalizada de NGINX
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
