@@ -67,7 +67,6 @@ export class Login {
               title: 'Acceso denegado',
               message: 'No tienes permisos para ingresar.'
             };
-            this.isModalVisible = true;
           }
         });
       },
@@ -78,7 +77,6 @@ export class Login {
           title: 'Error al iniciar sesión',
           message: 'Credenciales inválidas.'
         };
-        this.isModalVisible = true;
       }
     });
   }
