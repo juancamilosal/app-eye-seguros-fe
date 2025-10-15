@@ -54,7 +54,7 @@ export class Login implements OnInit {
         this.auth.me().subscribe({
           next: (meResp) => {
             try {
-              StorageServices.saveObjectInSessionStorage(StorageServices.CURRENT_USER, meResp?.data);
+              StorageServices.setUserData(meResp?.data);
             } catch {}
             this.isSubmitting = false;
             // Eliminamos la línea que activa el modal en caso de éxito
@@ -88,10 +88,8 @@ export class Login implements OnInit {
   }
 
   ngOnInit(): void {
-    // Si el usuario ya está logueado, lo redirigimos al dashboard
     if (this.auth.isLoggedIn()) {
       this.router.navigateByUrl('/dashboard');
     }
   }
-
 }

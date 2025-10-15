@@ -11,6 +11,10 @@ export class StorageServices {
     return typeof window !== 'undefined' && typeof sessionStorage !== 'undefined';
   }
 
+  private static get isLocalStorageAvailable(): boolean {
+    return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+  }
+
   static saveInSessionStorage(name: string, item: string): void {
     if (this.isBrowser) {
       sessionStorage.setItem(name, item);
@@ -38,6 +42,34 @@ export class StorageServices {
     return null;
   }
 
+  // Métodos para localStorage
+  static saveInLocalStorage(name: string, item: string): void {
+    if (this.isLocalStorageAvailable) {
+      localStorage.setItem(name, item);
+    }
+  }
+
+  static saveObjectInLocalStorage(name: string, item: any): void {
+    if (this.isLocalStorageAvailable) {
+      localStorage.setItem(name, JSON.stringify(item));
+    }
+  }
+
+  static getItemFromLocalStorage(name: string): string | null {
+    if (this.isLocalStorageAvailable) {
+      return localStorage.getItem(name);
+    }
+    return null;
+  }
+
+  static getItemObjectFromLocalStorage(name: string): any {
+    if (this.isLocalStorageAvailable) {
+      const item: string | null = localStorage.getItem(name);
+      return item != null ? JSON.parse(item) : null;
+    }
+    return null;
+  }
+
   // Métodos específicos para tokens de autenticación
   static setAccessToken(token: string): void {
     this.saveInSessionStorage('access_token', token);
@@ -56,11 +88,13 @@ export class StorageServices {
   }
 
   static setUserData(current_user: any): void {
-    this.saveObjectInSessionStorage(this.CURRENT_USER, current_user);
+    if (this.isLocalStorageAvailable) {
+      this.saveObjectInLocalStorage(this.CURRENT_USER, current_user);
+    }
   }
 
   static getCurrentUser(): any {
-    return this.getItemObjectFromSessionStorage(this.CURRENT_USER);
+    return this.getItemObjectFromLocalStorage(this.CURRENT_USER);
   }
 
   static clearTokens(): void {
@@ -74,13 +108,18 @@ export class StorageServices {
     if (this.isBrowser) {
       sessionStorage.removeItem('access_token');
       sessionStorage.removeItem('refresh_token');
-      sessionStorage.removeItem(this.CURRENT_USER);
+    }
+    if (this.isLocalStorageAvailable) {
+      localStorage.removeItem(this.CURRENT_USER);
     }
   }
 
   static clearAllSession(): void {
     if (this.isBrowser) {
       sessionStorage.clear();
+    }
+    if (this.isLocalStorageAvailable) {
+      localStorage.removeItem(this.CURRENT_USER);
     }
   }
 }
