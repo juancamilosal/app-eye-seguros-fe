@@ -1,32 +1,42 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-
+import { Component, EventEmitter, Input, Output, OnChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ScrollLockService } from '../../core/services/scroll-lock.service';
 
 @Component({
   selector: 'app-modal-comentario',
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './modal-comentario.html'
 })
-export class ModalComentarioComponent {
+export class ModalComentarioComponent implements OnChanges {
   @Input() isVisible = false;
-  @Input() initialComentario: string = '';
+  @Input() initialComentario = '';
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<string>();
 
-  comentario: string = '';
+  comentario = '';
+
+  constructor(private scrollLockService: ScrollLockService) {}
 
   ngOnChanges() {
-    this.comentario = this.initialComentario ?? '';
+    if (this.isVisible) {
+      this.comentario = this.initialComentario || '';
+      this.scrollLockService.lock();
+    } else {
+      this.scrollLockService.unlock();
+    }
   }
 
   onClose() {
     this.isVisible = false;
+    this.scrollLockService.unlock();
     this.close.emit();
   }
 
   onSave() {
+    this.save.emit(this.comentario);
     this.isVisible = false;
-    this.save.emit(this.comentario ?? '');
+    this.scrollLockService.unlock();
   }
 }

@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {NotificationData} from '../../core/models/NotificationData';
+import { ScrollLockService } from '../../core/services/scroll-lock.service';
 
 @Component({
   selector: 'app-notification-modal',
@@ -9,27 +10,37 @@ import {NotificationData} from '../../core/models/NotificationData';
   templateUrl: './notification-modal.html',
   styleUrl: './notification-modal.css'
 })
-export class NotificationModalComponent {
+export class NotificationModalComponent implements OnChanges {
   @Input() isVisible: boolean = false;
   @Input() notification: NotificationData | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() confirm = new EventEmitter<void>();
 
+  constructor(private scrollLockService: ScrollLockService) {}
+
   ngOnChanges() {
-    if (this.isVisible && this.notification?.duration) {
-      setTimeout(() => {
-        this.closeModal();
-      }, this.notification.duration);
+    if (this.isVisible) {
+      this.scrollLockService.lock();
+      
+      if (this.notification?.duration) {
+        setTimeout(() => {
+          this.closeModal();
+        }, this.notification.duration);
+      }
+    } else {
+      this.scrollLockService.unlock();
     }
   }
 
   closeModal() {
     this.isVisible = false;
+    this.scrollLockService.unlock();
     this.close.emit();
   }
 
   onConfirm() {
     this.isVisible = false;
+    this.scrollLockService.unlock();
     this.confirm.emit();
   }
 
