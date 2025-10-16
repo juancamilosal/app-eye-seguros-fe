@@ -13,6 +13,7 @@ import {GestionModel} from '../../../../core/models/GestionModel';
 import {Filtro} from '../../../../core/models/Filter';
 import { AseguradoraService } from '../../../../core/services/aseguradora.service';
 import {Aseguradora} from '../../../../core/models/Aseguradora';
+import { TIPOS_VEHICULO } from '../../../../core/const/TiposVehiculoConst';
 
 @Component({
   selector: 'app-gestion',
@@ -24,6 +25,7 @@ export class Gestion implements OnInit {
 
   vencimientos: Array<Management & { id?: string }> = [];
   formaPago = FORMA_PAGO;
+  tiposVehiculo = TIPOS_VEHICULO;
   loading = true;
   isModalVisible = false;
   notification: NotificationData | null = null;
@@ -104,6 +106,7 @@ export class Gestion implements OnInit {
             comentarios: r?.comentarios ?? undefined,
             prenda: !!(r?.prenda ?? r?.prenda),
             esVehiculo: !!(r?.es_vehiculo ?? r?.esVehiculo),
+            tipo_vehiculo: r?.tipo_vehiculo ?? undefined,
             placa: (r?.es_vehiculo ?? r?.esVehiculo) ? (r?.placa ?? r?.placa ?? '') : undefined,
             entidadPrendaria: r?.entidad_prendaria ?? r?.entidadPrendaria ?? undefined,
           } as Management;

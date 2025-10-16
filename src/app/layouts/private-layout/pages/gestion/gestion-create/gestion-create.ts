@@ -31,7 +31,6 @@ export class GestionCreate {
   }
 
   onSave(item: Management & { titularId?: string; aseguradoraId?: string }) {
-    // Se espera que el formulario provea el ID del titular (cliente) en item.titularId
     const payload: GestionModel = {
       cliente_id: item.titularId || '',
       numero_poliza: item.numeroPoliza,
@@ -45,10 +44,10 @@ export class GestionCreate {
       estado: item.estado,
       prenda: !!item.prenda,
       es_vehiculo: !!item.esVehiculo,
+      tipo_vehiculo: item.tipo_vehiculo || undefined,
       placa: item.esVehiculo ? (item.placa || '') : undefined,
       entidad_prendaria: item.prenda ? (item.entidadPrendaria || '') : undefined,
     };
-
     this.isSubmitting = true;
     this.vencimientoService.crearVencimiento(payload).subscribe({
       next: () => {

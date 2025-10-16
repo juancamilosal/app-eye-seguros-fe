@@ -246,6 +246,10 @@
                       </div>
                     } @else if (vencimiento.esVehiculo) {
                       <div class="mt-1 text-xs text-gray-600">
+                        <div>Vehículo</div>
+                        @if (vencimiento.tipo_vehiculo) {
+                          <div class="mt-0.5">{{ vencimiento.tipo_vehiculo }}</div>
+                        }
                         <span>
                           {{ vencimiento.prenda ? 'Con Prenda' : 'Sin Prenda' }}
                           @if (vencimiento.placa) {

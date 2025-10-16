@@ -222,6 +222,16 @@
                       <div class="mt-1 text-xs text-gray-700">
                         @if (vencimiento.esVehiculo) {
                           <div class="flex items-center gap-2 mb-1">
+                            <select class="min-w-[200px] shrink-0 sm:min-w-0 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                              [value]="(editBuffer[editingRowId!]?.tipo_vehiculo ?? vencimiento.tipo_vehiculo) ?? ''"
+                              (change)="onInlineFieldChange(editingRowId || '', 'tipo_vehiculo', $any($event.target).value)">
+                              <option value="">Seleccione tipo</option>
+                              @for (tipo of tiposVehiculo; track tipo) {
+                                <option [value]="tipo">{{ tipo }}</option>
+                              }
+                            </select>
+                          </div>
+                          <div class="flex items-center gap-2 mb-1">
                             <label class="inline-flex items-center gap-2 select-none cursor-pointer">
                               <input type="checkbox" [checked]="(editBuffer[editingRowId!]?.prenda ?? vencimiento.prenda)" (change)="onInlineFieldChange(editingRowId || '', 'prenda', $any($event.target).checked)" class="peer sr-only" />
                               <span class="inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 bg-gray-300 peer-checked:bg-[#243B88] p-0.5 justify-start peer-checked:justify-end">
@@ -256,6 +266,9 @@
                         </span>
                         @if (vencimiento.prenda && vencimiento.entidadPrendaria) {
                           <div class="mt-0.5">Entidad Prendaria: {{ vencimiento.entidadPrendaria }}</div>
+                        }
+                        @if (vencimiento.tipo_vehiculo) {
+                          <div class="mt-0.5">{{ vencimiento.tipo_vehiculo }}</div>
                         }
                       </div>
                     }

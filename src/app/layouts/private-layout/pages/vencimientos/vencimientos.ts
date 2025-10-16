@@ -95,6 +95,7 @@ export class Vencimientos implements OnInit {
             // Campos de vehículo
             prenda: !!(r?.prenda ?? r?.prenda),
             esVehiculo: !!(r?.es_vehiculo ?? r?.esVehiculo),
+            tipo_vehiculo: r?.tipo_vehiculo ?? undefined,
             placa: (r?.es_vehiculo ?? r?.esVehiculo) ? (r?.placa ?? r?.placa ?? '') : undefined,
             entidadPrendaria: r?.entidad_prendaria ?? r?.entidadPrendaria ?? undefined,
           } as Management;
