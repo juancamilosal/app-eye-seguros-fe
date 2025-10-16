@@ -126,17 +126,78 @@ export class Gestion implements OnInit {
       meta: 'filter_count',
       sort: 'fecha_vencimiento'
     };
+    
     if (q) {
-      // Buscar por titular (nombre/apellido), o número de póliza
-      params['filter[_or][0][numero_poliza][_icontains]'] = q;
-      params['filter[_or][1][tipo_poliza][_icontains]'] = q;
-      // Buscar por nombre de la relación aseguradora_id (no por campo aseguradora directo)
-      params['filter[_or][2][aseguradora_id][nombre][_icontains]'] = q;
-      // Nombre y apellido vía relación cliente_id
-      params['filter[_or][3][cliente_id][nombre][_icontains]'] = q;
-      params['filter[_or][4][cliente_id][apellido][_icontains]'] = q;
-      // Número de documento vía relación cliente_id
-      params['filter[_or][5][cliente_id][numero_documento][_icontains]'] = q;
+      const words = q.split(/\s+/).filter(w => w.length > 0);
+      let orIndex = 0;
+
+      if (words.length === 1) {
+        // Búsqueda simple: una sola palabra
+        const word = words[0];
+        params[`filter[_or][${orIndex++}][numero_poliza][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][tipo_poliza][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][aseguradora_id][nombre][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][cliente_id][nombre][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][cliente_id][apellido][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][cliente_id][numero_documento][_icontains]`] = word;
+      } else {
+        // Búsqueda del término completo primero
+        params[`filter[_or][${orIndex++}][numero_poliza][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][tipo_poliza][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][aseguradora_id][nombre][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][cliente_id][nombre][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][cliente_id][apellido][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][cliente_id][numero_documento][_icontains]`] = q;
+
+        // Dividir en diferentes combinaciones para nombres completos
+        const firstWord = words[0];
+        const restWords = words.slice(1).join(' ');
+
+        // Opción 1: Primera palabra en nombre, resto en apellido
+        params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = firstWord;
+        params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = restWords;
+        orIndex++;
+
+        // Opción 2: Resto en nombre, primera palabra en apellido
+        params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = restWords;
+        params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = firstWord;
+        orIndex++;
+
+        // Para 3 o más palabras, probar divisiones adicionales
+        if (words.length >= 3) {
+          // Primeras dos palabras en nombre, resto en apellido
+          const firstTwoWords = words.slice(0, 2).join(' ');
+          const lastWords = words.slice(2).join(' ');
+
+          params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = firstTwoWords;
+          params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = lastWords;
+          orIndex++;
+
+          // Primera palabra en nombre, resto en apellido
+          const firstWordOnly = words[0];
+          const restFromSecond = words.slice(1).join(' ');
+
+          params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = firstWordOnly;
+          params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = restFromSecond;
+          orIndex++;
+        }
+
+        // Para exactamente 2 palabras, agregar combinaciones cruzadas
+        if (words.length === 2) {
+          const word1 = words[0];
+          const word2 = words[1];
+
+          // Nombre contiene word1 Y apellido contiene word2
+          params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = word1;
+          params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = word2;
+          orIndex++;
+
+          // Nombre contiene word2 Y apellido contiene word1
+          params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = word2;
+          params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = word1;
+          orIndex++;
+        }
+      }
     }
     const f = filters || this.filters;
     // Filtros avanzados (AND entre ellos)
