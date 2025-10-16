@@ -142,7 +142,7 @@
           <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Fecha de Vencimiento</th>
           <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Aseguradora</th>
           <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Estado</th>
-          <th class="px-4 py-3 text-center text-xs font-semibold text-white hidden sm:table-cell whitespace-nowrap">Acción</th>
+          <th class="px-4 py-3 text-center text-xs font-semibold text-white whitespace-nowrap">Acción</th>
         </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -206,27 +206,6 @@
                     <div class="font-medium">{{ poliza.titular }}</div>
                     @if (poliza.tipoDocumento || poliza.numeroDocumento) {
                       <div class="text-xs text-gray-600 mt-1">{{ poliza.tipoDocumento }} : {{ poliza.numeroDocumento }}</div>
-                    }
-                  </div>
-                  <!-- Acciones (solo mobile) -->
-                  <div class="mt-2 flex items-center gap-2 md:hidden">
-                    @if (editingRowId === poliza.id) {
-                      <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
-                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
-                      </button>
-                      <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
-                        <img src="assets/icons/regresar.png" alt="Volver" class="w-5 h-5" />
-                      </button>
-                    } @else {
-                      <button (click)="editPoliza(poliza)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
-                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5 object-contain" />
-                      </button>
-                      <button (click)="openComentarios(poliza)" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-50" title="Comentarios">
-                        <img src="assets/icons/comentarios.png" alt="Comentarios" class="w-5 h-5 object-contain" />
-                      </button>
-                      <button (click)="eliminarVencimientoPrompt(poliza)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
-                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5 object-contain" />
-                      </button>
                     }
                   </div>
                 </td>
@@ -363,7 +342,7 @@
                   }
                 </td>
                 <!-- Acciones (solo desktop) -->
-                <td class="px-4 py-3 text-center hidden sm:table-cell">
+                <td class="px-4 py-3 text-center">
                   @if (editingRowId === poliza.id) {
                     <div class="flex items-center justify-center gap-2">
                       <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
