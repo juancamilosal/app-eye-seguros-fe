@@ -109,7 +109,7 @@
           } @else {
             @for (cliente of clientes; track cliente.id) {
               <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap sm:whitespace-normal">
+                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                   @if (editingRowId === cliente.id) {
                     <!-- Siempre horizontal: inputs largos con scroll horizontal si se requiere -->
                     <div class="overflow-x-auto">
@@ -158,17 +158,17 @@
                   <div class="mt-2 flex items-center gap-2 sm:hidden">
                     @if (editingRowId === cliente.id) {
                       <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
-                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
+                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5 object-contain" />
                       </button>
                       <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
-                        <img src="assets/icons/regresar.png" alt="Volver" class="w-5 h-5" />
+                        <img src="assets/icons/regresar.png" alt="Volver" class="w-5 h-5 object-contain" />
                       </button>
                     } @else {
                       <button (click)="editCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
-                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5" />
+                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5 object-contain" />
                       </button>
                       <button (click)="eliminarCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
-                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5" />
+                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5 object-contain" />
                       </button>
                     }
                   </div>
@@ -242,17 +242,17 @@
                   <div class="flex items-center justify-center gap-2">
                     @if (editingRowId === cliente.id) {
                       <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
-                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
+                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5 object-contain" />
                       </button>
                       <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
-                        <img src="assets/icons/regresar.png" alt="Regresar" class="w-5 h-5" />
+                        <img src="assets/icons/regresar.png" alt="Regresar" class="w-5 h-5 object-contain" />
                       </button>
                     } @else {
                       <button (click)="editCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
-                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5" />
+                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5 object-contain" />
                       </button>
                       <button (click)="eliminarCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
-                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5" />
+                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5 object-contain" />
                       </button>
                     }
                   </div>
