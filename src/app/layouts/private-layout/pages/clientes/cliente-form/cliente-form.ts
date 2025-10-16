@@ -39,7 +39,11 @@ export class ClienteForm implements OnInit {
       fecha_nacimiento: [null, [Validators.required]],
       direccion: [null, [Validators.required, Validators.minLength(5)]],
       numero_contacto: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
-      email: [null, [Validators.required, Validators.email]]
+      email: [null, [Validators.required, Validators.email]],
+      // Información Laboral (campos opcionales)
+      numero_oficina: [null, [Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
+      direccion_oficina: [null, [Validators.minLength(5)]],
+      email_laboral: [null, [Validators.email]]
     });
 
     if (this._initialValue) {

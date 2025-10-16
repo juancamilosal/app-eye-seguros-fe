@@ -58,6 +58,9 @@
             <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Dirección</th>
             <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Número de Contacto</th>
             <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Email</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Teléfono Oficina</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Dirección Oficina</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Email Laboral</th>
             <th class="px-4 py-3 text-center text-xs font-semibold text-white hidden sm:table-cell whitespace-nowrap">Acción</th>
           </tr>
         </thead>
@@ -83,6 +86,15 @@
                   <div class="h-4 w-56 bg-gray-200 animate-pulse rounded"></div>
                 </td>
                 <td class="px-4 py-3">
+                  <div class="h-4 w-28 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-48 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-56 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
                   <div class="h-4 w-16 bg-gray-200 animate-pulse rounded"></div>
                 </td>
               </tr>
@@ -90,7 +102,7 @@
           } @else if (!loading && clientes.length === 0) {
             <!-- Empty state -->
             <tr>
-              <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-600">
+              <td colspan="9" class="px-4 py-8 text-center text-sm text-gray-600">
                 No hay datos para mostrar.
               </td>
             </tr>
@@ -176,7 +188,7 @@
                       [value]="(editBuffer[editingRowId!]?.direccion ?? cliente.direccion)"
                       (input)="onInlineFieldChange(editingRowId || '', 'direccion', $any($event.target).value)" />
                   } @else {
-                    <span class="whitespace-nowrap">{{ cliente.direccion }}</span>
+                    <span class="whitespace-nowrap" [class]="cliente.direccion ? '' : 'text-gray-400 italic'">{{ cliente.direccion || 'Sin Información' }}</span>
                   }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
@@ -186,7 +198,7 @@
                       [value]="(editBuffer[editingRowId!]?.numero_contacto ?? cliente.numero_contacto)"
                       (input)="onInlineFieldChange(editingRowId || '', 'numero_contacto', $any($event.target).value)" />
                   } @else {
-                    <span class="whitespace-nowrap">{{ cliente.numero_contacto }}</span>
+                    <span class="whitespace-nowrap" [class]="cliente.numero_contacto ? '' : 'text-gray-400 italic'">{{ cliente.numero_contacto || 'Sin Información' }}</span>
                   }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
@@ -195,7 +207,35 @@
                       [value]="(editBuffer[editingRowId!]?.email ?? cliente.email)"
                       (input)="onInlineFieldChange(editingRowId || '', 'email', $any($event.target).value)" />
                   } @else {
-                    <span class="whitespace-nowrap lowercase">{{ cliente.email }}</span>
+                    <span class="whitespace-nowrap lowercase" [class]="cliente.email ? '' : 'text-gray-400 italic'">{{ cliente.email || 'Sin Información' }}</span>
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                  @if (editingRowId === cliente.id) {
+                    <input inputmode="numeric" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      maxlength="10"
+                      [value]="(editBuffer[editingRowId!]?.numero_oficina ?? cliente.numero_oficina)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'numero_oficina', $any($event.target).value)" />
+                  } @else {
+                    <span class="whitespace-nowrap" [class]="cliente.numero_oficina ? '' : 'text-gray-400 italic'">{{ cliente.numero_oficina || 'Sin Información' }}</span>
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                  @if (editingRowId === cliente.id) {
+                    <input class="w-full min-w-[320px] sm:min-w-0 shrink-0 border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.direccion_oficina ?? cliente.direccion_oficina)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'direccion_oficina', $any($event.target).value)" />
+                  } @else {
+                    <span class="whitespace-nowrap" [class]="cliente.direccion_oficina ? '' : 'text-gray-400 italic'">{{ cliente.direccion_oficina || 'Sin Información' }}</span>
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                  @if (editingRowId === cliente.id) {
+                    <input type="email" class="w-full min-w-[360px] sm:min-w-0 shrink-0 border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88] lowercase"
+                      [value]="(editBuffer[editingRowId!]?.email_laboral ?? cliente.email_laboral)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'email_laboral', $any($event.target).value)" />
+                  } @else {
+                    <span class="whitespace-nowrap lowercase" [class]="cliente.email_laboral ? '' : 'text-gray-400 italic'">{{ cliente.email_laboral || 'Sin Información' }}</span>
                   }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 hidden sm:table-cell sm:min-w-[120px] sm:border-l sm:border-gray-200">

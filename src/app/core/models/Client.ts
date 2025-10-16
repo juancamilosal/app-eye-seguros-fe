@@ -8,4 +8,8 @@ export class Client {
   direccion: string;
   email: string;
   numero_contacto: string;
+  // Información Laboral
+  numero_oficina?: string;
+  direccion_oficina?: string;
+  email_laboral?: string;
 }

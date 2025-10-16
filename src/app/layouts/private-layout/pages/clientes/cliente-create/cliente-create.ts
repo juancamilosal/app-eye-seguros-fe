@@ -39,6 +39,10 @@ export class ClienteCreate {
       direccion: item.direccion,
       numero_contacto: item.numero_contacto,
       email: item.email,
+      // Información Laboral
+      numero_oficina: item.numero_oficina,
+      direccion_oficina: item.direccion_oficina,
+      email_laboral: item.email_laboral,
     };
 
     this.isSubmitting = true;
