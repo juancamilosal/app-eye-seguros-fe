@@ -75,11 +75,74 @@ export class Clientes implements OnInit {
       meta: 'filter_count',
       sort: 'nombre'
     };
+
     if (q) {
-      params['filter[_or][0][nombre][_icontains]'] = q;
-      params['filter[_or][1][apellido][_icontains]'] = q;
-      params['filter[_or][2][numero_documento][_icontains]'] = q;
+      const words = q.split(/\s+/).filter(w => w.length > 0);
+      let orIndex = 0;
+
+      if (words.length === 1) {
+        // Búsqueda simple: una sola palabra
+        const word = words[0];
+        params[`filter[_or][${orIndex++}][nombre][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][apellido][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][numero_documento][_icontains]`] = word;
+      } else {
+        // Búsqueda del término completo primero
+        params[`filter[_or][${orIndex++}][nombre][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][apellido][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][numero_documento][_icontains]`] = q;
+
+        // Dividir en diferentes combinaciones para nombres completos
+        const firstWord = words[0];
+        const restWords = words.slice(1).join(' ');
+
+        // Opción 1: Primera palabra en nombre, resto en apellido
+        params[`filter[_or][${orIndex}][_and][0][nombre][_icontains]`] = firstWord;
+        params[`filter[_or][${orIndex}][_and][1][apellido][_icontains]`] = restWords;
+        orIndex++;
+
+        // Opción 2: Resto en nombre, primera palabra en apellido
+        params[`filter[_or][${orIndex}][_and][0][nombre][_icontains]`] = restWords;
+        params[`filter[_or][${orIndex}][_and][1][apellido][_icontains]`] = firstWord;
+        orIndex++;
+
+        // Para 3 o más palabras, probar divisiones adicionales
+        if (words.length >= 3) {
+          // Primeras dos palabras en nombre, resto en apellido
+          const firstTwoWords = words.slice(0, 2).join(' ');
+          const lastWords = words.slice(2).join(' ');
+
+          params[`filter[_or][${orIndex}][_and][0][nombre][_icontains]`] = firstTwoWords;
+          params[`filter[_or][${orIndex}][_and][1][apellido][_icontains]`] = lastWords;
+          orIndex++;
+
+          // Primera palabra en nombre, resto en apellido
+          const firstWordOnly = words[0];
+          const restFromSecond = words.slice(1).join(' ');
+
+          params[`filter[_or][${orIndex}][_and][0][nombre][_icontains]`] = firstWordOnly;
+          params[`filter[_or][${orIndex}][_and][1][apellido][_icontains]`] = restFromSecond;
+          orIndex++;
+        }
+
+        // Para exactamente 2 palabras, agregar combinaciones cruzadas
+        if (words.length === 2) {
+          const word1 = words[0];
+          const word2 = words[1];
+
+          // Nombre contiene word1 Y apellido contiene word2
+          params[`filter[_or][${orIndex}][_and][0][nombre][_icontains]`] = word1;
+          params[`filter[_or][${orIndex}][_and][1][apellido][_icontains]`] = word2;
+          orIndex++;
+
+          // Nombre contiene word2 Y apellido contiene word1
+          params[`filter[_or][${orIndex}][_and][0][nombre][_icontains]`] = word2;
+          params[`filter[_or][${orIndex}][_and][1][apellido][_icontains]`] = word1;
+          orIndex++;
+        }
+      }
     }
+
     return params;
   }
 
