@@ -183,25 +183,10 @@
                     }
                   </div>
                   <!-- Acciones (solo mobile) -->
-                  <div class="mt-2 flex items-center gap-2 sm:hidden">
-                    @if (editingRowId === vencimiento.id) {
-                      <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
-                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
-                      </button>
-                      <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
-                        <img src="assets/icons/regresar.png" alt="Volver" class="w-5 h-5" />
-                      </button>
-                    } @else {
-                      <button (click)="startInlineEdit(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
-                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5" />
-                      </button>
+                  <div class="mt-2 flex justify-center items-center gap-2 sm:hidden">
                       <button (click)="openComentarios(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-50" title="Comentarios">
                         <img src="assets/icons/comentarios.png" alt="Comentarios" class="w-5 h-5" />
                       </button>
-                      <button (click)="eliminarVencimientoPrompt(vencimiento)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
-                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5" />
-                      </button>
-                    }
                   </div>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap sm:whitespace-normal">
