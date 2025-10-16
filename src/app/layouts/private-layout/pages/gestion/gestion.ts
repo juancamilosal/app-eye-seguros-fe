@@ -24,6 +24,7 @@ import { TIPOS_VEHICULO } from '../../../../core/const/TiposVehiculoConst';
 export class Gestion implements OnInit {
 
   vencimientos: Array<Management & { id?: string }> = [];
+  polizas: Array<Management & { id?: string }> = [];
   formaPago = FORMA_PAGO;
   tiposVehiculo = TIPOS_VEHICULO;
   loading = true;
@@ -35,13 +36,19 @@ export class Gestion implements OnInit {
   vencimientoToDelete: { id: string; numeroPoliza?: string; titular?: string } | null = null;
   editingRowId: string | null = null;
   // Buffer para edición en línea por fila
-  editBuffer: Record<string, Partial<Management> & { aseguradoraId?: string }> = {};
+  editBuffer: Record<string, Partial<Management> & { aseguradoraId?: string; cliente_nombre?: string; cliente_apellido?: string }> = {};
   // Autocomplete aseguradora en edición inline
   aseguradorasSug: Record<string, Aseguradora[]> = {};
   asegLoadingRow: Record<string, boolean> = {};
   asegNoResultsRow: Record<string, boolean> = {};
   // Visibilidad de filtros avanzados
   showAdvancedFilters = false;
+  // Autocomplete para filtro de aseguradora
+  aseguradorasSuggestions: Aseguradora[] = [];
+  aseguradoraFilterLoading = false;
+  private aseguradoraFilterSearch$ = new Subject<string>();
+  // Constante para formas de pago
+  FORMA_PAGO = FORMA_PAGO;
   // Búsqueda
   private search$ = new Subject<string>();
   // Filtros avanzados
@@ -52,7 +59,8 @@ export class Gestion implements OnInit {
     formaPago: '',
     mesVencimiento: '',
     fechaDesde: '',
-    fechaHasta: ''
+    fechaHasta: '',
+    tipoVehiculo: ''
   };
   private filters$ = new BehaviorSubject<Filtro>(this.filters);
   // Filtro de Aseguradora (sin autocomplete)
@@ -66,6 +74,25 @@ export class Gestion implements OnInit {
 
   constructor(private router: Router, private vencimientoService: GestionService, private aseguradoraService: AseguradoraService) {}
   ngOnInit(): void {
+    // Configurar autocompletado de aseguradoras para filtros
+    this.aseguradoraFilterSearch$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((term) => {
+          if (!term || term.length < 2) {
+            return of({ data: [] });
+          }
+          return this.aseguradoraService.buscarPorNombre(term, 10).pipe(
+            catchError(() => of({ data: [] }))
+          );
+        })
+      )
+      .subscribe((resp) => {
+        this.aseguradorasSuggestions = resp?.data ?? [];
+        this.aseguradoraFilterLoading = false;
+      });
+
     const term$ = this.search$.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -112,6 +139,8 @@ export class Gestion implements OnInit {
           } as Management;
         });
 
+        // Asignar también a polizas para compatibilidad con el template
+        this.polizas = this.vencimientos;
 
         const meta = resp?.meta ?? {};
         this.total = (meta?.filter_count ?? meta?.total_count ?? 0) as number;
@@ -218,6 +247,9 @@ export class Gestion implements OnInit {
     if (f.formaPago?.trim()) {
       params['filter[forma_pago][_eq]'] = f.formaPago.trim();
     }
+    if (f.tipoVehiculo?.trim()) {
+      params['filter[tipo_vehiculo][_eq]'] = f.tipoVehiculo.trim();
+    }
     const desde = (f.fechaDesde ?? '').trim();
     const hasta = (f.fechaHasta ?? '').trim();
     if (desde) {
@@ -240,12 +272,8 @@ export class Gestion implements OnInit {
   }
 
   clearFilters() {
-    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', mesVencimiento: '', fechaDesde: '', fechaHasta: '' };
+    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', mesVencimiento: '', fechaDesde: '', fechaHasta: '', tipoVehiculo: '' };
     this.filters$.next(this.filters);
-  }
-
-  toggleAdvancedFilters() {
-    this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 
   onLimitChange(value: string) {
@@ -299,42 +327,57 @@ export class Gestion implements OnInit {
     this.router.navigateByUrl('/gestion/nuevo');
   }
 
+  goToCreate() {
+    this.router.navigateByUrl('/gestion/nuevo');
+  }
+
+  editPoliza(poliza: Management & { id?: string }) {
+    this.startInlineEdit(poliza);
+  }
+
   startInlineEdit(item: { id?: string } & Management) {
     if (!item?.id) return;
     this.editingRowId = item.id!;
+    
+    // Extraer nombre y apellido del cliente_id si existe
+    const clienteNombre = (item as any).cliente_id?.nombre || '';
+    const clienteApellido = (item as any).cliente_id?.apellido || '';
+    
     this.editBuffer[item.id!] = {
-      numeroPoliza: item.numeroPoliza,
-      tipoPoliza: item.tipoPoliza,
-      formaPagoRenovacion: item.formaPagoRenovacion,
-      valorAnterior: item.valorAnterior,
-      valorActual: item.valorActual,
-      fechaVencimiento: item.fechaVencimiento,
-      aseguradora: item.aseguradora,
-      estado: item.estado,
-      comentarios: item.comentarios,
-      titular: item.titular,
-      tipoDocumento: item.tipoDocumento,
-      numeroDocumento: item.numeroDocumento,
-      prenda: item.prenda,
-      placa: item.placa ?? '',
-      entidadPrendaria: item.entidadPrendaria ?? '',
+      numeroPoliza: item.numeroPoliza || '',
+      tipoPoliza: item.tipoPoliza || '',
+      formaPagoRenovacion: item.formaPagoRenovacion || '',
+      valorAnterior: item.valorAnterior || 0,
+      valorActual: item.valorActual || 0,
+      fechaVencimiento: item.fechaVencimiento || '',
+      aseguradora: item.aseguradora || '',
+      estado: item.estado || '',
+      comentarios: item.comentarios || '',
+      titular: item.titular || '',
+      tipoDocumento: item.tipoDocumento || '',
+      numeroDocumento: item.numeroDocumento || '',
+      prenda: item.prenda || false,
+      placa: item.placa || '',
+      entidadPrendaria: item.entidadPrendaria || '',
+      cliente_nombre: clienteNombre,
+      cliente_apellido: clienteApellido,
     };
   }
 
-  onInlineFieldChange(id: string, field: keyof Management, value: any) {
-    if (!this.editBuffer[id]) this.editBuffer[id] = {};
-    // Normalización básica: números para valorAnterior/valorActual
-    if (field === 'valorAnterior' || field === 'valorActual') {
-      const onlyDigits = String(value || '').replace(/\D+/g, '');
-      this.editBuffer[id][field] = Number(onlyDigits || 0);
-    } else if (field === 'placa') {
-      const upper = String(value ?? '').toLocaleUpperCase('es-ES');
-      this.editBuffer[id][field] = upper;
-    } else if (field === 'entidadPrendaria') {
-      const transformed = this.toTitleCaseSpanish(String(value ?? ''));
-      this.editBuffer[id][field] = transformed;
-    } else {
+  onInlineFieldChange(id: string, field: keyof Management | 'cliente_nombre' | 'cliente_apellido', value: any) {
+    if (!this.editBuffer[id]) return;
+    
+    if (field === 'cliente_nombre' || field === 'cliente_apellido') {
+      // Campos especiales para nombres de cliente
       this.editBuffer[id][field] = value;
+    } else if (field === 'valorAnterior' || field === 'valorActual') {
+      this.editBuffer[id][field] = parseFloat(value) || 0;
+    } else if (field === 'placa') {
+      this.editBuffer[id][field] = value?.toUpperCase();
+    } else if (field === 'entidadPrendaria') {
+      this.editBuffer[id][field] = this.toTitleCaseSpanish(value);
+    } else {
+      (this.editBuffer[id] as any)[field] = value;
     }
   }
 
@@ -518,5 +561,49 @@ export class Gestion implements OnInit {
       .map(w => w.charAt(0).toLocaleUpperCase('es-ES') + w.slice(1))
       .join(' ');
     return transformed + trailing;
+  }
+
+  // Métodos para filtros avanzados
+  toggleAdvancedFilters() {
+    this.showAdvancedFilters = !this.showAdvancedFilters;
+    if (!this.showAdvancedFilters) {
+      // Limpiar sugerencias cuando se cierra
+      this.aseguradorasSuggestions = [];
+    }
+  }
+
+  onAseguradoraFilterInput(value: string) {
+    const term = (value || '').trim();
+    this.onFilterChange('aseguradora', term);
+    
+    if (term.length >= 2) {
+      this.aseguradoraFilterLoading = true;
+      this.aseguradoraFilterSearch$.next(term);
+    } else {
+      this.aseguradorasSuggestions = [];
+      this.aseguradoraFilterLoading = false;
+    }
+  }
+
+  selectAseguradoraFilter(aseguradora: Aseguradora) {
+    this.onFilterChange('aseguradora', aseguradora.nombre);
+    this.aseguradorasSuggestions = [];
+    this.aseguradoraFilterLoading = false;
+  }
+
+  clearAdvancedFilters() {
+    this.filters = {
+      aseguradora: '',
+      tipoPoliza: '',
+      numeroPoliza: '',
+      formaPago: '',
+      mesVencimiento: '',
+      fechaDesde: '',
+      fechaHasta: '',
+      tipoVehiculo: ''
+    };
+    this.filters$.next(this.filters);
+    this.aseguradorasSuggestions = [];
+    this.aseguradoraFilterLoading = false;
   }
 }

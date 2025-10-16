@@ -40,7 +40,8 @@ export class Vencimientos implements OnInit {
     formaPago: '',
     mesVencimiento: '',
     fechaDesde: '',
-    fechaHasta: ''
+    fechaHasta: '',
+    tipoVehiculo: ''
   };
   private filters$ = new BehaviorSubject<Filtro>(this.filters);
   // Paginación
@@ -244,7 +245,7 @@ export class Vencimientos implements OnInit {
   }
 
   clearFilters() {
-    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', mesVencimiento: '', fechaDesde: '', fechaHasta: '' };
+    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', mesVencimiento: '', fechaDesde: '', fechaHasta: '', tipoVehiculo: '' };
     this.filters$.next(this.filters);
   }
 
