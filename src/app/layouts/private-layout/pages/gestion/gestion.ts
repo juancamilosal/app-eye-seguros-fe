@@ -18,7 +18,7 @@ import { TIPOS_VEHICULO } from '../../../../core/const/TiposVehiculoConst';
 @Component({
   selector: 'app-gestion',
   standalone: true,
-  imports: [CommonModule, NotificationModalComponent, ModalComentarioComponent],
+  imports: [CommonModule, ModalComentarioComponent],
   templateUrl: './gestion.html'
 })
 export class Gestion implements OnInit {
@@ -158,7 +158,7 @@ export class Gestion implements OnInit {
       meta: 'filter_count',
       sort: 'fecha_vencimiento'
     };
-    
+
     if (q) {
       const words = q.split(/\s+/).filter(w => w.length > 0);
       let orIndex = 0;
@@ -338,11 +338,11 @@ export class Gestion implements OnInit {
   startInlineEdit(item: { id?: string } & Management) {
     if (!item?.id) return;
     this.editingRowId = item.id!;
-    
+
     // Extraer nombre y apellido del cliente_id si existe
     const clienteNombre = (item as any).cliente_id?.nombre || '';
     const clienteApellido = (item as any).cliente_id?.apellido || '';
-    
+
     this.editBuffer[item.id!] = {
       numeroPoliza: item.numeroPoliza || '',
       tipoPoliza: item.tipoPoliza || '',
@@ -366,7 +366,7 @@ export class Gestion implements OnInit {
 
   onInlineFieldChange(id: string, field: keyof Management | 'cliente_nombre' | 'cliente_apellido', value: any) {
     if (!this.editBuffer[id]) return;
-    
+
     if (field === 'cliente_nombre' || field === 'cliente_apellido') {
       // Campos especiales para nombres de cliente
       this.editBuffer[id][field] = value;
@@ -575,7 +575,7 @@ export class Gestion implements OnInit {
   onAseguradoraFilterInput(value: string) {
     const term = (value || '').trim();
     this.onFilterChange('aseguradora', term);
-    
+
     if (term.length >= 2) {
       this.aseguradoraFilterLoading = true;
       this.aseguradoraFilterSearch$.next(term);
