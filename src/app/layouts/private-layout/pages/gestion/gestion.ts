@@ -457,10 +457,17 @@ export class Gestion implements OnInit {
     };
     this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
       next: () => {
-        // Refleja cambios localmente
+        // Refleja cambios localmente en ambos arrays
+        const updatedItem = { ...data, prenda, esVehiculo, placa, entidadPrendaria: prenda ? entidad : undefined };
         this.vencimientos = this.vencimientos.map(v => {
           if (v.id === id) {
-            return { ...v, ...data, prenda, esVehiculo, placa, entidadPrendaria: prenda ? entidad : undefined };
+            return { ...v, ...updatedItem };
+          }
+          return v;
+        });
+        this.polizas = this.polizas.map(v => {
+          if (v.id === id) {
+            return { ...v, ...updatedItem };
           }
           return v;
         });
@@ -496,7 +503,9 @@ export class Gestion implements OnInit {
     const payload: Partial<GestionModel> = { comentarios: (value ?? '').trim() };
     this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
       next: () => {
+        // Update both arrays to keep them in sync
         this.vencimientos = this.vencimientos.map(v => v.id === id ? { ...v, comentarios: payload.comentarios } : v);
+        this.polizas = this.polizas.map(v => v.id === id ? { ...v, comentarios: payload.comentarios } : v);
         this.onComentarioClose();
       },
       error: () => {
