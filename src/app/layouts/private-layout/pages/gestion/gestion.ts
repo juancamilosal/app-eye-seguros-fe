@@ -18,7 +18,7 @@ import { TIPOS_VEHICULO } from '../../../../core/const/TiposVehiculoConst';
 @Component({
   selector: 'app-gestion',
   standalone: true,
-  imports: [CommonModule, ModalComentarioComponent],
+  imports: [CommonModule, ModalComentarioComponent, NotificationModalComponent],
   templateUrl: './gestion.html'
 })
 export class Gestion implements OnInit {
@@ -547,13 +547,23 @@ export class Gestion implements OnInit {
       this.onModalClosed();
       return;
     }
+    
     this.vencimientoService.eliminarVencimiento(v.id).subscribe({
       next: () => {
+        // Update both arrays to keep them in sync
         this.vencimientos = this.vencimientos.filter(item => item.id !== v.id);
+        this.polizas = this.polizas.filter(item => item.id !== v.id);
         this.onModalClosed();
       },
-      error: () => {
-        this.onModalClosed();
+      error: (error) => {
+        // Show error notification
+        this.notification = {
+          type: 'error',
+          title: 'Error al eliminar',
+          message: 'No se pudo eliminar el registro. Intente nuevamente.',
+          confirmable: false
+        };
+        // Keep modal open to show error
       }
     });
   }

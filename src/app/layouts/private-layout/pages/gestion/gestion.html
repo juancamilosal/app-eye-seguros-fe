@@ -403,4 +403,12 @@
     (close)="onComentarioClose()"
     (save)="onComentarioSave($event)"
   ></app-modal-comentario>
+
+  <!-- Modal de notificación -->
+  <app-notification-modal
+    [isVisible]="isModalVisible"
+    [notification]="notification"
+    (close)="onModalClosed()"
+    (confirm)="onModalConfirm()"
+  ></app-notification-modal>
 </div>
