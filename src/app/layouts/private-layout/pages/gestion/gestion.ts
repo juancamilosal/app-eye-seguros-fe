@@ -18,7 +18,7 @@ import { TIPOS_VEHICULO } from '../../../../core/const/TiposVehiculoConst';
 @Component({
   selector: 'app-gestion',
   standalone: true,
-  imports: [CommonModule, ModalComentarioComponent],
+  imports: [CommonModule, ModalComentarioComponent, NotificationModalComponent],
   templateUrl: './gestion.html'
 })
 export class Gestion implements OnInit {
@@ -457,10 +457,17 @@ export class Gestion implements OnInit {
     };
     this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
       next: () => {
-        // Refleja cambios localmente
+        // Refleja cambios localmente en ambos arrays
+        const updatedItem = { ...data, prenda, esVehiculo, placa, entidadPrendaria: prenda ? entidad : undefined };
         this.vencimientos = this.vencimientos.map(v => {
           if (v.id === id) {
-            return { ...v, ...data, prenda, esVehiculo, placa, entidadPrendaria: prenda ? entidad : undefined };
+            return { ...v, ...updatedItem };
+          }
+          return v;
+        });
+        this.polizas = this.polizas.map(v => {
+          if (v.id === id) {
+            return { ...v, ...updatedItem };
           }
           return v;
         });
@@ -496,7 +503,9 @@ export class Gestion implements OnInit {
     const payload: Partial<GestionModel> = { comentarios: (value ?? '').trim() };
     this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
       next: () => {
+        // Update both arrays to keep them in sync
         this.vencimientos = this.vencimientos.map(v => v.id === id ? { ...v, comentarios: payload.comentarios } : v);
+        this.polizas = this.polizas.map(v => v.id === id ? { ...v, comentarios: payload.comentarios } : v);
         this.onComentarioClose();
       },
       error: () => {
@@ -538,13 +547,23 @@ export class Gestion implements OnInit {
       this.onModalClosed();
       return;
     }
+    
     this.vencimientoService.eliminarVencimiento(v.id).subscribe({
       next: () => {
+        // Update both arrays to keep them in sync
         this.vencimientos = this.vencimientos.filter(item => item.id !== v.id);
+        this.polizas = this.polizas.filter(item => item.id !== v.id);
         this.onModalClosed();
       },
-      error: () => {
-        this.onModalClosed();
+      error: (error) => {
+        // Show error notification
+        this.notification = {
+          type: 'error',
+          title: 'Error al eliminar',
+          message: 'No se pudo eliminar el registro. Intente nuevamente.',
+          confirmable: false
+        };
+        // Keep modal open to show error
       }
     });
   }

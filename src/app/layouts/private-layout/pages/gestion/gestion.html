@@ -357,8 +357,11 @@
                       <button (click)="editPoliza(poliza)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
                         <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5 object-contain" />
                       </button>
-                      <button (click)="openComentarios(poliza)" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-50" title="Comentarios">
+                      <button (click)="openComentarios(poliza)" class="relative inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-50" title="Comentarios">
                         <img src="assets/icons/comentarios.png" alt="Comentarios" class="w-5 h-5 object-contain" />
+                        @if (poliza.comentarios && poliza.comentarios.trim()) {
+                          <span class="absolute top-1/2 -translate-y-1/2 left-1 w-2.5 h-2.5 bg-red-400 rounded-full"></span>
+                        }
                       </button>
                       <button (click)="eliminarVencimientoPrompt(poliza)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
                         <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5 object-contain" />
@@ -400,4 +403,12 @@
     (close)="onComentarioClose()"
     (save)="onComentarioSave($event)"
   ></app-modal-comentario>
+
+  <!-- Modal de notificación -->
+  <app-notification-modal
+    [isVisible]="isModalVisible"
+    [notification]="notification"
+    (close)="onModalClosed()"
+    (confirm)="onModalConfirm()"
+  ></app-notification-modal>
 </div>
