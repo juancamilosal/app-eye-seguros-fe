@@ -58,7 +58,10 @@
             <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Dirección</th>
             <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Número de Contacto</th>
             <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Email</th>
-            <th class="px-4 py-3 text-center text-xs font-semibold text-white hidden sm:table-cell whitespace-nowrap">Acción</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Teléfono Oficina</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Dirección Oficina</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-white whitespace-nowrap">Email Laboral</th>
+            <th class="px-4 py-3 text-center text-xs font-semibold text-white whitespace-nowrap">Acción</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -83,6 +86,15 @@
                   <div class="h-4 w-56 bg-gray-200 animate-pulse rounded"></div>
                 </td>
                 <td class="px-4 py-3">
+                  <div class="h-4 w-28 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-48 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="h-4 w-56 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                <td class="px-4 py-3">
                   <div class="h-4 w-16 bg-gray-200 animate-pulse rounded"></div>
                 </td>
               </tr>
@@ -90,14 +102,14 @@
           } @else if (!loading && clientes.length === 0) {
             <!-- Empty state -->
             <tr>
-              <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-600">
+              <td colspan="9" class="px-4 py-8 text-center text-sm text-gray-600">
                 No hay datos para mostrar.
               </td>
             </tr>
           } @else {
             @for (cliente of clientes; track cliente.id) {
               <tr class="hover:bg-gray-50">
-                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap sm:whitespace-normal">
+                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                   @if (editingRowId === cliente.id) {
                     <!-- Siempre horizontal: inputs largos con scroll horizontal si se requiere -->
                     <div class="overflow-x-auto">
@@ -142,24 +154,6 @@
                       }
                     </div>
                   }
-                  <!-- Acciones (solo mobile) -->
-                  <div class="mt-2 flex items-center gap-2 sm:hidden">
-                    @if (editingRowId === cliente.id) {
-                      <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
-                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
-                      </button>
-                      <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
-                        <img src="assets/icons/regresar.png" alt="Volver" class="w-5 h-5" />
-                      </button>
-                    } @else {
-                      <button (click)="editCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
-                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5" />
-                      </button>
-                      <button (click)="eliminarCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
-                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5" />
-                      </button>
-                    }
-                  </div>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                   @if (editingRowId === cliente.id) {
@@ -176,7 +170,14 @@
                       [value]="(editBuffer[editingRowId!]?.direccion ?? cliente.direccion)"
                       (input)="onInlineFieldChange(editingRowId || '', 'direccion', $any($event.target).value)" />
                   } @else {
-                    <span class="whitespace-nowrap">{{ cliente.direccion }}</span>
+                    @if (cliente.direccion && cliente.direccion.length > 20) {
+                      <span class="cursor-pointer text-blue-600 hover:text-blue-800 underline" 
+                            (click)="showAddressModal(cliente.direccion, 'Dirección Completa')">
+                        {{ truncateText(cliente.direccion, 20) }}
+                      </span>
+                    } @else {
+                      <span class="whitespace-nowrap" [class]="cliente.direccion ? '' : 'text-gray-400 italic'">{{ cliente.direccion || 'Sin Información' }}</span>
+                    }
                   }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
@@ -186,7 +187,7 @@
                       [value]="(editBuffer[editingRowId!]?.numero_contacto ?? cliente.numero_contacto)"
                       (input)="onInlineFieldChange(editingRowId || '', 'numero_contacto', $any($event.target).value)" />
                   } @else {
-                    <span class="whitespace-nowrap">{{ cliente.numero_contacto }}</span>
+                    <span class="whitespace-nowrap" [class]="cliente.numero_contacto ? '' : 'text-gray-400 italic'">{{ cliente.numero_contacto || 'Sin Información' }}</span>
                   }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
@@ -195,24 +196,59 @@
                       [value]="(editBuffer[editingRowId!]?.email ?? cliente.email)"
                       (input)="onInlineFieldChange(editingRowId || '', 'email', $any($event.target).value)" />
                   } @else {
-                    <span class="whitespace-nowrap lowercase">{{ cliente.email }}</span>
+                    <span class="whitespace-nowrap lowercase" [class]="cliente.email ? '' : 'text-gray-400 italic'">{{ cliente.email || 'Sin Información' }}</span>
                   }
                 </td>
-                <td class="px-4 py-3 text-sm text-gray-900 hidden sm:table-cell sm:min-w-[120px] sm:border-l sm:border-gray-200">
-                  <div class="flex items-center justify-center gap-2">
+                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                  @if (editingRowId === cliente.id) {
+                    <input inputmode="numeric" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      maxlength="10"
+                      [value]="(editBuffer[editingRowId!]?.numero_oficina ?? cliente.numero_oficina)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'numero_oficina', $any($event.target).value)" />
+                  } @else {
+                    <span class="whitespace-nowrap" [class]="cliente.numero_oficina ? '' : 'text-gray-400 italic'">{{ cliente.numero_oficina || 'Sin Información' }}</span>
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                  @if (editingRowId === cliente.id) {
+                    <input class="w-full min-w-[320px] sm:min-w-0 shrink-0 border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88]"
+                      [value]="(editBuffer[editingRowId!]?.direccion_oficina ?? cliente.direccion_oficina)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'direccion_oficina', $any($event.target).value)" />
+                  } @else {
+                    @if (cliente.direccion_oficina && cliente.direccion_oficina.length > 20) {
+                      <span class="cursor-pointer text-blue-600 hover:text-blue-800 underline" 
+                            (click)="showAddressModal(cliente.direccion_oficina, 'Dirección Oficina Completa')">
+                        {{ truncateText(cliente.direccion_oficina, 20) }}
+                      </span>
+                    } @else {
+                      <span class="whitespace-nowrap" [class]="cliente.direccion_oficina ? '' : 'text-gray-400 italic'">{{ cliente.direccion_oficina || 'Sin Información' }}</span>
+                    }
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
+                  @if (editingRowId === cliente.id) {
+                    <input type="email" class="w-full min-w-[360px] sm:min-w-0 shrink-0 border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#243B88] lowercase"
+                      [value]="(editBuffer[editingRowId!]?.email_laboral ?? cliente.email_laboral)"
+                      (input)="onInlineFieldChange(editingRowId || '', 'email_laboral', $any($event.target).value)" />
+                  } @else {
+                    <span class="whitespace-nowrap lowercase" [class]="cliente.email_laboral ? '' : 'text-gray-400 italic'">{{ cliente.email_laboral || 'Sin Información' }}</span>
+                  }
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-900 sm:min-w-[120px] sm:border-l sm:border-gray-200">
+                  <div class="flex  w-32 items-center justify-center gap-2">
                     @if (editingRowId === cliente.id) {
                       <button (click)="confirmInlineUpdate(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-green-50" title="Actualizar">
-                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5" />
+                        <img src="assets/icons/actualizar.png" alt="Actualizar" class="w-5 h-5 object-contain" />
                       </button>
                       <button (click)="cancelInlineEdit(editingRowId || '')" class="inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-50" title="Volver">
-                        <img src="assets/icons/regresar.png" alt="Regresar" class="w-5 h-5" />
+                        <img src="assets/icons/regresar.png" alt="Regresar" class="w-5 h-5 object-contain" />
                       </button>
                     } @else {
                       <button (click)="editCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-blue-600 hover:bg-blue-50" title="Editar">
-                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5" />
+                        <img src="assets/icons/editar.png" alt="Editar" class="w-5 h-5 object-contain" />
                       </button>
                       <button (click)="eliminarCliente(cliente)" class="inline-flex items-center justify-center p-2 rounded-md text-red-600 hover:bg-red-50" title="Eliminar">
-                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5" />
+                        <img src="assets/icons/eliminar.png" alt="Eliminar" class="w-5 h-5 object-contain" />
                       </button>
                     }
                   </div>
@@ -253,5 +289,29 @@
   (close)="onModalClosed()"
   (confirm)="onModalConfirm()"
 ></app-notification-modal>
+
+<!-- Modal para mostrar direcciones completas -->
+@if (isAddressModalVisible) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeAddressModal()">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">{{ addressModalTitle }}</h3>
+        <button (click)="closeAddressModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-700 break-words">
+        {{ addressModalContent }}
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button (click)="closeAddressModal()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+}
 </div>
 </div>

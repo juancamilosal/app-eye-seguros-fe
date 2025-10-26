@@ -5,6 +5,8 @@ export const environment = {
   clientes: apiUrl + 'items/clientes',
   polizas: apiUrl + 'items/polizas',
   aseguradoras: apiUrl + 'items/aseguradoras',
+  asesores: apiUrl + 'items/asesores',
+  asesores_aseguradoras: apiUrl + 'items/asesores_aseguradoras',
   lista_tarea: apiUrl + 'items/lista_tareas',
   seguridad: {
     login: apiUrl + 'auth/login',

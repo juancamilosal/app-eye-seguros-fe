@@ -13,17 +13,20 @@ import {GestionModel} from '../../../../core/models/GestionModel';
 import {Filtro} from '../../../../core/models/Filter';
 import { AseguradoraService } from '../../../../core/services/aseguradora.service';
 import {Aseguradora} from '../../../../core/models/Aseguradora';
+import { TIPOS_VEHICULO } from '../../../../core/const/TiposVehiculoConst';
 
 @Component({
   selector: 'app-gestion',
   standalone: true,
-  imports: [CommonModule, NotificationModalComponent, ModalComentarioComponent],
+  imports: [CommonModule, ModalComentarioComponent, NotificationModalComponent],
   templateUrl: './gestion.html'
 })
 export class Gestion implements OnInit {
 
   vencimientos: Array<Management & { id?: string }> = [];
+  polizas: Array<Management & { id?: string }> = [];
   formaPago = FORMA_PAGO;
+  tiposVehiculo = TIPOS_VEHICULO;
   loading = true;
   isModalVisible = false;
   notification: NotificationData | null = null;
@@ -33,13 +36,19 @@ export class Gestion implements OnInit {
   vencimientoToDelete: { id: string; numeroPoliza?: string; titular?: string } | null = null;
   editingRowId: string | null = null;
   // Buffer para edición en línea por fila
-  editBuffer: Record<string, Partial<Management> & { aseguradoraId?: string }> = {};
+  editBuffer: Record<string, Partial<Management> & { aseguradoraId?: string; cliente_nombre?: string; cliente_apellido?: string }> = {};
   // Autocomplete aseguradora en edición inline
   aseguradorasSug: Record<string, Aseguradora[]> = {};
   asegLoadingRow: Record<string, boolean> = {};
   asegNoResultsRow: Record<string, boolean> = {};
   // Visibilidad de filtros avanzados
   showAdvancedFilters = false;
+  // Autocomplete para filtro de aseguradora
+  aseguradorasSuggestions: Aseguradora[] = [];
+  aseguradoraFilterLoading = false;
+  private aseguradoraFilterSearch$ = new Subject<string>();
+  // Constante para formas de pago
+  FORMA_PAGO = FORMA_PAGO;
   // Búsqueda
   private search$ = new Subject<string>();
   // Filtros avanzados
@@ -50,7 +59,8 @@ export class Gestion implements OnInit {
     formaPago: '',
     mesVencimiento: '',
     fechaDesde: '',
-    fechaHasta: ''
+    fechaHasta: '',
+    tipoVehiculo: ''
   };
   private filters$ = new BehaviorSubject<Filtro>(this.filters);
   // Filtro de Aseguradora (sin autocomplete)
@@ -64,6 +74,25 @@ export class Gestion implements OnInit {
 
   constructor(private router: Router, private vencimientoService: GestionService, private aseguradoraService: AseguradoraService) {}
   ngOnInit(): void {
+    // Configurar autocompletado de aseguradoras para filtros
+    this.aseguradoraFilterSearch$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((term) => {
+          if (!term || term.length < 2) {
+            return of({ data: [] });
+          }
+          return this.aseguradoraService.buscarPorNombre(term, 10).pipe(
+            catchError(() => of({ data: [] }))
+          );
+        })
+      )
+      .subscribe((resp) => {
+        this.aseguradorasSuggestions = resp?.data ?? [];
+        this.aseguradoraFilterLoading = false;
+      });
+
     const term$ = this.search$.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -104,11 +133,14 @@ export class Gestion implements OnInit {
             comentarios: r?.comentarios ?? undefined,
             prenda: !!(r?.prenda ?? r?.prenda),
             esVehiculo: !!(r?.es_vehiculo ?? r?.esVehiculo),
+            tipo_vehiculo: r?.tipo_vehiculo ?? undefined,
             placa: (r?.es_vehiculo ?? r?.esVehiculo) ? (r?.placa ?? r?.placa ?? '') : undefined,
             entidadPrendaria: r?.entidad_prendaria ?? r?.entidadPrendaria ?? undefined,
           } as Management;
         });
 
+        // Asignar también a polizas para compatibilidad con el template
+        this.polizas = this.vencimientos;
 
         const meta = resp?.meta ?? {};
         this.total = (meta?.filter_count ?? meta?.total_count ?? 0) as number;
@@ -126,17 +158,78 @@ export class Gestion implements OnInit {
       meta: 'filter_count',
       sort: 'fecha_vencimiento'
     };
+
     if (q) {
-      // Buscar por titular (nombre/apellido), o número de póliza
-      params['filter[_or][0][numero_poliza][_icontains]'] = q;
-      params['filter[_or][1][tipo_poliza][_icontains]'] = q;
-      // Buscar por nombre de la relación aseguradora_id (no por campo aseguradora directo)
-      params['filter[_or][2][aseguradora_id][nombre][_icontains]'] = q;
-      // Nombre y apellido vía relación cliente_id
-      params['filter[_or][3][cliente_id][nombre][_icontains]'] = q;
-      params['filter[_or][4][cliente_id][apellido][_icontains]'] = q;
-      // Número de documento vía relación cliente_id
-      params['filter[_or][5][cliente_id][numero_documento][_icontains]'] = q;
+      const words = q.split(/\s+/).filter(w => w.length > 0);
+      let orIndex = 0;
+
+      if (words.length === 1) {
+        // Búsqueda simple: una sola palabra
+        const word = words[0];
+        params[`filter[_or][${orIndex++}][numero_poliza][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][tipo_poliza][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][aseguradora_id][nombre][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][cliente_id][nombre][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][cliente_id][apellido][_icontains]`] = word;
+        params[`filter[_or][${orIndex++}][cliente_id][numero_documento][_icontains]`] = word;
+      } else {
+        // Búsqueda del término completo primero
+        params[`filter[_or][${orIndex++}][numero_poliza][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][tipo_poliza][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][aseguradora_id][nombre][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][cliente_id][nombre][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][cliente_id][apellido][_icontains]`] = q;
+        params[`filter[_or][${orIndex++}][cliente_id][numero_documento][_icontains]`] = q;
+
+        // Dividir en diferentes combinaciones para nombres completos
+        const firstWord = words[0];
+        const restWords = words.slice(1).join(' ');
+
+        // Opción 1: Primera palabra en nombre, resto en apellido
+        params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = firstWord;
+        params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = restWords;
+        orIndex++;
+
+        // Opción 2: Resto en nombre, primera palabra en apellido
+        params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = restWords;
+        params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = firstWord;
+        orIndex++;
+
+        // Para 3 o más palabras, probar divisiones adicionales
+        if (words.length >= 3) {
+          // Primeras dos palabras en nombre, resto en apellido
+          const firstTwoWords = words.slice(0, 2).join(' ');
+          const lastWords = words.slice(2).join(' ');
+
+          params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = firstTwoWords;
+          params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = lastWords;
+          orIndex++;
+
+          // Primera palabra en nombre, resto en apellido
+          const firstWordOnly = words[0];
+          const restFromSecond = words.slice(1).join(' ');
+
+          params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = firstWordOnly;
+          params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = restFromSecond;
+          orIndex++;
+        }
+
+        // Para exactamente 2 palabras, agregar combinaciones cruzadas
+        if (words.length === 2) {
+          const word1 = words[0];
+          const word2 = words[1];
+
+          // Nombre contiene word1 Y apellido contiene word2
+          params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = word1;
+          params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = word2;
+          orIndex++;
+
+          // Nombre contiene word2 Y apellido contiene word1
+          params[`filter[_or][${orIndex}][_and][0][cliente_id][nombre][_icontains]`] = word2;
+          params[`filter[_or][${orIndex}][_and][1][cliente_id][apellido][_icontains]`] = word1;
+          orIndex++;
+        }
+      }
     }
     const f = filters || this.filters;
     // Filtros avanzados (AND entre ellos)
@@ -153,6 +246,9 @@ export class Gestion implements OnInit {
     }
     if (f.formaPago?.trim()) {
       params['filter[forma_pago][_eq]'] = f.formaPago.trim();
+    }
+    if (f.tipoVehiculo?.trim()) {
+      params['filter[tipo_vehiculo][_eq]'] = f.tipoVehiculo.trim();
     }
     const desde = (f.fechaDesde ?? '').trim();
     const hasta = (f.fechaHasta ?? '').trim();
@@ -176,12 +272,8 @@ export class Gestion implements OnInit {
   }
 
   clearFilters() {
-    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', mesVencimiento: '', fechaDesde: '', fechaHasta: '' };
+    this.filters = { aseguradora: '', tipoPoliza: '', numeroPoliza: '', formaPago: '', mesVencimiento: '', fechaDesde: '', fechaHasta: '', tipoVehiculo: '' };
     this.filters$.next(this.filters);
-  }
-
-  toggleAdvancedFilters() {
-    this.showAdvancedFilters = !this.showAdvancedFilters;
   }
 
   onLimitChange(value: string) {
@@ -235,42 +327,57 @@ export class Gestion implements OnInit {
     this.router.navigateByUrl('/gestion/nuevo');
   }
 
+  goToCreate() {
+    this.router.navigateByUrl('/gestion/nuevo');
+  }
+
+  editPoliza(poliza: Management & { id?: string }) {
+    this.startInlineEdit(poliza);
+  }
+
   startInlineEdit(item: { id?: string } & Management) {
     if (!item?.id) return;
     this.editingRowId = item.id!;
+
+    // Extraer nombre y apellido del cliente_id si existe
+    const clienteNombre = (item as any).cliente_id?.nombre || '';
+    const clienteApellido = (item as any).cliente_id?.apellido || '';
+
     this.editBuffer[item.id!] = {
-      numeroPoliza: item.numeroPoliza,
-      tipoPoliza: item.tipoPoliza,
-      formaPagoRenovacion: item.formaPagoRenovacion,
-      valorAnterior: item.valorAnterior,
-      valorActual: item.valorActual,
-      fechaVencimiento: item.fechaVencimiento,
-      aseguradora: item.aseguradora,
-      estado: item.estado,
-      comentarios: item.comentarios,
-      titular: item.titular,
-      tipoDocumento: item.tipoDocumento,
-      numeroDocumento: item.numeroDocumento,
-      prenda: item.prenda,
-      placa: item.placa ?? '',
-      entidadPrendaria: item.entidadPrendaria ?? '',
+      numeroPoliza: item.numeroPoliza || '',
+      tipoPoliza: item.tipoPoliza || '',
+      formaPagoRenovacion: item.formaPagoRenovacion || '',
+      valorAnterior: item.valorAnterior || 0,
+      valorActual: item.valorActual || 0,
+      fechaVencimiento: item.fechaVencimiento || '',
+      aseguradora: item.aseguradora || '',
+      estado: item.estado || '',
+      comentarios: item.comentarios || '',
+      titular: item.titular || '',
+      tipoDocumento: item.tipoDocumento || '',
+      numeroDocumento: item.numeroDocumento || '',
+      prenda: item.prenda || false,
+      placa: item.placa || '',
+      entidadPrendaria: item.entidadPrendaria || '',
+      cliente_nombre: clienteNombre,
+      cliente_apellido: clienteApellido,
     };
   }
 
-  onInlineFieldChange(id: string, field: keyof Management, value: any) {
-    if (!this.editBuffer[id]) this.editBuffer[id] = {};
-    // Normalización básica: números para valorAnterior/valorActual
-    if (field === 'valorAnterior' || field === 'valorActual') {
-      const onlyDigits = String(value || '').replace(/\D+/g, '');
-      this.editBuffer[id][field] = Number(onlyDigits || 0);
-    } else if (field === 'placa') {
-      const upper = String(value ?? '').toLocaleUpperCase('es-ES');
-      this.editBuffer[id][field] = upper;
-    } else if (field === 'entidadPrendaria') {
-      const transformed = this.toTitleCaseSpanish(String(value ?? ''));
-      this.editBuffer[id][field] = transformed;
-    } else {
+  onInlineFieldChange(id: string, field: keyof Management | 'cliente_nombre' | 'cliente_apellido', value: any) {
+    if (!this.editBuffer[id]) return;
+
+    if (field === 'cliente_nombre' || field === 'cliente_apellido') {
+      // Campos especiales para nombres de cliente
       this.editBuffer[id][field] = value;
+    } else if (field === 'valorAnterior' || field === 'valorActual') {
+      this.editBuffer[id][field] = parseFloat(value) || 0;
+    } else if (field === 'placa') {
+      this.editBuffer[id][field] = value?.toUpperCase();
+    } else if (field === 'entidadPrendaria') {
+      this.editBuffer[id][field] = this.toTitleCaseSpanish(value);
+    } else {
+      (this.editBuffer[id] as any)[field] = value;
     }
   }
 
@@ -350,10 +457,17 @@ export class Gestion implements OnInit {
     };
     this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
       next: () => {
-        // Refleja cambios localmente
+        // Refleja cambios localmente en ambos arrays
+        const updatedItem = { ...data, prenda, esVehiculo, placa, entidadPrendaria: prenda ? entidad : undefined };
         this.vencimientos = this.vencimientos.map(v => {
           if (v.id === id) {
-            return { ...v, ...data, prenda, esVehiculo, placa, entidadPrendaria: prenda ? entidad : undefined };
+            return { ...v, ...updatedItem };
+          }
+          return v;
+        });
+        this.polizas = this.polizas.map(v => {
+          if (v.id === id) {
+            return { ...v, ...updatedItem };
           }
           return v;
         });
@@ -389,7 +503,9 @@ export class Gestion implements OnInit {
     const payload: Partial<GestionModel> = { comentarios: (value ?? '').trim() };
     this.vencimientoService.actualizarVencimiento(id, payload).subscribe({
       next: () => {
+        // Update both arrays to keep them in sync
         this.vencimientos = this.vencimientos.map(v => v.id === id ? { ...v, comentarios: payload.comentarios } : v);
+        this.polizas = this.polizas.map(v => v.id === id ? { ...v, comentarios: payload.comentarios } : v);
         this.onComentarioClose();
       },
       error: () => {
@@ -431,13 +547,23 @@ export class Gestion implements OnInit {
       this.onModalClosed();
       return;
     }
+    
     this.vencimientoService.eliminarVencimiento(v.id).subscribe({
       next: () => {
+        // Update both arrays to keep them in sync
         this.vencimientos = this.vencimientos.filter(item => item.id !== v.id);
+        this.polizas = this.polizas.filter(item => item.id !== v.id);
         this.onModalClosed();
       },
-      error: () => {
-        this.onModalClosed();
+      error: (error) => {
+        // Show error notification
+        this.notification = {
+          type: 'error',
+          title: 'Error al eliminar',
+          message: 'No se pudo eliminar el registro. Intente nuevamente.',
+          confirmable: false
+        };
+        // Keep modal open to show error
       }
     });
   }
@@ -454,5 +580,49 @@ export class Gestion implements OnInit {
       .map(w => w.charAt(0).toLocaleUpperCase('es-ES') + w.slice(1))
       .join(' ');
     return transformed + trailing;
+  }
+
+  // Métodos para filtros avanzados
+  toggleAdvancedFilters() {
+    this.showAdvancedFilters = !this.showAdvancedFilters;
+    if (!this.showAdvancedFilters) {
+      // Limpiar sugerencias cuando se cierra
+      this.aseguradorasSuggestions = [];
+    }
+  }
+
+  onAseguradoraFilterInput(value: string) {
+    const term = (value || '').trim();
+    this.onFilterChange('aseguradora', term);
+
+    if (term.length >= 2) {
+      this.aseguradoraFilterLoading = true;
+      this.aseguradoraFilterSearch$.next(term);
+    } else {
+      this.aseguradorasSuggestions = [];
+      this.aseguradoraFilterLoading = false;
+    }
+  }
+
+  selectAseguradoraFilter(aseguradora: Aseguradora) {
+    this.onFilterChange('aseguradora', aseguradora.nombre);
+    this.aseguradorasSuggestions = [];
+    this.aseguradoraFilterLoading = false;
+  }
+
+  clearAdvancedFilters() {
+    this.filters = {
+      aseguradora: '',
+      tipoPoliza: '',
+      numeroPoliza: '',
+      formaPago: '',
+      mesVencimiento: '',
+      fechaDesde: '',
+      fechaHasta: '',
+      tipoVehiculo: ''
+    };
+    this.filters$.next(this.filters);
+    this.aseguradorasSuggestions = [];
+    this.aseguradoraFilterLoading = false;
   }
 }

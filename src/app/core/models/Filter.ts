@@ -6,4 +6,5 @@ export class Filtro{
   mesVencimiento?: string;
   fechaDesde: string;
   fechaHasta: string;
+  tipoVehiculo: string;
 }

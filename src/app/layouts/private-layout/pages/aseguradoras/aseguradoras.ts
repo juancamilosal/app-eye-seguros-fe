@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AseguradoraService } from '../../../../core/services/aseguradora.service';
-import { AseguradoraCard } from '../../../../components/aseguradora-card/aseguradora-card';
+import { AseguradoraCard } from './aseguradora-card/aseguradora-card';
 
 @Component({
   selector: 'app-aseguradoras',
@@ -40,7 +40,24 @@ export class Aseguradoras implements OnInit {
 
   onCardUpdated(item: any): void {
     if (!item?.id) return;
-    this.aseguradoras = this.aseguradoras.map(a => (a.id === item.id ? { ...a, ...item } : a));
+    // Recargar los datos completos de la aseguradora para obtener los asesores actualizados
+    this.aseguradoraService.obtenerAseguradoras({
+      'filter[id][_eq]': item.id,
+      'fields': '*,asesores_id.*, asesores_id.asesores_id.*'
+    }).subscribe({
+      next: (resp) => {
+        const updatedAseguradora = resp?.data?.[0];
+        if (updatedAseguradora) {
+          this.aseguradoras = this.aseguradoras.map(a =>
+            a.id === item.id ? updatedAseguradora : a
+          );
+        }
+      },
+      error: () => {
+        // Fallback: usar los datos proporcionados
+        this.aseguradoras = this.aseguradoras.map(a => (a.id === item.id ? { ...a, ...item } : a));
+      }
+    });
   }
 
   onCardDeleted(id: string): void {
@@ -49,7 +66,9 @@ export class Aseguradoras implements OnInit {
 
   private loadAll(): void {
     this.loading = true;
-    this.aseguradoraService.obtenerAseguradoras({ fields: '*' }).subscribe({
+    this.aseguradoraService.obtenerAseguradoras({
+      fields: '*,asesores_id.*, asesores_id.asesores_id.*'
+    }).subscribe({
       next: (resp) => {
         this.aseguradoras = resp?.data ?? [];
         this.loading = false;

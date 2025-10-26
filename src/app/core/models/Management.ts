@@ -13,6 +13,7 @@ export class Management {
   comentarios?: string;
   prenda?: boolean;
   esVehiculo?: boolean;
+  tipo_vehiculo?: string;
   placa?: string;
   entidadPrendaria?: string;
 }

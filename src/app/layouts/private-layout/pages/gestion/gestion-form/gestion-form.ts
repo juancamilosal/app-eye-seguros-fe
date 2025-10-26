@@ -8,6 +8,7 @@ import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith, f
 import { AseguradoraService } from '../../../../../core/services/aseguradora.service';
 import {TIPO_DOCUMENTO} from '../../../../../core/const/TipoDocumentoConst';
 import {FORMA_PAGO} from '../../../../../core/const/FormaPagoConst';
+import {TIPOS_VEHICULO} from '../../../../../core/const/TiposVehiculoConst';
 import {Aseguradora} from '../../../../../core/models/Aseguradora';
 
 @Component({
@@ -22,6 +23,7 @@ export class GestionForm implements OnInit {
   @Input() isSubmitting = false;
   tiposDocumento = TIPO_DOCUMENTO;
   formaPago = FORMA_PAGO;
+  tiposVehiculo = TIPOS_VEHICULO;
   gestionForm: FormGroup;
   private clienteIdEncontrado: string | null = null;
   submitted = false;
@@ -43,6 +45,7 @@ export class GestionForm implements OnInit {
       fechaVencimiento: [null, Validators.required],
       aseguradora: [null, Validators.required],
       esVehiculo: [false],
+      tipo_vehiculo: [{ value: null, disabled: true }],
       prenda: [{ value: false, disabled: true }],
       placa: [{ value: null, disabled: true }],
       entidadPrendaria: [{ value: null, disabled: true }]
@@ -90,17 +93,36 @@ export class GestionForm implements OnInit {
     const prendaCtrl = this.gestionForm.get('prenda');
     const entidadCtrl = this.gestionForm.get('entidadPrendaria');
     const placaCtrl = this.gestionForm.get('placa');
+    const tipoVehiculoCtrl = this.gestionForm.get('tipo_vehiculo');
+    const tipoPolizaCtrl = this.gestionForm.get('tipoPoliza');
+
     esVehiculoCtrl?.valueChanges.subscribe((isVehiculo: boolean) => {
       if (isVehiculo) {
+        // Establecer automáticamente "Vehículo" en tipo de póliza
+        tipoPolizaCtrl?.setValue('Vehículo', { emitEvent: false });
+
+        // Habilitar controles de vehículo
+        tipoVehiculoCtrl?.enable({ emitEvent: false });
+        tipoVehiculoCtrl?.addValidators([Validators.required]);
         prendaCtrl?.enable({ emitEvent: false });
         placaCtrl?.enable({ emitEvent: false });
         placaCtrl?.addValidators([Validators.required]);
+
         // Entidad prendaria depende de prenda
         if (prendaCtrl?.value) {
           entidadCtrl?.enable({ emitEvent: false });
           entidadCtrl?.addValidators([Validators.required]);
         }
       } else {
+        // Limpiar tipo de póliza si no es vehículo
+        if (tipoPolizaCtrl?.value === 'Vehículo') {
+          tipoPolizaCtrl?.setValue(null, { emitEvent: false });
+        }
+
+        // Deshabilitar y limpiar controles de vehículo
+        tipoVehiculoCtrl?.clearValidators();
+        tipoVehiculoCtrl?.setValue(null, { emitEvent: false });
+        tipoVehiculoCtrl?.disable({ emitEvent: false });
         prendaCtrl?.disable({ emitEvent: false });
         prendaCtrl?.setValue(false, { emitEvent: false });
         placaCtrl?.clearValidators();
@@ -110,6 +132,7 @@ export class GestionForm implements OnInit {
         entidadCtrl?.setValue(null, { emitEvent: false });
         entidadCtrl?.disable({ emitEvent: false });
       }
+      tipoVehiculoCtrl?.updateValueAndValidity({ emitEvent: false });
       placaCtrl?.updateValueAndValidity({ emitEvent: false });
       entidadCtrl?.updateValueAndValidity({ emitEvent: false });
     });
@@ -188,11 +211,12 @@ export class GestionForm implements OnInit {
       fechaVencimiento?: string;
       aseguradora?: string;
       esVehiculo?: boolean;
+      tipo_vehiculo?: string;
       prenda?: boolean;
       placa?: string;
       entidadPrendaria?: string;
     };
-
+    const tipoVehiculoValue = this.gestionForm.get('tipo_vehiculo')?.value;
     const data: Management & { titularId?: string; aseguradoraId?: string } = {
       titular: `${(v.nombre || '').trim()} ${(v.apellido || '').trim()}`.trim(),
       numeroPoliza: v.numeroPoliza,
@@ -206,6 +230,7 @@ export class GestionForm implements OnInit {
       prenda: !!v.prenda,
       // Campos vehículo
       esVehiculo: !!v.esVehiculo,
+      tipo_vehiculo: v.esVehiculo && tipoVehiculoValue ? tipoVehiculoValue : undefined,
       placa: v.esVehiculo ? (v.placa || '').trim() : undefined,
       entidadPrendaria: v.prenda ? this.toTitleCaseSpanish((v.entidadPrendaria || '').trim()) : undefined,
       titularId: this.clienteIdEncontrado ?? undefined,
@@ -234,6 +259,7 @@ export class GestionForm implements OnInit {
         valorActual: 'El Valor Póliza Año Actual es Obligatorio',
         fechaVencimiento: 'La Fecha de Vencimiento es Obligatoria',
         aseguradora: 'La Aseguradora es Obligatoria',
+        tipo_vehiculo: 'El Tipo de Vehículo es Obligatorio',
       };
       return requiredMessages[name] ?? 'Este campo es obligatorio';
     }

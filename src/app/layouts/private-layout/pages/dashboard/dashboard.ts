@@ -22,6 +22,18 @@ export class Dashboard implements OnInit {
     numeroPoliza: string;
     fechaVencimiento?: string;
   }> = [];
+  
+  // Vencimientos agrupados por aseguradora para el acordeón
+  vencimientosPorAseguradora: Array<{
+    aseguradora: string;
+    vencimientos: Array<{
+      titular: string;
+      numeroPoliza: string;
+      fechaVencimiento?: string;
+    }>;
+    expanded: boolean;
+  }> = [];
+  
   loadingVencimientos = true;
 
   // Sección: Cumpleaños hoy
@@ -37,6 +49,7 @@ export class Dashboard implements OnInit {
 
   // Estado de modales de detalle
   showVencimientosModal = false;
+  showVencimientosAccordionModal = false;
   showCumpleanosModal = false;
   showAseguradorasModal = false;
 
@@ -69,7 +82,7 @@ export class Dashboard implements OnInit {
     const fmt = (d: Date) => d.toISOString().slice(0, 10);
     const params: Record<string, string> = {
       page: '1',
-      limit: '5',
+      limit: '-1', // Obtener todos los vencimientos para agrupar
       meta: 'filter_count',
       sort: 'fecha_vencimiento',
       'filter[fecha_vencimiento][_gte]': fmt(nextMonthStart),
@@ -85,19 +98,92 @@ export class Dashboard implements OnInit {
           const titular = `${nombre} ${apellido}`.trim();
           return {
             titular,
-            aseguradora: (r?.aseguradora ?? r?.aseguradora_id?.nombre ?? undefined),
+            aseguradora: (r?.aseguradora ?? r?.aseguradora_id?.nombre ?? 'Sin aseguradora'),
             numeroPoliza: r?.numero_poliza ?? '',
             fechaVencimiento: r?.fecha_vencimiento ?? undefined,
           };
         });
+        
+        // Agrupar por aseguradora
+        this.groupVencimientosByAseguradora();
         this.loadingVencimientos = false;
       },
       error: () => {
         this.proximosVencimientos = [];
+        this.vencimientosPorAseguradora = [];
         this.loadingVencimientos = false;
       }
     });
   }
+
+  private groupVencimientosByAseguradora(): void {
+    const groups = new Map<string, Array<{titular: string; numeroPoliza: string; fechaVencimiento?: string}>>();
+    
+    this.proximosVencimientos.forEach(vencimiento => {
+      const aseguradora = vencimiento.aseguradora || 'Sin aseguradora';
+      if (!groups.has(aseguradora)) {
+        groups.set(aseguradora, []);
+      }
+      groups.get(aseguradora)!.push({
+        titular: vencimiento.titular,
+        numeroPoliza: vencimiento.numeroPoliza,
+        fechaVencimiento: vencimiento.fechaVencimiento
+      });
+    });
+
+    // Orden de prioridad para las aseguradoras
+    const prioridadAseguradoras = [
+      'ALLIANZ SEGUROS DE SALUD Y VIDA',
+      'ALLIANZ SEGUROS S.A.',
+      'SEGUROS GENERALES SURAMERICANA S.A',
+      'HDI SEGUROS COLOMBIA S.A.'
+    ];
+
+    // Convertir a array y ordenar por prioridad
+    const allGroups = Array.from(groups.entries()).map(([aseguradora, vencimientos]) => ({
+      aseguradora,
+      vencimientos,
+      expanded: false
+    }));
+
+    // Separar aseguradoras prioritarias de las demás
+    const prioritarias: Array<{aseguradora: string; vencimientos: Array<{titular: string; numeroPoliza: string; fechaVencimiento?: string}>; expanded: boolean; prioridad: number}> = [];
+    const otras: typeof allGroups = [];
+
+    allGroups.forEach(grupo => {
+      const index = prioridadAseguradoras.findIndex(p => 
+        grupo.aseguradora.toUpperCase().includes(p.toUpperCase()) || 
+        p.toUpperCase().includes(grupo.aseguradora.toUpperCase())
+      );
+      
+      if (index !== -1) {
+        prioritarias.push({ ...grupo, prioridad: index });
+      } else {
+        otras.push(grupo);
+      }
+    });
+
+    // Ordenar prioritarias por su índice de prioridad
+    prioritarias.sort((a, b) => a.prioridad - b.prioridad);
+    
+    // Ordenar las otras alfabéticamente
+    otras.sort((a, b) => a.aseguradora.localeCompare(b.aseguradora));
+
+    // Combinar: primero las prioritarias, luego las otras (sin la propiedad prioridad)
+    const prioritariasSinPrioridad = prioritarias.map(({ prioridad, ...resto }) => resto);
+    this.vencimientosPorAseguradora = [...prioritariasSinPrioridad, ...otras];
+  }
+
+  // Vencimientos agrupados por aseguradora para el acordeón con estado modal
+  vencimientosPorAseguradoraModal: Array<{
+    aseguradora: string;
+    vencimientos: Array<{
+      titular: string;
+      numeroPoliza: string;
+      fechaVencimiento?: string;
+    }>;
+    expanded: boolean;
+  }> = [];
 
   private loadCumpleanerosHoy(): void {
     this.loadingCumpleanos = true;
@@ -147,10 +233,31 @@ export class Dashboard implements OnInit {
     });
   }
 
+  toggleAseguradora(index: number): void {
+    this.vencimientosPorAseguradora[index].expanded = !this.vencimientosPorAseguradora[index].expanded;
+  }
+
+  toggleAseguradoraModal(index: number): void {
+    this.vencimientosPorAseguradoraModal[index].expanded = !this.vencimientosPorAseguradoraModal[index].expanded;
+  }
+
   // Abrir/cerrar modales y helpers de preview
   openVencimientosModal(): void { this.showVencimientosModal = true; }
   closeVencimientosModal(): void { this.showVencimientosModal = false; }
+  
+  openVencimientosAccordionModal(): void { 
+    // Crear una copia independiente para el modal
+    this.vencimientosPorAseguradoraModal = this.vencimientosPorAseguradora.map(grupo => ({
+      ...grupo,
+      vencimientos: [...grupo.vencimientos],
+      expanded: false // Inicialmente cerrados en el modal
+    }));
+    this.showVencimientosAccordionModal = true; 
+  }
+  closeVencimientosAccordionModal(): void { this.showVencimientosAccordionModal = false; }
+  
   get proximosVencimientosPreview() { return (this.proximosVencimientos ?? []).slice(0, 3); }
+  get vencimientosPorAseguradoraPreview() { return (this.vencimientosPorAseguradora ?? []).slice(0, 5); }
 
   openCumpleanosModal(): void { this.showCumpleanosModal = true; }
   closeCumpleanosModal(): void { this.showCumpleanosModal = false; }

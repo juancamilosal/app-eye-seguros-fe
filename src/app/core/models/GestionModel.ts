@@ -12,6 +12,7 @@ export class GestionModel {
   comentarios?: string;
   prenda?: boolean;
   es_vehiculo?: boolean;
+  tipo_vehiculo?: string;
   placa?: string;
   entidad_prendaria?: string | null;
 }

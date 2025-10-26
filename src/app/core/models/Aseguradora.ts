@@ -1,3 +1,5 @@
+import { Asesor } from './Asesor';
+
 export class Aseguradora {
   id: string;
   nombre: string;
@@ -6,4 +8,5 @@ export class Aseguradora {
   telefono_celular: string;
   web: string;
   email: string;
+  asesores_id?: any[]; // Array de relaciones que contienen los datos del asesor
 }
