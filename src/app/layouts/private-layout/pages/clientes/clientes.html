@@ -170,7 +170,14 @@
                       [value]="(editBuffer[editingRowId!]?.direccion ?? cliente.direccion)"
                       (input)="onInlineFieldChange(editingRowId || '', 'direccion', $any($event.target).value)" />
                   } @else {
-                    <span class="whitespace-nowrap" [class]="cliente.direccion ? '' : 'text-gray-400 italic'">{{ cliente.direccion || 'Sin Información' }}</span>
+                    @if (cliente.direccion && cliente.direccion.length > 20) {
+                      <span class="cursor-pointer text-blue-600 hover:text-blue-800 underline" 
+                            (click)="showAddressModal(cliente.direccion, 'Dirección Completa')">
+                        {{ truncateText(cliente.direccion, 20) }}
+                      </span>
+                    } @else {
+                      <span class="whitespace-nowrap" [class]="cliente.direccion ? '' : 'text-gray-400 italic'">{{ cliente.direccion || 'Sin Información' }}</span>
+                    }
                   }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
@@ -208,7 +215,14 @@
                       [value]="(editBuffer[editingRowId!]?.direccion_oficina ?? cliente.direccion_oficina)"
                       (input)="onInlineFieldChange(editingRowId || '', 'direccion_oficina', $any($event.target).value)" />
                   } @else {
-                    <span class="whitespace-nowrap" [class]="cliente.direccion_oficina ? '' : 'text-gray-400 italic'">{{ cliente.direccion_oficina || 'Sin Información' }}</span>
+                    @if (cliente.direccion_oficina && cliente.direccion_oficina.length > 20) {
+                      <span class="cursor-pointer text-blue-600 hover:text-blue-800 underline" 
+                            (click)="showAddressModal(cliente.direccion_oficina, 'Dirección Oficina Completa')">
+                        {{ truncateText(cliente.direccion_oficina, 20) }}
+                      </span>
+                    } @else {
+                      <span class="whitespace-nowrap" [class]="cliente.direccion_oficina ? '' : 'text-gray-400 italic'">{{ cliente.direccion_oficina || 'Sin Información' }}</span>
+                    }
                   }
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
@@ -275,5 +289,29 @@
   (close)="onModalClosed()"
   (confirm)="onModalConfirm()"
 ></app-notification-modal>
+
+<!-- Modal para mostrar direcciones completas -->
+@if (isAddressModalVisible) {
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeAddressModal()">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">{{ addressModalTitle }}</h3>
+        <button (click)="closeAddressModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="text-gray-700 break-words">
+        {{ addressModalContent }}
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button (click)="closeAddressModal()" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+}
 </div>
 </div>

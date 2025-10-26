@@ -22,6 +22,10 @@ export class Clientes implements OnInit {
   notification: NotificationData | null = null;
   clienteToDelete: Client | null = null;
   private search$ = new Subject<string>();
+  // Modal para direcciones
+  isAddressModalVisible = false;
+  addressModalTitle = '';
+  addressModalContent = '';
   // Edición en línea
   editingRowId: string | null = null;
   editBuffer: Record<string, Partial<Client>> = {};
@@ -316,5 +320,23 @@ export class Clientes implements OnInit {
         this.onModalClosed();
       }
     });
+  }
+
+  // Métodos para el modal de direcciones
+  truncateText(text: string, maxLength: number = 20): string {
+    if (!text || text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  }
+
+  showAddressModal(address: string, title: string) {
+    this.addressModalTitle = title;
+    this.addressModalContent = address;
+    this.isAddressModalVisible = true;
+  }
+
+  closeAddressModal() {
+    this.isAddressModalVisible = false;
+    this.addressModalTitle = '';
+    this.addressModalContent = '';
   }
 }
