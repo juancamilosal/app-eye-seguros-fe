@@ -1,0 +1,26 @@
+@if (isVisible) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" (click)="onBackdropClick($event)">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center p-4 border-b">
+        <h2 class="text-xl font-semibold text-[#243B88]">Agregar Asesor a la Aseguradora</h2>
+        <button
+          (click)="close.emit()"
+          class="text-gray-400 hover:text-gray-600 focus:outline-none"
+          aria-label="Cerrar modal"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="p-4">
+        <app-asesor-form
+          [aseguradoraId]="aseguradoraId"
+          (formSubmit)="onFormSubmit($event)"
+          (formCancel)="onFormCancel()"
+        ></app-asesor-form>
+      </div>
+    </div>
+  </div>
+}
