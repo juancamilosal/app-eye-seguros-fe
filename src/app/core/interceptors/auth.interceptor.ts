@@ -1,11 +1,13 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { switchMap, catchError } from 'rxjs/operators';
 import { of, throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
+  const router = inject(Router);
   const token = auth.getToken();
 
   const isAuthEndpoint = (url: string): boolean => {
@@ -41,12 +43,24 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return auth.refresh().pipe(
           switchMap((newToken) => {
             if (!newToken) {
-              return throwError(() => error);
+              return auth.logout().pipe(
+                switchMap(() => {
+                  router.navigateByUrl('/login');
+                  return throwError(() => error);
+                })
+              );
             }
             const retryReq = addAuth(newToken);
             return next(retryReq);
           }),
-          catchError(() => throwError(() => error))
+          catchError(() => {
+            return auth.logout().pipe(
+              switchMap(() => {
+                router.navigateByUrl('/login');
+                return throwError(() => error);
+              })
+            );
+          })
         );
       }
       return throwError(() => error);
