@@ -144,6 +144,14 @@ export class Clientes implements OnInit {
           params[`filter[_or][${orIndex}][_and][1][apellido][_icontains]`] = word1;
           orIndex++;
         }
+
+        params[`filter[_or][${orIndex}][_and][0][_or][0][nombre][_icontains]`] = words[0];
+        params[`filter[_or][${orIndex}][_and][0][_or][1][apellido][_icontains]`] = words[0];
+        for (let i = 1; i < words.length; i++) {
+          params[`filter[_or][${orIndex}][_and][${i}][_or][0][nombre][_icontains]`] = words[i];
+          params[`filter[_or][${orIndex}][_and][${i}][_or][1][apellido][_icontains]`] = words[i];
+        }
+        orIndex++;
       }
     }
 
