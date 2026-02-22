@@ -98,6 +98,20 @@ export class AuthService {
     }
   }
 
+  getTokenRemainingMs(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    const expMs = this.decodeJwtExpMs(token);
+    if (expMs === null) return null;
+    return expMs - Date.now();
+  }
+
+  needsImmediateRefresh(): boolean {
+    const remaining = this.getTokenRemainingMs();
+    if (remaining === null) return false;
+    return remaining <= this.REFRESH_SKEW_MS;
+  }
+
   // Programa un refresco proactivo antes de la expiración
   private scheduleProactiveRefresh(token: string, expiresSeconds?: number): void {
     // Limpiar cualquier temporizador previo
