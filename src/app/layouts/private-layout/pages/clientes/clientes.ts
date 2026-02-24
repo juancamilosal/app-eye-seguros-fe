@@ -8,6 +8,7 @@ import { NotificationData } from '../../../../core/models/NotificationData';
 import { Subject, BehaviorSubject, of, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith } from 'rxjs/operators';
 import { TIPO_DOCUMENTO } from '../../../../core/const/TipoDocumentoConst';
+import { DepartamentosConst } from '../../../../core/const/DepartamentosConst';
 
 @Component({
   selector: 'app-clientes',
@@ -33,6 +34,7 @@ export class Clientes implements OnInit {
   total = 0;
   private page$ = new BehaviorSubject<number>(1);
   private limit$ = new BehaviorSubject<number>(10);
+  ciudadesFiltradas: string[] = DepartamentosConst.map(d => String(d.LUGAR ?? ''));
 
   constructor(private router: Router, private clienteService: ClienteService) {}
 
@@ -240,6 +242,7 @@ export class Clientes implements OnInit {
       email: cliente.email,
       numero_contacto: cliente.numero_contacto,
     };
+    this.ciudadesFiltradas = DepartamentosConst.map(d => String(d.LUGAR ?? ''));
   }
 
   onInlineFieldChange(id: string, field: keyof Client, value: any) {
@@ -250,17 +253,49 @@ export class Clientes implements OnInit {
     } else if (field === 'email') {
       const lowered = String(value ?? '').toLocaleLowerCase('es-ES');
       this.editBuffer[id][field] = lowered;
-    } else if (field === 'nombre' || field === 'apellido' || field === 'direccion' || field === 'ciudad') {
+    } else if (field === 'nombre' || field === 'apellido' || field === 'direccion') {
       const transformed = this.toTitleCaseSpanish(String(value ?? ''));
       this.editBuffer[id][field] = transformed;
+    } else if (field === 'ciudad') {
+      const raw = String(value ?? '');
+      this.editBuffer[id][field] = raw;
+      const term = raw.toLocaleLowerCase('es-ES').trim();
+      if (!term) {
+        this.ciudadesFiltradas = DepartamentosConst.map(d => String(d.LUGAR ?? ''));
+      } else {
+        this.ciudadesFiltradas = DepartamentosConst
+          .map(d => String(d.LUGAR ?? ''))
+          .filter(c => c.toLocaleLowerCase('es-ES').includes(term));
+      }
     } else {
       this.editBuffer[id][field] = value;
     }
   }
 
+  onInlineCiudadSelect(id: string, ciudad: string) {
+    if (!this.editBuffer[id]) this.editBuffer[id] = {};
+    this.editBuffer[id]['ciudad'] = ciudad;
+    this.ciudadesFiltradas = [];
+  }
+
+  private isCiudadValida(value: any): boolean {
+    const v = String(value ?? '').trim();
+    if (!v) return false;
+    return DepartamentosConst.some(d => String(d.LUGAR ?? '').trim() === v);
+  }
+
   confirmInlineUpdate(id: string) {
     const data = this.editBuffer[id];
     if (!id || !data) return;
+    if (!this.isCiudadValida(data.ciudad)) {
+      this.notification = {
+        type: 'error',
+        title: 'Ciudad inválida',
+        message: 'Selecciona una ciudad válida del listado',
+        confirmable: false
+      };
+      return;
+    }
     const payload: Partial<Client> = {
       tipo_documento: data.tipo_documento,
       numero_documento: data.numero_documento,
