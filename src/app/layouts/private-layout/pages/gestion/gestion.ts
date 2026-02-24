@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Management } from '../../../../core/models/Management';
 import { Router } from '@angular/router';
 import { GestionService } from '../../../../core/services/gestion.service';
+import { ExcelService } from '../../../../core/services/excel.service';
 import { FORMA_PAGO } from '../../../../core/const/FormaPagoConst';
 import { Subject, BehaviorSubject, of, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith } from 'rxjs/operators';
@@ -72,7 +73,29 @@ export class Gestion implements OnInit {
   private page$ = new BehaviorSubject<number>(1);
   private limit$ = new BehaviorSubject<number>(10);
 
-  constructor(private router: Router, private vencimientoService: GestionService, private aseguradoraService: AseguradoraService) {}
+  constructor(
+    private router: Router,
+    private vencimientoService: GestionService,
+    private aseguradoraService: AseguradoraService,
+    private excelService: ExcelService
+  ) {}
+  exportExcel(): void {
+    const dataToExport = this.polizas.map((p: any) => ({
+      'Número Póliza': p.numeroPoliza,
+      'Tipo Póliza': p.tipoPoliza,
+      'Aseguradora': p.aseguradora_id?.nombre || p.aseguradora,
+      'Titular': (p.cliente_id?.nombre || '') + ' ' + (p.cliente_id?.apellido || ''),
+      'Documento': p.cliente_id?.numero_documento || p.numeroDocumento,
+      'Placa': p.placa,
+      'Valor Actual': p.valorActual,
+      'Fecha Vencimiento': p.fechaVencimiento,
+      'Estado': p.estado,
+      'Forma Pago': p.formaPagoRenovacion,
+      'Comentarios': p.comentarios
+    }));
+    this.excelService.exportAsExcelFile(dataToExport, 'Gestion Polizas');
+  }
+
   ngOnInit(): void {
     // Configurar autocompletado de aseguradoras para filtros
     this.aseguradoraFilterSearch$

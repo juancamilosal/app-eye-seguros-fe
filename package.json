@@ -27,8 +27,11 @@
     "@angular/forms": "20.3.4",
     "@angular/platform-browser": "20.3.4",
     "@angular/router": "20.3.4",
+    "@types/file-saver": "^2.0.7",
+    "file-saver": "^2.0.5",
     "rxjs": "~7.8.0",
     "tslib": "^2.6.3",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
