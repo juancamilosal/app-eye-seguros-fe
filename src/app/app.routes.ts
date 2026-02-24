@@ -59,6 +59,18 @@ export const routes: Routes = [
         title: 'Euyenid & Edder | Nuevo Cliente',
         loadComponent: () => import('./layouts/private-layout/pages/clientes/cliente-create/cliente-create').then(m => m.ClienteCreate)
       }
+      ,
+      {
+        path: 'usuarios',
+        title: 'Euyenid & Edder | Usuarios',
+        loadComponent: () => import('./layouts/private-layout/pages/usuarios/usuarios').then(m => m.Usuarios)
+      }
+      ,
+      {
+        path: 'usuarios/nuevo',
+        title: 'Euyenid & Edder | Nuevo Usuario',
+        loadComponent: () => import('./layouts/private-layout/pages/usuarios/usuario-create/usuario-create').then(m => m.UsuarioCreate)
+      }
       
     ]
   },

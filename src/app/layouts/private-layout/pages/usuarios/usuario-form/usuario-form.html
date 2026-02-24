@@ -1,0 +1,140 @@
+<div class="w-full">
+  <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()" class="space-y-8">
+    <div>
+      <h3 class="text-xl font-semibold text-[#243B88] mb-10">Información Personal</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 gap-y-10">
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+          <input
+            type="text"
+            formControlName="first_name"
+            (input)="onCapitalizeInput($event, 'first_name')"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('first_name')) {
+              <span class="text-xs text-red-600">{{ getError('first_name') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+          <input
+            type="text"
+            formControlName="last_name"
+            (input)="onCapitalizeInput($event, 'last_name')"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('last_name')) {
+              <span class="text-xs text-red-600">{{ getError('last_name') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="h-px bg-gray-200/60 my-4"></div>
+
+    <div>
+      <h3 class="text-xl font-semibold text-[#243B88] mb-10">Información de Contacto</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 gap-y-10">
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+          <input
+            type="email"
+            formControlName="email"
+            (input)="onLowercaseInput($event, 'email')"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4] lowercase"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('email')) {
+              <span class="text-xs text-red-600">{{ getError('email') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+          <input
+            type="text"
+            formControlName="telefono"
+            inputmode="numeric"
+            maxlength="15"
+            (input)="onNumericInput($event, 'telefono', 15)"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('telefono')) {
+              <span class="text-xs text-red-600">{{ getError('telefono') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="h-px bg-gray-200/60 my-4"></div>
+
+    <div>
+      <h3 class="text-xl font-semibold text-[#243B88] mb-10">Información de Seguridad</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 gap-y-10">
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+          <input
+            type="password"
+            formControlName="password"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('password')) {
+              <span class="text-xs text-red-600">{{ getError('password') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('confirmPassword')) {
+              <span class="text-xs text-red-600">{{ getError('confirmPassword') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-2 flex items-center justify-end gap-3">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        [disabled]="isSubmitting"
+        class="px-4 py-2 rounded-md bg-[#243B88] text-white disabled:opacity-70 disabled:cursor-not-allowed"
+      >
+        <span class="inline-flex items-center gap-2">
+          @if (isSubmitting) {
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="animate-spin h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25" />
+              <path d="M4 12a8 8 0 018-8" stroke-width="4" class="opacity-75" />
+            </svg>
+          }
+          <span>{{ isSubmitting ? 'Guardando...' : 'Guardar' }}</span>
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

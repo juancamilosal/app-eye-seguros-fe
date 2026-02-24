@@ -21,6 +21,17 @@
           </a>
         </li>
         <li>
+          <a (click)="onSelect()" #rlaUsuarios="routerLinkActive" routerLink="/usuarios" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
+             [routerLinkActiveOptions]="{ exact: true }"
+             class="flex items-center gap-3 px-3 py-4 text-2xl font-light w-full"
+             [ngClass]="{ 'hover:bg-[#3E1F78]': !rlaUsuarios.isActive }">
+            <span class="inline-flex items-center justify-center w-12 h-12" aria-hidden="true">
+              <img src="assets/icons/usuarios.png" alt="Usuarios" class="w-full h-full object-contain" />
+            </span>
+            <span class="ml-auto text-right">Usuarios</span>
+          </a>
+        </li>
+        <li>
           <a (click)="onSelect()" #rlaClients="routerLinkActive" routerLink="/clientes" routerLinkActive="active-link bg-[#7EA6F4] text-[#3E1F78] cursor-default font-semibold"
              [routerLinkActiveOptions]="{ exact: true }"
              class="flex items-center gap-3 px-3 py-4 text-2xl font-light w-full"
