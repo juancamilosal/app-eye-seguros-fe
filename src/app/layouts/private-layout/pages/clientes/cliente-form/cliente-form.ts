@@ -1,8 +1,22 @@
 import { Component, EventEmitter, OnInit, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { TIPO_DOCUMENTO } from '../../../../../core/const/TipoDocumentoConst';
-import {Client} from '../../../../../core/models/Client';
+import { Client } from '../../../../../core/models/Client';
+import { DepartamentosConst } from '../../../../../core/const/DepartamentosConst';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+
+function ciudadFromDepartamentosValidator(control: AbstractControl) {
+  const value = String(control.value ?? '').trim();
+  if (!value) {
+    return { required: true };
+  }
+  const exists = DepartamentosConst.some(d => {
+    const label = String(d.LUGAR ?? '').trim();
+    return label === value;
+  });
+  return exists ? null : { invalidCity: true };
+}
 
 
 @Component({
@@ -27,6 +41,7 @@ export class ClienteForm implements OnInit {
   tiposDocumento = TIPO_DOCUMENTO;
   submitted = false;
   isNitSelected = false;
+  ciudadesFiltradas: string[] = DepartamentosConst.map(d => String(d.LUGAR ?? ''));
 
   constructor(private fb: FormBuilder) {}
 
@@ -38,6 +53,7 @@ export class ClienteForm implements OnInit {
       apellido: [null, [Validators.required, Validators.minLength(2)]],
       fecha_nacimiento: [null, [Validators.required]],
       direccion: [null, [Validators.required, Validators.minLength(5)]],
+      ciudad: [null, [ciudadFromDepartamentosValidator]],
       numero_contacto: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
       email: [null, [Validators.required, Validators.email]],
       // Información Laboral (campos opcionales)
@@ -49,6 +65,23 @@ export class ClienteForm implements OnInit {
     if (this._initialValue) {
       this.clienteForm.patchValue(this._initialValue);
     }
+
+    const ciudadCtrl = this.clienteForm.get('ciudad');
+    ciudadCtrl?.valueChanges
+      .pipe(
+        debounceTime(200),
+        distinctUntilChanged()
+      )
+      .subscribe((val) => {
+        const term = String(val ?? '').toLocaleLowerCase('es-ES').trim();
+        if (!term) {
+          this.ciudadesFiltradas = DepartamentosConst.map(d => String(d.LUGAR ?? ''));
+        } else {
+          this.ciudadesFiltradas = DepartamentosConst
+            .map(d => String(d.LUGAR ?? ''))
+            .filter(c => c.toLocaleLowerCase('es-ES').includes(term));
+        }
+      });
 
     const tipoCtrl = this.clienteForm.get('tipoDocumento');
     tipoCtrl?.valueChanges.subscribe((val) => {
@@ -110,6 +143,14 @@ export class ClienteForm implements OnInit {
     ctrl?.setValue(lowered, { emitEvent: false });
   }
 
+  onCiudadSelect(ciudad: string) {
+    const ctrl = this.clienteForm.get('ciudad');
+    ctrl?.setValue(ciudad);
+    ctrl?.markAsDirty();
+    ctrl?.markAsTouched();
+    this.ciudadesFiltradas = [];
+  }
+
   isInvalid(name: string): boolean {
     const c = this.clienteForm.get(name);
     return !!(c && c.invalid && (c.touched || this.submitted));
@@ -126,6 +167,7 @@ export class ClienteForm implements OnInit {
         apellido: 'El Apellido es Obligatorio',
         fechaNacimiento: 'La Fecha de Nacimiento es Obligatoria',
         direccion: 'La Dirección es Obligatoria',
+        ciudad: 'La Ciudad es Obligatoria',
         numeroContacto: 'El Número de Contacto es Obligatorio',
         email: 'El Email es Obligatorio',
       };
@@ -145,6 +187,10 @@ export class ClienteForm implements OnInit {
       // Caso específico para número solo dígitos
       if (name === 'numeroContacto' || name === 'numeroDocumento') return 'Solo números';
       return 'Formato inválido';
+    }
+    if (c.errors['invalidCity']) {
+      if (name === 'ciudad') return 'Selecciona una ciudad de la lista';
+      return 'Valor inválido';
     }
     return 'Valor inválido';
   }

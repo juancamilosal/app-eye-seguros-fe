@@ -6,6 +6,7 @@ export class Client {
   apellido: string;
   fecha_nacimiento: string;
   direccion: string;
+  ciudad: string;
   email: string;
   numero_contacto: string;
   // Información Laboral

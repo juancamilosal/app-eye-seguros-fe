@@ -1,0 +1,216 @@
+<div class="w-full">
+  <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()" class="space-y-8">
+    <div>
+      <h3 class="text-xl font-semibold text-[#243B88] mb-10">Información Personal</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 gap-y-10">
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+          <input
+            type="text"
+            formControlName="first_name"
+            (input)="onCapitalizeInput($event, 'first_name')"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('first_name')) {
+              <span class="text-xs text-red-600">{{ getError('first_name') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+          <input
+            type="text"
+            formControlName="last_name"
+            (input)="onCapitalizeInput($event, 'last_name')"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('last_name')) {
+              <span class="text-xs text-red-600">{{ getError('last_name') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="h-px bg-gray-200/60 my-4"></div>
+
+    <div>
+      <h3 class="text-xl font-semibold text-[#243B88] mb-10">Información de Contacto</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 gap-y-10">
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+          <input
+            type="email"
+            formControlName="email"
+            (input)="onLowercaseInput($event, 'email')"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4] lowercase"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('email')) {
+              <span class="text-xs text-red-600">{{ getError('email') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+          <input
+            type="text"
+            formControlName="telefono"
+            inputmode="numeric"
+            maxlength="15"
+            (input)="onNumericInput($event, 'telefono', 15)"
+            class="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('telefono')) {
+              <span class="text-xs text-red-600">{{ getError('telefono') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="h-px bg-gray-200/60 my-4"></div>
+
+    <div>
+      <h3 class="text-xl font-semibold text-[#243B88] mb-10">Información de Seguridad</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 gap-y-10">
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <button
+            type="button"
+            (click)="togglePasswordVisibility()"
+            class="absolute inset-y-0 right-0 flex items-center px-3 mt-7 text-gray-500 hover:text-[#243B88]"
+            tabindex="-1"
+          >
+            @if (!showPassword) {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            } @else {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M3 3l18 18M10.584 10.587A3 3 0 013.41 13.41M9.88 9.88L5.5 5.5M9.88 9.88A3 3 0 0114.12 14.12M9.88 9.88L9.88 9.88"
+                />
+                <path
+                  d="M6.228 6.228C4.42 7.385 3.135 9.128 2.458 12c1.274 4.057 5.065 7 9.542 7 1.39 0 2.724-.254 3.956-.72M17.772 17.772C19.58 16.615 20.865 14.872 21.542 12 20.268 7.943 16.477 5 12 5c-1.54 0-3.013.292-4.365.82"
+                />
+              </svg>
+            }
+          </button>
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('password')) {
+              <span class="text-xs text-red-600">{{ getError('password') }}</span>
+            }
+          </div>
+        </div>
+        <div class="relative">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña</label>
+          <input
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            class="w-full px-3 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#7EA6F4]"
+          />
+          <button
+            type="button"
+            (click)="toggleConfirmPasswordVisibility()"
+            class="absolute inset-y-0 right-0 flex items-center px-3 mt-7 text-gray-500 hover:text-[#243B88]"
+            tabindex="-1"
+          >
+            @if (!showConfirmPassword) {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            } @else {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M3 3l18 18M10.584 10.587A3 3 0 013.41 13.41M9.88 9.88L5.5 5.5M9.88 9.88A3 3 0 0114.12 14.12M9.88 9.88L9.88 9.88"
+                />
+                <path
+                  d="M6.228 6.228C4.42 7.385 3.135 9.128 2.458 12c1.274 4.057 5.065 7 9.542 7 1.39 0 2.724-.254 3.956-.72M17.772 17.772C19.58 16.615 20.865 14.872 21.542 12 20.268 7.943 16.477 5 12 5c-1.54 0-3.013.292-4.365.82"
+                />
+              </svg>
+            }
+          </button>
+          <div class="absolute left-0 top-full h-5 pointer-events-none">
+            @if (isInvalid('confirmPassword')) {
+              <span class="text-xs text-red-600">{{ getError('confirmPassword') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-2 flex items-center justify-end gap-3">
+      <button
+        type="button"
+        (click)="onCancel()"
+        class="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        [disabled]="isSubmitting"
+        class="px-4 py-2 rounded-md bg-[#243B88] text-white disabled:opacity-70 disabled:cursor-not-allowed"
+      >
+        <span class="inline-flex items-center gap-2">
+          @if (isSubmitting) {
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="animate-spin h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <circle cx="12" cy="12" r="10" stroke-width="4" class="opacity-25" />
+              <path d="M4 12a8 8 0 018-8" stroke-width="4" class="opacity-75" />
+            </svg>
+          }
+          <span>{{ isSubmitting ? 'Guardando...' : 'Guardar' }}</span>
+        </span>
+      </button>
+    </div>
+  </form>
+</div>

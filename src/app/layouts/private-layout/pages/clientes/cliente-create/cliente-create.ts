@@ -37,6 +37,7 @@ export class ClienteCreate {
       apellido: item.apellido,
       fecha_nacimiento: item.fecha_nacimiento,
       direccion: item.direccion,
+      ciudad: item.ciudad,
       numero_contacto: item.numero_contacto,
       email: item.email,
       // Información Laboral
