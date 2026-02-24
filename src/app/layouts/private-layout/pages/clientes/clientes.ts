@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ClienteService } from '../../../../core/services/cliente.service';
+import { ExcelService } from '../../../../core/services/excel.service';
 import { Client } from '../../../../core/models/Client';
 import { NotificationModalComponent } from '../../../../components/notification-modal/notification-modal';
 import { NotificationData } from '../../../../core/models/NotificationData';
@@ -36,7 +37,11 @@ export class Clientes implements OnInit {
   private limit$ = new BehaviorSubject<number>(10);
   ciudadesFiltradas: string[] = DepartamentosConst.map(d => String(d.LUGAR ?? ''));
 
-  constructor(private router: Router, private clienteService: ClienteService) {}
+  constructor(
+    private router: Router,
+    private clienteService: ClienteService,
+    private excelService: ExcelService
+  ) {}
 
   ngOnInit(): void {
     // Búsqueda con debounce + combinación con paginación (page, limit)
@@ -68,6 +73,24 @@ export class Clientes implements OnInit {
 
   onSearchChange(value: string) {
     this.search$.next(value?.trim() ?? '');
+  }
+
+  exportExcel(): void {
+    const dataToExport = this.clientes.map(c => ({
+      'Tipo Doc': c.tipo_documento,
+      'Documento': c.numero_documento,
+      'Nombre': c.nombre,
+      'Apellido': c.apellido,
+      'Fecha Nacimiento': c.fecha_nacimiento,
+      'Dirección': c.direccion,
+      'Ciudad': c.ciudad,
+      'Email': c.email,
+      'Contacto': c.numero_contacto,
+      'Oficina': c.numero_oficina,
+      'Dir. Oficina': c.direccion_oficina,
+      'Email Laboral': c.email_laboral
+    }));
+    this.excelService.exportAsExcelFile(dataToExport, 'Clientes');
   }
 
   private buildFilterParams(term: string | undefined, page?: number, limit?: number): Record<string, string> {

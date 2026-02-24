@@ -7,9 +7,15 @@
             </span>
         <h1 class="text-3xl font-bold text-[#38338a]">Clientes</h1>
       </div>
-      <button (click)="goToCreate()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">
-        + Nuevo Cliente
-      </button>
+      <div class="flex gap-2">
+        <button (click)="exportExcel()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#107C41] hover:bg-[#0c5e31] text-white">
+          <img src="assets/icons/excel.png" class="w-5 h-5 object-contain" />
+          Exportar
+        </button>
+        <button (click)="goToCreate()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-[#243B88] hover:bg-[#3E1F78] text-white">
+          + Nuevo Cliente
+        </button>
+      </div>
     </div>
 
     <!-- Descripción de la pantalla -->

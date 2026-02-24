@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Management } from '../../../../core/models/Management';
 import { Router } from '@angular/router';
 import { GestionService } from '../../../../core/services/gestion.service';
+import { ExcelService } from '../../../../core/services/excel.service';
 import { FORMA_PAGO } from '../../../../core/const/FormaPagoConst';
 import { Subject, BehaviorSubject, of, combineLatest } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith } from 'rxjs/operators';
@@ -53,7 +54,28 @@ export class Vencimientos implements OnInit {
   meses = MESES;
 
 
-  constructor(private router: Router, private vencimientoService: GestionService) {}
+  constructor(
+    private router: Router,
+    private vencimientoService: GestionService,
+    private excelService: ExcelService
+  ) {}
+  exportExcel(): void {
+    const dataToExport = this.vencimientos.map((p: any) => ({
+      'Número Póliza': p.numeroPoliza,
+      'Tipo Póliza': p.tipoPoliza,
+      'Aseguradora': p.aseguradora,
+      'Titular': p.titular,
+      'Documento': p.numeroDocumento,
+      'Placa': p.placa,
+      'Valor Actual': p.valorActual,
+      'Fecha Vencimiento': p.fechaVencimiento,
+      'Estado': p.estado,
+      'Forma Pago': p.formaPagoRenovacion,
+      'Comentarios': p.comentarios
+    }));
+    this.excelService.exportAsExcelFile(dataToExport, 'Vencimientos');
+  }
+
   ngOnInit(): void {
     const term$ = this.search$.pipe(
       debounceTime(300),
