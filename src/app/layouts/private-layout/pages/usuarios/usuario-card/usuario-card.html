@@ -1,7 +1,7 @@
 <div class="relative flex flex-col items-center justify-between bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-200 w-64 h-64 border border-gray-100 overflow-hidden">
   <div class="w-full h-24 bg-gradient-to-r from-[#243B88] via-[#3E1F78] to-[#7EA6F4] flex items-center justify-center">
     <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-md">
-      <img src="assets/icons/usuarios.png" alt="Usuario" class="w-14 h-14 object-contain" />
+      <img src="assets/icons/usuario.png" alt="Usuario" class="w-14 h-14 object-contain" />
     </div>
   </div>
   <div class="flex-1 flex flex-col items-center justify-center px-4 text-center">
@@ -11,5 +11,14 @@
     <div class="mt-2 text-sm text-gray-500 break-all max-w-full" [title]="email || 'Sin email'">
       {{ email || 'Sin email' }}
     </div>
+  </div>
+  <div class="w-full px-4 pb-4 flex justify-center">
+    <button
+      type="button"
+      (click)="onEdit()"
+      class="inline-flex items-center justify-center px-4 py-1.5 rounded-full text-sm font-medium bg-[#243B88] text-white hover:bg-[#3E1F78]"
+    >
+      Editar
+    </button>
   </div>
 </div>

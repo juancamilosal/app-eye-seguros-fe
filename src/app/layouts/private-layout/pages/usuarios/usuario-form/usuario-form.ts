@@ -22,6 +22,8 @@ export class UsuarioForm implements OnInit {
   @Output() cancel = new EventEmitter<void>();
   @Output() save = new EventEmitter<Usuario>();
   @Input() isSubmitting = false;
+  @Input() initialData: Usuario | null = null;
+  @Input() isEditMode = false;
 
   usuarioForm!: FormGroup;
   submitted = false;
@@ -31,17 +33,40 @@ export class UsuarioForm implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    this.usuarioForm = this.fb.group(
-      {
-        first_name: ['', [Validators.required, Validators.minLength(2)]],
-        last_name: ['', [Validators.required, Validators.minLength(2)]],
-        email: ['', [Validators.required, Validators.email]],
-        telefono: ['', [Validators.required, Validators.maxLength(15), Validators.pattern(/^\d+$/)]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', [Validators.required]]
-      },
-      { validators: passwordMatchValidator }
-    );
+    if (this.isEditMode) {
+      this.usuarioForm = this.fb.group(
+        {
+          first_name: ['', [Validators.minLength(2)]],
+          last_name: ['', [Validators.minLength(2)]],
+          email: ['', [Validators.email]],
+          telefono: ['', [Validators.maxLength(15), Validators.pattern(/^\d+$/)]],
+          password: ['', [Validators.minLength(6)]],
+          confirmPassword: ['']
+        },
+        { validators: passwordMatchValidator }
+      );
+    } else {
+      this.usuarioForm = this.fb.group(
+        {
+          first_name: ['', [Validators.required, Validators.minLength(2)]],
+          last_name: ['', [Validators.required, Validators.minLength(2)]],
+          email: ['', [Validators.required, Validators.email]],
+          telefono: ['', [Validators.required, Validators.maxLength(15), Validators.pattern(/^\d+$/)]],
+          password: ['', [Validators.required, Validators.minLength(6)]],
+          confirmPassword: ['', [Validators.required]]
+        },
+        { validators: passwordMatchValidator }
+      );
+    }
+
+    if (this.initialData) {
+      this.usuarioForm.patchValue({
+        first_name: this.initialData.first_name,
+        last_name: this.initialData.last_name,
+        email: this.initialData.email,
+        telefono: this.initialData.telefono
+      });
+    }
   }
 
   onCancel() {

@@ -71,6 +71,12 @@ export const routes: Routes = [
         title: 'Euyenid & Edder | Nuevo Usuario',
         loadComponent: () => import('./layouts/private-layout/pages/usuarios/usuario-create/usuario-create').then(m => m.UsuarioCreate)
       }
+      ,
+      {
+        path: 'usuarios/editar/:id',
+        title: 'Euyenid & Edder | Editar Usuario',
+        loadComponent: () => import('./layouts/private-layout/pages/usuarios/usuario-edit/usuario-edit').then(m => m.UsuarioEdit)
+      }
       
     ]
   },
