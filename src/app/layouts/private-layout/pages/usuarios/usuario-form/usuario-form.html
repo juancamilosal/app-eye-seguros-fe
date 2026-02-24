@@ -90,36 +90,37 @@
             class="absolute inset-y-0 right-0 flex items-center px-3 mt-7 text-gray-500 hover:text-[#243B88]"
             tabindex="-1"
           >
-            <svg
-              *ngIf="!showPassword"
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-              />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-            <svg
-              *ngIf="showPassword"
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M3 3l18 18M10.584 10.587A3 3 0 0113.41 13.41M9.88 9.88L5.5 5.5M9.88 9.88A3 3 0 0114.12 14.12M9.88 9.88L9.88 9.88"
-              />
-              <path
-                d="M6.228 6.228C4.42 7.385 3.135 9.128 2.458 12c1.274 4.057 5.065 7 9.542 7 1.39 0 2.724-.254 3.956-.72M17.772 17.772C19.58 16.615 20.865 14.872 21.542 12 20.268 7.943 16.477 5 12 5c-1.54 0-3.013.292-4.365.82"
-              />
-            </svg>
+            @if (!showPassword) {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            } @else {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M3 3l18 18M10.584 10.587A3 3 0 013.41 13.41M9.88 9.88L5.5 5.5M9.88 9.88A3 3 0 0114.12 14.12M9.88 9.88L9.88 9.88"
+                />
+                <path
+                  d="M6.228 6.228C4.42 7.385 3.135 9.128 2.458 12c1.274 4.057 5.065 7 9.542 7 1.39 0 2.724-.254 3.956-.72M17.772 17.772C19.58 16.615 20.865 14.872 21.542 12 20.268 7.943 16.477 5 12 5c-1.54 0-3.013.292-4.365.82"
+                />
+              </svg>
+            }
           </button>
           <div class="absolute left-0 top-full h-5 pointer-events-none">
             @if (isInvalid('password')) {
@@ -140,36 +141,37 @@
             class="absolute inset-y-0 right-0 flex items-center px-3 mt-7 text-gray-500 hover:text-[#243B88]"
             tabindex="-1"
           >
-            <svg
-              *ngIf="!showConfirmPassword"
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-              />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-            <svg
-              *ngIf="showConfirmPassword"
-              xmlns="http://www.w3.org/2000/svg"
-              class="w-5 h-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M3 3l18 18M10.584 10.587A3 3 0 013.41 13.41M9.88 9.88L5.5 5.5M9.88 9.88A3 3 0 0114.12 14.12M9.88 9.88L9.88 9.88"
-              />
-              <path
-                d="M6.228 6.228C4.42 7.385 3.135 9.128 2.458 12c1.274 4.057 5.065 7 9.542 7 1.39 0 2.724-.254 3.956-.72M17.772 17.772C19.58 16.615 20.865 14.872 21.542 12 20.268 7.943 16.477 5 12 5c-1.54 0-3.013.292-4.365.82"
-              />
-            </svg>
+            @if (!showConfirmPassword) {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            } @else {
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="w-5 h-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M3 3l18 18M10.584 10.587A3 3 0 013.41 13.41M9.88 9.88L5.5 5.5M9.88 9.88A3 3 0 0114.12 14.12M9.88 9.88L9.88 9.88"
+                />
+                <path
+                  d="M6.228 6.228C4.42 7.385 3.135 9.128 2.458 12c1.274 4.057 5.065 7 9.542 7 1.39 0 2.724-.254 3.956-.72M17.772 17.772C19.58 16.615 20.865 14.872 21.542 12 20.268 7.943 16.477 5 12 5c-1.54 0-3.013.292-4.365.82"
+                />
+              </svg>
+            }
           </button>
           <div class="absolute left-0 top-full h-5 pointer-events-none">
             @if (isInvalid('confirmPassword')) {
