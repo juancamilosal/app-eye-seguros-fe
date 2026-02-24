@@ -108,6 +108,9 @@ export class AseguradoraCard implements OnChanges {
         buffer[e.key] = this.aseguradora[e.key] || '';
       }
     });
+    
+    // Asegurar que el nombre esté en el buffer
+    buffer['nombre'] = this.aseguradora?.nombre || '';
 
     this.editBuffer = buffer;
   }
