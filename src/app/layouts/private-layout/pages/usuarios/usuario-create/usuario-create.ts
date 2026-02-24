@@ -17,6 +17,7 @@ export class UsuarioCreate {
   isSubmitting = false;
   isModalVisible = false;
   notification: NotificationData | null = null;
+  private navigateAfterClose = false;
 
   constructor(private router: Router, private usuarioService: UsuarioService) {}
 
@@ -42,7 +43,14 @@ export class UsuarioCreate {
     this.usuarioService.crearUsuario(payload).subscribe({
       next: () => {
         this.isSubmitting = false;
-        this.goBack();
+        this.notification = {
+          type: 'success',
+          title: 'Usuario creado',
+          message: 'El usuario se creó satisfactoriamente.',
+          confirmable: false
+        };
+        this.isModalVisible = true;
+        this.navigateAfterClose = true;
       },
       error: (err) => {
         this.isSubmitting = false;
@@ -54,6 +62,7 @@ export class UsuarioCreate {
           confirmable: false
         };
         this.isModalVisible = true;
+        this.navigateAfterClose = false;
       }
     });
   }
@@ -61,6 +70,10 @@ export class UsuarioCreate {
   onModalClosed() {
     this.isModalVisible = false;
     this.notification = null;
+     if (this.navigateAfterClose) {
+       this.navigateAfterClose = false;
+       this.goBack();
+     }
   }
 
   private getErrorMessage(err: any): string {

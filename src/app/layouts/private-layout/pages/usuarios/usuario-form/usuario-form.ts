@@ -25,6 +25,8 @@ export class UsuarioForm implements OnInit {
 
   usuarioForm!: FormGroup;
   submitted = false;
+  showPassword = false;
+  showConfirmPassword = false;
 
   constructor(private fb: FormBuilder) {}
 
@@ -61,6 +63,14 @@ export class UsuarioForm implements OnInit {
       password: value.password
     };
     this.save.emit(payload);
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   onNumericInput(event: Event, controlName: keyof Usuario, maxLen = 15) {
