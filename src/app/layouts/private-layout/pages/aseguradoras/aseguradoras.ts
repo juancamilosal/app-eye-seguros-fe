@@ -26,7 +26,10 @@ export class Aseguradoras implements OnInit {
       return;
     }
     this.loading = true;
-    this.aseguradoraService.buscarPorNombre(this.searchTerm, 50).subscribe({
+    this.aseguradoraService.obtenerAseguradoras({
+      'filter[nombre][_icontains]': this.searchTerm,
+      'fields': '*,asesores_id.*, asesores_id.asesores_id.*'
+    }).subscribe({
       next: (resp) => {
         this.aseguradoras = resp?.data ?? [];
         this.loading = false;
