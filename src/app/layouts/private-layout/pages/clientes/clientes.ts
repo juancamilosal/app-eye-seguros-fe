@@ -22,15 +22,12 @@ export class Clientes implements OnInit {
   notification: NotificationData | null = null;
   clienteToDelete: Client | null = null;
   private search$ = new Subject<string>();
-  // Modal para direcciones
   isAddressModalVisible = false;
   addressModalTitle = '';
   addressModalContent = '';
-  // Edición en línea
   editingRowId: string | null = null;
   editBuffer: Record<string, Partial<Client>> = {};
   tiposDocumento = TIPO_DOCUMENTO;
-  // Paginación
   page = 1;
   limit = 10;
   total = 0;
@@ -239,6 +236,7 @@ export class Clientes implements OnInit {
       apellido: cliente.apellido,
       fecha_nacimiento: cliente.fecha_nacimiento,
       direccion: cliente.direccion,
+      ciudad: cliente.ciudad,
       email: cliente.email,
       numero_contacto: cliente.numero_contacto,
     };
@@ -252,7 +250,7 @@ export class Clientes implements OnInit {
     } else if (field === 'email') {
       const lowered = String(value ?? '').toLocaleLowerCase('es-ES');
       this.editBuffer[id][field] = lowered;
-    } else if (field === 'nombre' || field === 'apellido' || field === 'direccion') {
+    } else if (field === 'nombre' || field === 'apellido' || field === 'direccion' || field === 'ciudad') {
       const transformed = this.toTitleCaseSpanish(String(value ?? ''));
       this.editBuffer[id][field] = transformed;
     } else {
@@ -270,6 +268,7 @@ export class Clientes implements OnInit {
       apellido: data.apellido,
       fecha_nacimiento: data.fecha_nacimiento,
       direccion: data.direccion,
+      ciudad: data.ciudad,
       email: data.email,
       numero_contacto: data.numero_contacto,
     };

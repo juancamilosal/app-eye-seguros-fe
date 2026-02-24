@@ -38,6 +38,7 @@ export class ClienteForm implements OnInit {
       apellido: [null, [Validators.required, Validators.minLength(2)]],
       fecha_nacimiento: [null, [Validators.required]],
       direccion: [null, [Validators.required, Validators.minLength(5)]],
+      ciudad: [null, [Validators.required, Validators.minLength(2)]],
       numero_contacto: [null, [Validators.required, Validators.maxLength(10), Validators.pattern(/^\d+$/)]],
       email: [null, [Validators.required, Validators.email]],
       // Información Laboral (campos opcionales)
@@ -126,6 +127,7 @@ export class ClienteForm implements OnInit {
         apellido: 'El Apellido es Obligatorio',
         fechaNacimiento: 'La Fecha de Nacimiento es Obligatoria',
         direccion: 'La Dirección es Obligatoria',
+        ciudad: 'La Ciudad es Obligatoria',
         numeroContacto: 'El Número de Contacto es Obligatorio',
         email: 'El Email es Obligatorio',
       };
